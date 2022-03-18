@@ -11,7 +11,7 @@ import (
 
 type User struct {
 	Address   string `json:"address" binding:"required"`
-	Email     string `json:"email" binding:"required"`
+	Email     string `json:"email" binding:"required,email"`
 	UUID      string `json:"uuid"`
 	Timestamp int64  `json:"timestamp"`
 	Type      string `json:"type" binding:"required"`
