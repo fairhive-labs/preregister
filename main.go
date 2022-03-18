@@ -1,7 +1,24 @@
 package main
 
-import "fmt"
+import (
+	"log"
+
+	"github.com/gin-gonic/gin"
+)
 
 func main() {
-	fmt.Println("preregister user")
+	r := setupRouter()
+	log.Fatal(r.Run())
+}
+
+func setupRouter() *gin.Engine {
+	r := gin.Default()
+	r.GET("/", validate)
+	return r
+}
+
+func validate(c *gin.Context) {
+	c.JSON(200, gin.H{
+		"validated": true,
+	})
 }
