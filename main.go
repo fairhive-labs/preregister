@@ -3,11 +3,14 @@ package main
 import (
 	"log"
 	"net/http"
+	"regexp"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
+
+var jwtregexp = regexp.MustCompile(`^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]*$`)
 
 type User struct {
 	Address   string `json:"address" binding:"required,eth_addr"`
@@ -44,6 +47,10 @@ func register(c *gin.Context) {
 
 func validate(c *gin.Context) {
 	t := c.Param("token")
+	if !jwtregexp.MatchString(t) {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
 	c.JSON(http.StatusOK, gin.H{
 		"token":     t,
 		"validated": true,
