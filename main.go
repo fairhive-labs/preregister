@@ -14,7 +14,7 @@ type User struct {
 	Email     string `json:"email" binding:"required,email"`
 	UUID      string `json:"uuid"`
 	Timestamp int64  `json:"timestamp"`
-	Type      string `json:"type" binding:"required"`
+	Type      string `json:"type" binding:"required,oneof=client talent agent mentor"`
 	Validated bool   `json:"validated"`
 }
 
