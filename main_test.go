@@ -243,31 +243,90 @@ func TestRegister(t *testing.T) {
 
 func TestValidate(t *testing.T) {
 	r := setupRouter()
-	w := httptest.NewRecorder()
-	token := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmYWlyaGl2ZSIsIm5hbWUiOiJKb2huIERvZSIsImlhdCI6MTUxNjIzOTAyMn0.EhPeianM8j3sd78CAMQtrrlGRugJnX725VqkOqgzxmY"
-	req, _ := http.NewRequest("GET", fmt.Sprintf("/validate/%s", token), nil)
-	r.ServeHTTP(w, req)
 
-	if w.Code != http.StatusOK {
-		t.Errorf("Status code is incorrect, got %d, want %d", w.Code, http.StatusOK)
-		t.Errorf(w.Body.String())
-		t.FailNow()
+	tt := []struct {
+		name   string
+		token  string
+		status int
+		err    string
+	}{
+		{
+			"valid token",
+			"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpvaG4uZG9lQG1haWxzZXJ2aWNlLmNvbSIsInV1aWQiOiI4MGM3MWVlZS01ZGIyLTRlODctOWIwNC02ODZhYWRkOGQ1N2EifQ.96OWDzW6mL78KjAuVOwa4erGSeMeusWTYFv6Wsnv5-k",
+			http.StatusOK,
+			"",
+		},
+		{
+			"no token",
+			"",
+			http.StatusNotFound,
+			"",
+		},
+		{
+			"malformated token",
+			"eyJhbGciOiJIUzI1N.ZZZZZ.dczrracv.de",
+			http.StatusUnauthorized,
+			`{"error":"Unauthorized"}`,
+		},
 	}
 
-	var res struct {
-		Validated bool
-		Token     string
-	}
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			w := httptest.NewRecorder()
+			token := tc.token
+			req, _ := http.NewRequest("GET", fmt.Sprintf("/validate/%s", token), nil)
+			r.ServeHTTP(w, req)
 
-	json.NewDecoder(w.Body).Decode(&res)
+			switch tc.status {
+			case http.StatusOK:
+				if w.Code != http.StatusOK {
+					t.Errorf("Status code is incorrect, got %d, want %d", w.Code, http.StatusOK)
+					t.Errorf(w.Body.String())
+					t.FailNow()
+				}
 
-	if !res.Validated {
-		t.Errorf("Validated is incorrect, got %v, want %v", res.Validated, true)
-		t.FailNow()
-	}
+				var res struct {
+					Validated bool
+					Token     string
+				}
 
-	if res.Token != token {
-		t.Errorf("Token is incorrect, got %s, want %s", res.Token, token)
-		t.FailNow()
+				json.NewDecoder(w.Body).Decode(&res)
+
+				if !res.Validated {
+					t.Errorf("Validated is incorrect, got %v, want %v", res.Validated, true)
+					t.FailNow()
+				}
+
+				if res.Token != token {
+					t.Errorf("Token is incorrect, got %s, want %s", res.Token, token)
+					t.FailNow()
+				}
+			case http.StatusNotFound:
+				if w.Code != http.StatusNotFound {
+					t.Errorf("Status code is incorrect, got %d, want %d", w.Code, http.StatusNotFound)
+					t.Errorf(w.Body.String())
+					t.FailNow()
+				}
+			case http.StatusUnauthorized:
+				if w.Code != http.StatusUnauthorized {
+					t.Errorf("Status code is incorrect, got %d, want %d", w.Code, http.StatusUnauthorized)
+					t.Errorf(w.Body.String())
+					t.FailNow()
+				}
+
+				if w.Body == nil {
+					t.Errorf("Response body cannot be nil")
+					t.FailNow()
+				}
+
+				if w.Body.String() != tc.err {
+					t.Errorf("Error is incorrect, got %s, want %s", w.Body.String(), tc.err)
+					t.FailNow()
+				}
+			default:
+				t.Errorf("status %d not supported", tc.status)
+				t.FailNow()
+			}
+		})
 	}
 }
