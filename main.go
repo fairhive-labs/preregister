@@ -13,7 +13,7 @@ func main() {
 
 func setupRouter() *gin.Engine {
 	r := gin.Default()
-	r.GET("/", validate)
+	r.GET("/validate/:token", validate)
 	return r
 }
 

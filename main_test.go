@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -10,7 +11,8 @@ import (
 func TestValidate(t *testing.T) {
 	r := setupRouter()
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/", nil)
+	token := "12345"
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/validate/%s", token), nil)
 	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusOK {
