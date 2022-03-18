@@ -245,11 +245,12 @@ func TestValidate(t *testing.T) {
 	r := setupRouter()
 	w := httptest.NewRecorder()
 	token := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmYWlyaGl2ZSIsIm5hbWUiOiJKb2huIERvZSIsImlhdCI6MTUxNjIzOTAyMn0.EhPeianM8j3sd78CAMQtrrlGRugJnX725VqkOqgzxmY"
-	req, _ := http.NewRequest("GET", fmt.Sprintf("/validate?token=%s", token), nil)
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/validate/%s", token), nil)
 	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusOK {
 		t.Errorf("Status code is incorrect, got %d, want %d", w.Code, http.StatusOK)
+		t.Errorf(w.Body.String())
 		t.FailNow()
 	}
 
