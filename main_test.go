@@ -33,10 +33,21 @@ func TestRegister(t *testing.T) {
 		t.FailNow()
 	}
 
+	m := map[string]interface{}{}
+	if err := json.Unmarshal(jsonUser, &m); err != nil {
+		t.Errorf("Cannot unmarshal marshaled user: %v", err)
+		t.FailNow()
+	}
+
+	if len(m) != 6 {
+		t.Errorf("Incorrect number of field in json, got %d, want %d", len(m), 6)
+		t.FailNow()
+	}
+
 	var u User
 	err := json.NewDecoder(w.Body).Decode(&u)
 	if err != nil {
-		t.Errorf("Cannot decode response body %v", w.Body)
+		t.Errorf("Cannot decode response body %v, %v", w.Body, err)
 		t.FailNow()
 	}
 
@@ -61,7 +72,7 @@ func TestRegister(t *testing.T) {
 	}
 
 	if _, err := uuid.Parse(u.UUID); err != nil {
-		t.Errorf("UUID is incorrect, cannot be parsed")
+		t.Errorf("UUID is incorrect, cannot be parsed: %v", err)
 		t.FailNow()
 	}
 
