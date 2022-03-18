@@ -29,5 +29,16 @@ func TestValidate(t *testing.T) {
 	if !res.Validated {
 		t.Errorf("validated = %v, exp : %v", res.Validated, true)
 	}
+}
 
+func TestRegister(t *testing.T) {
+	r := setupRouter()
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("POST", "/", nil)
+	r.ServeHTTP(w, req)
+
+	if w.Code != http.StatusNotImplemented {
+		t.Errorf("code = %d, exp : %d", w.Code, http.StatusNotImplemented)
+		t.FailNow()
+	}
 }
