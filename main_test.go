@@ -244,8 +244,8 @@ func TestRegister(t *testing.T) {
 func TestValidate(t *testing.T) {
 	r := setupRouter()
 	w := httptest.NewRecorder()
-	token := "12345"
-	req, _ := http.NewRequest("GET", fmt.Sprintf("/validate/%s", token), nil)
+	token := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmYWlyaGl2ZSIsIm5hbWUiOiJKb2huIERvZSIsImlhdCI6MTUxNjIzOTAyMn0.EhPeianM8j3sd78CAMQtrrlGRugJnX725VqkOqgzxmY"
+	req, _ := http.NewRequest("GET", fmt.Sprintf("/validate?token=%s", token), nil)
 	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusOK {

@@ -18,6 +18,10 @@ type User struct {
 	Validated bool   `json:"validated"`
 }
 
+type Validation struct {
+	Token string `form:"token" binding:"required"`
+}
+
 func main() {
 	r := setupRouter()
 	log.Fatal(r.Run())
@@ -26,7 +30,7 @@ func main() {
 func setupRouter() *gin.Engine {
 	r := gin.Default()
 	r.POST("/", register)
-	r.GET("/validate/:token", validate)
+	r.GET("/validate", validate)
 	return r
 }
 
@@ -43,9 +47,13 @@ func register(c *gin.Context) {
 }
 
 func validate(c *gin.Context) {
-	t := c.Param("token")
+	var t Validation
+	if err := c.ShouldBindQuery(&t); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 	c.JSON(http.StatusOK, gin.H{
-		"token":     t,
+		"token":     t.Token,
 		"validated": true,
 	})
 }
