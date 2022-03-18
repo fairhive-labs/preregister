@@ -8,6 +8,18 @@ import (
 	"testing"
 )
 
+func TestRegister(t *testing.T) {
+	r := setupRouter()
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("POST", "/", nil)
+	r.ServeHTTP(w, req)
+
+	if w.Code != http.StatusNotImplemented {
+		t.Errorf("code = %d, exp : %d", w.Code, http.StatusNotImplemented)
+		t.FailNow()
+	}
+}
+
 func TestValidate(t *testing.T) {
 	r := setupRouter()
 	w := httptest.NewRecorder()
@@ -22,23 +34,18 @@ func TestValidate(t *testing.T) {
 
 	var res struct {
 		Validated bool
+		Token     string
 	}
 
 	json.NewDecoder(w.Body).Decode(&res)
 
 	if !res.Validated {
 		t.Errorf("validated = %v, exp : %v", res.Validated, true)
+		t.FailNow()
 	}
-}
 
-func TestRegister(t *testing.T) {
-	r := setupRouter()
-	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("POST", "/", nil)
-	r.ServeHTTP(w, req)
-
-	if w.Code != http.StatusNotImplemented {
-		t.Errorf("code = %d, exp : %d", w.Code, http.StatusNotImplemented)
+	if res.Token != token {
+		t.Errorf("res.Token = %s, exp : %s", res.Token, token)
 		t.FailNow()
 	}
 }
