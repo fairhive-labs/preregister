@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -11,10 +12,23 @@ import (
 func TestRegister(t *testing.T) {
 	r := setupRouter()
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("POST", "/", nil)
+
+	address := "0x8ba1f109551bD432803012645Ac136ddd64DBA72"
+	email := "john.doe@mailservice.com"
+	utype := "talent"
+
+	u := User{
+		Address: address,
+		Email:   email,
+		Type:    utype,
+	}
+
+	jsonUser, _ := json.Marshal(u)
+
+	req, _ := http.NewRequest("POST", "/", bytes.NewBuffer(jsonUser))
 	r.ServeHTTP(w, req)
 
-	if w.Code != http.StatusNotImplemented {
+	if w.Code != http.StatusCreated {
 		t.Errorf("code = %d, exp : %d", w.Code, http.StatusNotImplemented)
 		t.FailNow()
 	}
