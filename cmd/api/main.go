@@ -4,10 +4,8 @@ import (
 	"log"
 	"net/http"
 	"regexp"
-	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 
 	"github.com/fairhive-labs/preregister/internal/data"
 )
@@ -28,10 +26,7 @@ func (app App) register(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	u.UUID = uuid.New().String()
-	u.Timestamp = time.Now().UnixMilli()
-	u.Validated = false
-
+	u.Setup()
 	(*app.db).Save(&u)
 
 	c.JSON(http.StatusCreated, u)
