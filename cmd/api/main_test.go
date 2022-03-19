@@ -13,7 +13,7 @@ import (
 )
 
 func TestRegister(t *testing.T) {
-	app := *NewApp(data.MokeDB{})
+	app := *NewApp(data.MockDB)
 	r := setupRouter(app)
 	tt := []struct {
 		name    string
@@ -244,7 +244,7 @@ func TestRegister(t *testing.T) {
 }
 
 func TestValidate(t *testing.T) {
-	app := *NewApp(data.MokeDB{})
+	app := *NewApp(data.MockDB)
 	r := setupRouter(app)
 
 	tt := []struct {

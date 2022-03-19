@@ -58,7 +58,7 @@ func setupRouter(app App) *gin.Engine {
 }
 
 func main() {
-	app := *NewApp(data.MokeDB{})
+	app := *NewApp(data.MockDB)
 	r := setupRouter(app)
 	log.Fatal(r.Run())
 }

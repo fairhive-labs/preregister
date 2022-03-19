@@ -6,9 +6,11 @@ type DB interface {
 	FindAll()
 }
 
-type MokeDB struct {
+type mockDB struct {
 }
 
-func (db MokeDB) Save(u *User)   {}
-func (db MokeDB) Update(u *User) {}
-func (db MokeDB) FindAll()       {}
+func (db mockDB) Save(u *User)   {}
+func (db mockDB) Update(u *User) {}
+func (db mockDB) FindAll()       {}
+
+var MockDB = mockDB{}
