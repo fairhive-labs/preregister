@@ -8,33 +8,22 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+
+	"github.com/fairhive-labs/preregister/internal/data"
 )
+
+type App struct {
+	db *data.DB
+}
+
+func NewApp(db data.DB) *App {
+	return &App{&db}
+}
 
 var jwtregexp = regexp.MustCompile(`^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]*$`)
 
-type User struct {
-	Address   string `json:"address" binding:"required,eth_addr"`
-	Email     string `json:"email" binding:"required,email"`
-	UUID      string `json:"uuid"`
-	Timestamp int64  `json:"timestamp"`
-	Type      string `json:"type" binding:"required,oneof=client talent agent mentor"`
-	Validated bool   `json:"validated"`
-}
-
-func main() {
-	r := setupRouter()
-	log.Fatal(r.Run())
-}
-
-func setupRouter() *gin.Engine {
-	r := gin.Default()
-	r.POST("/", register)
-	r.GET("/validate/:token", validate)
-	return r
-}
-
-func register(c *gin.Context) {
-	var u User
+func (app App) register(c *gin.Context) {
+	var u data.User
 	if err := c.ShouldBindJSON(&u); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -42,17 +31,39 @@ func register(c *gin.Context) {
 	u.UUID = uuid.New().String()
 	u.Timestamp = time.Now().UnixMilli()
 	u.Validated = false
+
+	(*app.db).Save(&u)
+
 	c.JSON(http.StatusCreated, u)
 }
 
-func validate(c *gin.Context) {
+func (app App) validate(c *gin.Context) {
 	t := c.Param("token")
 	if !jwtregexp.MatchString(t) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
+
+	//@TODO: get email, address, uuid or retrieve from DB...
+	u := data.User{}
+	u.Validated = true
+	(*app.db).Update(&u)
+
 	c.JSON(http.StatusOK, gin.H{
 		"token":     t,
 		"validated": true,
 	})
+}
+
+func setupRouter(app App) *gin.Engine {
+	r := gin.Default()
+	r.POST("/", app.register)
+	r.GET("/validate/:token", app.validate)
+	return r
+}
+
+func main() {
+	app := *NewApp(data.MokeDB{})
+	r := setupRouter(app)
+	log.Fatal(r.Run())
 }

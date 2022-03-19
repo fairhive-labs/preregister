@@ -8,11 +8,13 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/fairhive-labs/preregister/internal/data"
 	"github.com/google/uuid"
 )
 
 func TestRegister(t *testing.T) {
-	r := setupRouter()
+	app := *NewApp(data.MokeDB{})
+	r := setupRouter(app)
 	tt := []struct {
 		name    string
 		address string
@@ -148,7 +150,7 @@ func TestRegister(t *testing.T) {
 			email := tc.email
 			utype := tc.utype
 
-			jsonUser, _ := json.Marshal(User{
+			jsonUser, _ := json.Marshal(data.User{
 				Address: address,
 				Email:   email,
 				Type:    utype,
@@ -191,7 +193,7 @@ func TestRegister(t *testing.T) {
 					t.FailNow()
 				}
 
-				var u User
+				var u data.User
 				err := json.NewDecoder(w.Body).Decode(&u)
 				if err != nil {
 					t.Errorf("Cannot decode response body %v, %v", w.Body, err)
@@ -242,7 +244,8 @@ func TestRegister(t *testing.T) {
 }
 
 func TestValidate(t *testing.T) {
-	r := setupRouter()
+	app := *NewApp(data.MokeDB{})
+	r := setupRouter(app)
 
 	tt := []struct {
 		name   string

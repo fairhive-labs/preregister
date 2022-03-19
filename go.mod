@@ -1,4 +1,4 @@
-module github/fairhive-labs/preregister
+module github.com/fairhive-labs/preregister
 
 go 1.17
 
