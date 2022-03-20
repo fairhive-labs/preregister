@@ -41,7 +41,6 @@ func (app App) validate(c *gin.Context) {
 
 	//@TODO: get email, address, uuid or retrieve from DB...
 	u := data.User{}
-	u.Validated = true
 	(*app.db).Update(&u)
 
 	c.JSON(http.StatusOK, gin.H{

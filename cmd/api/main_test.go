@@ -187,9 +187,9 @@ func TestRegister(t *testing.T) {
 					t.Errorf("Cannot unmarshal marshaled user: %v", err)
 					t.FailNow()
 				}
-
-				if len(m) != 6 {
-					t.Errorf("Incorrect number of field in json, got %d, want %d", len(m), 6)
+				n := 5
+				if len(m) != n {
+					t.Errorf("Incorrect number of field in json, got %d, want %d", len(m), n)
 					t.FailNow()
 				}
 
@@ -230,10 +230,6 @@ func TestRegister(t *testing.T) {
 					t.FailNow()
 				}
 
-				if u.Validated {
-					t.Errorf("Validated is incorrect, got %v, want %v", u.Validated, false)
-					t.FailNow()
-				}
 			default:
 				t.Errorf("status %d not supported", tc.status)
 				t.FailNow()

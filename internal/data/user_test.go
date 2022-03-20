@@ -25,9 +25,4 @@ func TestSetup(t *testing.T) {
 		t.Errorf("Timestamp is incorrect, cannot be set")
 		t.FailNow()
 	}
-
-	if u.Validated {
-		t.Errorf("Validated is incorrect, got %v, want %v", u.Validated, false)
-		t.FailNow()
-	}
 }
