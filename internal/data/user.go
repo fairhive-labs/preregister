@@ -18,3 +18,13 @@ func (u *User) Setup() {
 	u.UUID = uuid.New().String()
 	u.Timestamp = time.Now().UnixMilli()
 }
+
+func NewUser(a, e, t string) *User {
+	u := &User{
+		Address: a,
+		Email:   e,
+		Type:    t,
+	}
+	u.Setup()
+	return u
+}

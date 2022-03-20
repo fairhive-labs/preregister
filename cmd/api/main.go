@@ -26,25 +26,23 @@ func (app App) register(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	u.Setup()
-	(*app.db).Save(&u)
-
-	c.JSON(http.StatusCreated, u)
+	u.Setup()                     // not necessary there...
+	c.JSON(http.StatusCreated, u) // will be replace by accepted
 }
 
 func (app App) validate(c *gin.Context) {
-	t := c.Param("token")
-	if !jwtregexp.MatchString(t) {
+	token := c.Param("token")
+	if !jwtregexp.MatchString(token) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
 
-	//@TODO: get email, address, uuid or retrieve from DB...
-	u := data.User{}
-	(*app.db).Update(&u)
+	//@TODO: get email, address, uuid from JWT
+	a, e, t2 := "", "", ""
+	(*app.db).Save(data.NewUser(a, e, t2))
 
 	c.JSON(http.StatusOK, gin.H{
-		"token":     t,
+		"token":     token,
 		"validated": true,
 	})
 }
