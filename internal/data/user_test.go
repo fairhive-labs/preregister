@@ -43,7 +43,7 @@ func TestNewUSer(t *testing.T) {
 		t.FailNow()
 	}
 
-	if !u.IsSupportedUser() {
+	if !u.HasSupportedType() {
 		t.Errorf("Type is incorrect, got %s, want %s", u.Type, utype)
 		t.FailNow()
 	}

@@ -51,6 +51,27 @@ func TestRegister(t *testing.T) {
 			http.StatusCreated,
 			"",
 		},
+		{"valid mentor",
+			"0x8ba1f109551bD432803012645Ac136ddd64DBA72",
+			"john.doe@mailservice.com",
+			"advisor",
+			http.StatusCreated,
+			"",
+		},
+		{"valid mentor",
+			"0x8ba1f109551bD432803012645Ac136ddd64DBA72",
+			"john.doe@mailservice.com",
+			"contributor",
+			http.StatusCreated,
+			"",
+		},
+		{"valid mentor",
+			"0x8ba1f109551bD432803012645Ac136ddd64DBA72",
+			"john.doe@mailservice.com",
+			"investor",
+			http.StatusCreated,
+			"",
+		},
 		{"empty address",
 			"",
 			"john.doe@mailservice.com",
@@ -210,7 +231,7 @@ func TestRegister(t *testing.T) {
 					t.FailNow()
 				}
 
-				if !u.IsSupportedUser() {
+				if !u.HasSupportedType() {
 					t.Errorf("Type is incorrect, got %s, want %s", u.Type, utype)
 					t.FailNow()
 				}
@@ -239,7 +260,7 @@ func TestRegister(t *testing.T) {
 
 }
 
-func TestValidate(t *testing.T) {
+func TestActivate(t *testing.T) {
 	app := *NewApp(data.MockDB)
 	r := setupRouter(app)
 
@@ -273,7 +294,7 @@ func TestValidate(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			w := httptest.NewRecorder()
 			token := tc.token
-			req, _ := http.NewRequest("GET", fmt.Sprintf("/validate/%s", token), nil)
+			req, _ := http.NewRequest("GET", fmt.Sprintf("/activate/%s", token), nil)
 			r.ServeHTTP(w, req)
 
 			switch tc.status {
@@ -285,14 +306,14 @@ func TestValidate(t *testing.T) {
 				}
 
 				var res struct {
-					Validated bool
+					Activated bool
 					Token     string
 				}
 
 				json.NewDecoder(w.Body).Decode(&res)
 
-				if !res.Validated {
-					t.Errorf("Validated is incorrect, got %v, want %v", res.Validated, true)
+				if !res.Activated {
+					t.Errorf("Activated is incorrect, got %v, want %v", res.Activated, true)
 					t.FailNow()
 				}
 

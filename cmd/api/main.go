@@ -30,7 +30,7 @@ func (app App) register(c *gin.Context) {
 	c.JSON(http.StatusCreated, u) // will be replace by accepted
 }
 
-func (app App) validate(c *gin.Context) {
+func (app App) activate(c *gin.Context) {
 	token := c.Param("token")
 	if !jwtregexp.MatchString(token) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
@@ -43,14 +43,14 @@ func (app App) validate(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"token":     token,
-		"validated": true,
+		"activated": true,
 	})
 }
 
 func setupRouter(app App) *gin.Engine {
 	r := gin.Default()
 	r.POST("/", app.register)
-	r.GET("/validate/:token", app.validate)
+	r.GET("/activate/:token", app.activate)
 	return r
 }
 

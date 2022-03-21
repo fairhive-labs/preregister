@@ -29,7 +29,7 @@ func NewUser(a, e, t string) *User {
 	return u
 }
 
-func (u *User) IsSupportedUser() bool {
+func (u *User) HasSupportedType() bool {
 	switch u.Type {
 	case "advisor", "agent", "client", "contributor", "investor", "mentor", "talent":
 		return true
