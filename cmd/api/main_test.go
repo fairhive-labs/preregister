@@ -8,12 +8,11 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/fairhive-labs/preregister/internal/crypto"
 	"github.com/fairhive-labs/preregister/internal/data"
 )
 
 func TestRegister(t *testing.T) {
-	app := *NewApp(data.MockDB, crypto.JWT{})
+	app := *NewApp(data.MockDB)
 	r := setupRouter(app)
 	tt := []struct {
 		name    string
@@ -203,19 +202,12 @@ func TestRegister(t *testing.T) {
 					t.FailNow()
 				}
 
-				m := map[string]interface{}{}
-				if err := json.Unmarshal(jsonUser, &m); err != nil {
-					t.Errorf("Cannot unmarshal marshaled user: %v", err)
-					t.FailNow()
+				var res struct {
+					User data.User
+					Hash string
 				}
-				n := 5
-				if len(m) != n {
-					t.Errorf("Incorrect number of field in json, got %d, want %d", len(m), n)
-					t.FailNow()
-				}
-
-				var u data.User
-				err := json.NewDecoder(w.Body).Decode(&u)
+				err := json.NewDecoder(w.Body).Decode(&res)
+				u, _ := res.User, res.Hash //@TODO: control hash
 				if err != nil {
 					t.Errorf("Cannot decode response body %v, %v", w.Body, err)
 					t.FailNow()
@@ -256,7 +248,7 @@ func TestRegister(t *testing.T) {
 }
 
 func TestActivate(t *testing.T) {
-	app := *NewApp(data.MockDB, crypto.JWT{})
+	app := *NewApp(data.MockDB)
 	r := setupRouter(app)
 
 	tt := []struct {
