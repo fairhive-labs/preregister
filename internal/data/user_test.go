@@ -50,6 +50,7 @@ func TestMarshalling(t *testing.T) {
 		Email:   email,
 		Type:    utype,
 	}
+	jsonUser, _ = json.Marshal(u)
 	n = 3
 	m = make(map[string]interface{}, n)
 	if err := json.Unmarshal(jsonUser, &m); err != nil {
