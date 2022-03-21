@@ -9,8 +9,8 @@ import (
 type User struct {
 	Address   string `json:"address" binding:"required,eth_addr"`
 	Email     string `json:"email" binding:"required,email"`
-	UUID      string `json:"uuid"`
-	Timestamp int64  `json:"timestamp"`
+	UUID      string `json:"uuid,omitempty"`
+	Timestamp int64  `json:"timestamp,omitempty"`
 	Type      string `json:"type" binding:"required,oneof=advisor agent client contributor investor mentor talent"`
 }
 
