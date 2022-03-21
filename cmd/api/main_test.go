@@ -8,12 +8,12 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/fairhive-labs/preregister/internal/crypto"
 	"github.com/fairhive-labs/preregister/internal/data"
-	"github.com/google/uuid"
 )
 
 func TestRegister(t *testing.T) {
-	app := *NewApp(data.MockDB)
+	app := *NewApp(data.MockDB, crypto.JWT{})
 	r := setupRouter(app)
 	tt := []struct {
 		name    string
@@ -27,49 +27,49 @@ func TestRegister(t *testing.T) {
 			"0x8ba1f109551bD432803012645Ac136ddd64DBA72",
 			"john.doe@mailservice.com",
 			"talent",
-			http.StatusCreated,
+			http.StatusAccepted,
 			"",
 		},
 		{"valid client",
 			"0x8ba1f109551bD432803012645Ac136ddd64DBA72",
 			"john.doe@mailservice.com",
 			"client",
-			http.StatusCreated,
+			http.StatusAccepted,
 			"",
 		},
 		{"valid agent",
 			"0x8ba1f109551bD432803012645Ac136ddd64DBA72",
 			"john.doe@mailservice.com",
 			"agent",
-			http.StatusCreated,
+			http.StatusAccepted,
 			"",
 		},
 		{"valid mentor",
 			"0x8ba1f109551bD432803012645Ac136ddd64DBA72",
 			"john.doe@mailservice.com",
 			"mentor",
-			http.StatusCreated,
+			http.StatusAccepted,
 			"",
 		},
-		{"valid mentor",
+		{"valid advisor",
 			"0x8ba1f109551bD432803012645Ac136ddd64DBA72",
 			"john.doe@mailservice.com",
 			"advisor",
-			http.StatusCreated,
+			http.StatusAccepted,
 			"",
 		},
-		{"valid mentor",
+		{"valid contributor",
 			"0x8ba1f109551bD432803012645Ac136ddd64DBA72",
 			"john.doe@mailservice.com",
 			"contributor",
-			http.StatusCreated,
+			http.StatusAccepted,
 			"",
 		},
-		{"valid mentor",
+		{"valid investor",
 			"0x8ba1f109551bD432803012645Ac136ddd64DBA72",
 			"john.doe@mailservice.com",
 			"investor",
-			http.StatusCreated,
+			http.StatusAccepted,
 			"",
 		},
 		{"empty address",
@@ -197,9 +197,9 @@ func TestRegister(t *testing.T) {
 					t.Errorf("Error is incorrect, got %s, want %s", w.Body.String(), tc.err)
 					t.FailNow()
 				}
-			case http.StatusCreated:
-				if w.Code != http.StatusCreated {
-					t.Errorf("Status code is incorrect, got %d, want %d", w.Code, http.StatusCreated)
+			case http.StatusAccepted:
+				if w.Code != http.StatusAccepted {
+					t.Errorf("Status code is incorrect, got %d, want %d", w.Code, http.StatusAccepted)
 					t.FailNow()
 				}
 
@@ -236,18 +236,13 @@ func TestRegister(t *testing.T) {
 					t.FailNow()
 				}
 
-				if u.UUID == "" {
-					t.Errorf("UUID is incorrect, cannot be empty")
+				if u.UUID != "" {
+					t.Errorf("UUID is incorrect, got %s should be empty", u.UUID)
 					t.FailNow()
 				}
 
-				if _, err := uuid.Parse(u.UUID); err != nil {
-					t.Errorf("UUID is incorrect, cannot be parsed: %v", err)
-					t.FailNow()
-				}
-
-				if u.Timestamp == 0 {
-					t.Errorf("Timestamp is incorrect, cannot be set")
+				if u.Timestamp != 0 {
+					t.Errorf("Timestamp is incorrect, got %d should be 0", u.Timestamp)
 					t.FailNow()
 				}
 
@@ -261,7 +256,7 @@ func TestRegister(t *testing.T) {
 }
 
 func TestActivate(t *testing.T) {
-	app := *NewApp(data.MockDB)
+	app := *NewApp(data.MockDB, crypto.JWT{})
 	r := setupRouter(app)
 
 	tt := []struct {

@@ -7,15 +7,17 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/fairhive-labs/preregister/internal/crypto"
 	"github.com/fairhive-labs/preregister/internal/data"
 )
 
 type App struct {
-	db *data.DB
+	db  *data.DB
+	jwt *crypto.JWT
 }
 
-func NewApp(db data.DB) *App {
-	return &App{&db}
+func NewApp(db data.DB, jwt crypto.JWT) *App {
+	return &App{&db, &jwt}
 }
 
 var jwtregexp = regexp.MustCompile(`^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]*$`)
@@ -26,8 +28,7 @@ func (app App) register(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	u.Setup()                     // not necessary there...
-	c.JSON(http.StatusCreated, u) // will be replace by accepted
+	c.JSON(http.StatusAccepted, u)
 }
 
 func (app App) activate(c *gin.Context) {
@@ -55,7 +56,7 @@ func setupRouter(app App) *gin.Engine {
 }
 
 func main() {
-	app := *NewApp(data.MockDB)
+	app := *NewApp(data.MockDB, crypto.JWT{})
 	r := setupRouter(app)
 	log.Fatal(r.Run())
 }
