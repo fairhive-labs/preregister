@@ -210,7 +210,7 @@ func TestRegister(t *testing.T) {
 					t.FailNow()
 				}
 
-				if u.Type != "talent" && u.Type != "agent" && u.Type != "mentor" && u.Type != "client" {
+				if !u.IsSupportedUser() {
 					t.Errorf("Type is incorrect, got %s, want %s", u.Type, utype)
 					t.FailNow()
 				}
