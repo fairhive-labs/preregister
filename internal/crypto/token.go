@@ -11,6 +11,7 @@ type Token interface {
 	Create(user *data.User, t time.Time) (string, error)
 	Extract(token string) (string, string, string)
 	Hash(token string) string
+	Name() string
 }
 
 type UserClaims struct {
@@ -18,17 +19,21 @@ type UserClaims struct {
 	jwt.RegisteredClaims
 }
 
-type JWTHS struct {
-	secret []byte
+type JWTBase struct {
 	method jwt.SigningMethod
 }
 
+type JWTHS struct {
+	secret []byte
+	JWTBase
+}
+
 func NewJWTHS256(s string) *JWTHS {
-	return &JWTHS{[]byte(s), jwt.SigningMethodHS256}
+	return &JWTHS{[]byte(s), JWTBase{jwt.SigningMethodHS256}}
 }
 
 func NewJWTHS512(s string) *JWTHS {
-	return &JWTHS{[]byte(s), jwt.SigningMethodHS512}
+	return &JWTHS{[]byte(s), JWTBase{jwt.SigningMethodHS512}}
 }
 
 func (j JWTHS) Create(user *data.User, t time.Time) (string, error) {
@@ -51,4 +56,8 @@ func (j JWTHS) Extract(token string) (string, string, string) {
 
 func (j JWTHS) Hash(token string) string {
 	return "hash"
+}
+
+func (j JWTHS) Name() string {
+	return j.method.Alg()
 }

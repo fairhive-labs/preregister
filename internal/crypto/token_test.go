@@ -28,19 +28,16 @@ func TestNewJWTHS256(t *testing.T) {
 func TestCreate(t *testing.T) {
 
 	tt := []struct {
-		name  string
 		time  time.Time
 		token string
 		jwt   Token
 	}{
 		{
-			"HS256",
 			time.UnixMicro(timestamp),
 			tokenHS256,
 			NewJWTHS256(secret),
 		},
 		{
-			"HS512",
 			time.UnixMicro(timestamp),
 			tokenHS512,
 			NewJWTHS512(secret),
@@ -53,7 +50,7 @@ func TestCreate(t *testing.T) {
 			Email:   email,
 			Type:    utype,
 		}
-		t.Run(tc.name, func(t *testing.T) {
+		t.Run(tc.jwt.Name(), func(t *testing.T) {
 			ss, err := tc.jwt.Create(u, tc.time)
 			if err != nil {
 				t.Errorf("error creating user %v : %v", *u, err)
@@ -73,4 +70,14 @@ func TestExtract(t *testing.T) {
 
 func TestHash(t *testing.T) {
 
+}
+
+func TestName(t *testing.T) {
+	j := NewJWTHS256(secret)
+	n := "HS256"
+
+	if j.method.Alg() != n {
+		t.Errorf("incorrect method name, got %s, want %s", j.method.Alg(), n)
+		t.FailNow()
+	}
 }
