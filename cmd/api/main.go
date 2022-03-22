@@ -4,11 +4,13 @@ import (
 	"log"
 	"net/http"
 	"regexp"
+	"time"
 
 	"github.com/gin-gonic/gin"
 
 	"github.com/fairhive-labs/preregister/internal/crypto"
 	"github.com/fairhive-labs/preregister/internal/data"
+	pwdgen "github.com/trendev/go-pwdgen/generator"
 )
 
 type App struct {
@@ -17,7 +19,7 @@ type App struct {
 }
 
 func NewApp(db data.DB) *App {
-	return &App{&db, nil}
+	return &App{&db, crypto.NewJWTHS512(pwdgen.Generate(64))}
 }
 
 var jwtregexp = regexp.MustCompile(`^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]*$`)
@@ -28,7 +30,13 @@ func (app App) register(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	token := ""          // Create JWT
+
+	token, err := app.jwt.Create(&u, time.Now())
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	h := token + ".hash" // hash token (SHA3)
 	// Send JWT Token (email using template)
 	c.JSON(http.StatusAccepted, gin.H{
