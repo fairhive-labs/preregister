@@ -7,15 +7,17 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/fairhive-labs/preregister/internal/crypto"
 	"github.com/fairhive-labs/preregister/internal/data"
 )
 
 type App struct {
-	db *data.DB
+	db  *data.DB
+	jwt crypto.Token
 }
 
 func NewApp(db data.DB) *App {
-	return &App{&db}
+	return &App{&db, nil}
 }
 
 var jwtregexp = regexp.MustCompile(`^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]*$`)
