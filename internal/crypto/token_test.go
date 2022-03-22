@@ -17,6 +17,14 @@ const (
 	tokenHS512 = "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhZGRyZXNzIjoiMHg4YmExZjEwOTU1MWJENDMyODAzMDEyNjQ1QWMxMzZkZGQ2NERCQTcyIiwiZW1haWwiOiJqb2huLmRvZUBtYWlsc2VydmljZS5jb20iLCJ0eXBlIjoidGFsZW50IiwiaXNzIjoiZmFpcmhpdmUuaW8iLCJleHAiOjE2NDg1NTIsIm5iZiI6MTY0Nzk1MiwiaWF0IjoxNjQ3OTUyfQ.Dw_v9S0akP4xU8-3N2AcElUP_uhAnso619Ri5EKLESKWGIL0j_Cbb8JY7RrefWCe_Y4RkWdyhPY5VgHbGqPTug"
 )
 
+var (
+	u = &data.User{
+		Address: address,
+		Email:   email,
+		Type:    utype,
+	}
+)
+
 func TestNewJWTHS256(t *testing.T) {
 	j := NewJWTHS256(secret)
 	if secret != string(j.secret) {
@@ -45,11 +53,6 @@ func TestCreate(t *testing.T) {
 	}
 
 	for _, tc := range tt {
-		u := &data.User{
-			Address: address,
-			Email:   email,
-			Type:    utype,
-		}
 		t.Run(tc.jwt.Name(), func(t *testing.T) {
 			ss, err := tc.jwt.Create(u, tc.time)
 			if err != nil {
@@ -66,6 +69,31 @@ func TestCreate(t *testing.T) {
 }
 
 func TestExtract(t *testing.T) {
+	j := NewJWTHS256(secret)
+	now := time.Now()
+	ss, err := j.Create(u, now)
+	if err != nil {
+		t.Errorf("error creating user %v : %v", *u, err)
+		t.FailNow()
+	}
+
+	a, e, ut, err := j.Extract(ss)
+	if err != nil {
+		t.Errorf("error extracting JWT %v : %v", ss, err)
+		t.FailNow()
+	}
+	if a != address {
+		t.Errorf("incorrect address, got %v, want %v", a, address)
+		t.FailNow()
+	}
+	if e != email {
+		t.Errorf("incorrect email, got %v, want %v", e, email)
+		t.FailNow()
+	}
+	if ut != utype {
+		t.Errorf("incorrect type, got %v, want %v", ut, utype)
+		t.FailNow()
+	}
 }
 
 func TestHash(t *testing.T) {

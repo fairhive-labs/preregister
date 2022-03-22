@@ -1,6 +1,8 @@
 package crypto
 
 import (
+	"errors"
+	"fmt"
 	"time"
 
 	"github.com/fairhive-labs/preregister/internal/data"
@@ -36,6 +38,11 @@ func NewJWTHS512(s string) *JWTHS {
 	return &JWTHS{[]byte(s), JWTBase{jwt.SigningMethodHS512}}
 }
 
+var (
+	ErrSigningToken = errors.New("cannot sign token")
+	ErrInvalidToken = errors.New("invalid token")
+)
+
 func (j JWTHS) Create(user *data.User, t time.Time) (string, error) {
 	claims := UserClaims{
 		*user,
@@ -47,10 +54,26 @@ func (j JWTHS) Create(user *data.User, t time.Time) (string, error) {
 		},
 	}
 	token := jwt.NewWithClaims(j.method, claims)
-	return token.SignedString(j.secret)
+	ss, err := token.SignedString(j.secret)
+	if err != nil {
+		fmt.Printf("error creating token for user %v : %v", *user, err)
+		err = ErrSigningToken
+	}
+	return ss, err
 }
 
 func (j JWTHS) Extract(token string) (a, e, t string, err error) {
+	u := &UserClaims{}
+	tk, err := jwt.ParseWithClaims(token, u, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			fmt.Printf("Unexpected signing method: %v", token.Header["alg"])
+			return nil, jwt.ErrSignatureInvalid
+		}
+		return j.secret, nil
+	})
+	if tk.Valid {
+		a, e, t = u.Address, u.Email, u.Type
+	}
 	return
 }
 
