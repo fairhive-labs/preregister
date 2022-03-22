@@ -36,11 +36,9 @@ func (app App) register(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
-	h := token + ".hash" // hash token (SHA3)
-	// Send JWT Token (email using template)
+	h := app.jwt.Hash(token)
+	// Send JWT Token + Hash (email using template)
 	c.JSON(http.StatusAccepted, gin.H{
-		"user": u,
 		"hash": h,
 	})
 }

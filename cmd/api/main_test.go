@@ -203,39 +203,15 @@ func TestRegister(t *testing.T) {
 				}
 
 				var res struct {
-					User data.User
 					Hash string
 				}
 				err := json.NewDecoder(w.Body).Decode(&res)
-				u, _ := res.User, res.Hash //@TODO: control hash
 				if err != nil {
 					t.Errorf("Cannot decode response body %v, %v", w.Body, err)
 					t.FailNow()
 				}
-
-				if u.Address != address {
-					t.Errorf("Address is incorrect, got %s, want %s", u.Address, address)
-					t.FailNow()
-				}
-
-				if u.Email != email {
-					t.Errorf("Email is incorrect, got %s, want %s", u.Email, email)
-					t.FailNow()
-				}
-
-				if !u.HasSupportedType() {
-					t.Errorf("Type is incorrect, got %s, want %s", u.Type, utype)
-					t.FailNow()
-				}
-
-				if u.UUID != "" {
-					t.Errorf("UUID is incorrect, got %s should be empty", u.UUID)
-					t.FailNow()
-				}
-
-				if u.Timestamp != 0 {
-					t.Errorf("Timestamp is incorrect, got %d should be 0", u.Timestamp)
-					t.FailNow()
+				if res.Hash == "" {
+					t.Errorf("incorrect hash, cannot be empty string")
 				}
 
 			default:
