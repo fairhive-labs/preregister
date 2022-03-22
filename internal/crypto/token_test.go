@@ -36,6 +36,7 @@ func TestNewJWTHS256(t *testing.T) {
 func TestCreate(t *testing.T) {
 
 	tt := []struct {
+		name  string
 		time  time.Time
 		token string
 		user  *data.User
@@ -43,6 +44,7 @@ func TestCreate(t *testing.T) {
 		err   error
 	}{
 		{
+			"HS256",
 			time.UnixMicro(timestamp),
 			tokenHS256,
 			u,
@@ -50,6 +52,7 @@ func TestCreate(t *testing.T) {
 			nil,
 		},
 		{
+			"HS512",
 			time.UnixMicro(timestamp),
 			tokenHS512,
 			u,
@@ -57,19 +60,20 @@ func TestCreate(t *testing.T) {
 			nil,
 		},
 		{
+			"HS256 user missing address",
 			time.UnixMicro(timestamp),
-			"",
+			"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZGRyZXNzIjoiIiwiZW1haWwiOiJqb2huLmRvZUBtYWlsc2VydmljZS5jb20iLCJ0eXBlIjoidGFsZW50IiwiaXNzIjoiZmFpcmhpdmUuaW8iLCJleHAiOjE2NDg1NTIsIm5iZiI6MTY0Nzk1MiwiaWF0IjoxNjQ3OTUyfQ.fU_Vi8s1vxU59oRSAnTGj3bN4veMeNuFYBLNWKuOnJE",
 			&data.User{
 				Email: email,
 				Type:  utype,
 			},
 			NewJWTHS256(secret),
-			ErrSigningToken,
+			nil,
 		},
 	}
 
 	for _, tc := range tt {
-		t.Run(tc.jwt.Name(), func(t *testing.T) {
+		t.Run(tc.name, func(t *testing.T) {
 			ss, err := tc.jwt.Create(tc.user, tc.time)
 			if err != tc.err {
 				t.Errorf("incorrect error, got %v, want %v", err, tc.err)

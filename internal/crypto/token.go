@@ -13,7 +13,6 @@ type Token interface {
 	Create(user *data.User, t time.Time) (string, error)
 	Extract(token string) (*data.User, error)
 	Hash(token string) string
-	Name() string
 }
 
 type UserClaims struct {
@@ -44,12 +43,6 @@ var (
 )
 
 func (j JWTHS) Create(user *data.User, t time.Time) (string, error) {
-	if user.Address == "" ||
-		user.Email == "" ||
-		user.Type == "" { // mandatory Fields...
-		fmt.Printf("error creating token: mandatory Field missing")
-		return "", ErrSigningToken
-	}
 	claims := UserClaims{
 		*user,
 		jwt.RegisteredClaims{
@@ -90,8 +83,4 @@ func (j JWTHS) Extract(token string) (u *data.User, err error) {
 
 func (j JWTHS) Hash(token string) (h string) {
 	return
-}
-
-func (j JWTHS) Name() string {
-	return j.method.Alg()
 }
