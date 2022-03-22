@@ -9,7 +9,7 @@ import (
 
 type Token interface {
 	Create(user *data.User, t time.Time) (string, error)
-	Extract(token string) (string, string, string)
+	Extract(token string) (a, e, t string, err error)
 	Hash(token string) string
 	Name() string
 }
@@ -50,8 +50,8 @@ func (j JWTHS) Create(user *data.User, t time.Time) (string, error) {
 	return token.SignedString(j.secret)
 }
 
-func (j JWTHS) Extract(token string) (string, string, string) {
-	return "", "", ""
+func (j JWTHS) Extract(token string) (a, e, t string, err error) {
+	return
 }
 
 func (j JWTHS) Hash(token string) string {
