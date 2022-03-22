@@ -5,4 +5,5 @@ run: clean build
 clean:
 	rm -rf ./bin
 test:
-	go test -v ./...
+	go clean -testcache
+	go test -v ./... 
