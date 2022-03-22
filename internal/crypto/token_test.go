@@ -1,11 +1,28 @@
 package crypto
 
 import (
+	"crypto"
+	"errors"
 	"testing"
 	"time"
 
 	"github.com/fairhive-labs/preregister/internal/data"
+	"github.com/golang-jwt/jwt/v4"
 )
+
+type FakeHS512Method jwt.SigningMethodHMAC
+
+func (*FakeHS512Method) Sign(signingString string, key interface{}) (string, error) {
+	return "", MockErrSigningHS512
+}
+
+func (*FakeHS512Method) Verify(signingString, signature string, key interface{}) error {
+	return nil
+}
+
+func (m *FakeHS512Method) Alg() string {
+	return m.Name
+}
 
 const (
 	secret     = "VERY_SECURE_JWT_SECRET_L0L"
@@ -23,6 +40,16 @@ var (
 		Email:   email,
 		Type:    utype,
 	}
+	MockErrSigningHS512 = errors.New("fake error signing with HS512")
+	fakeHS512           = &JWTHS{
+		[]byte(secret),
+		JWTBase{
+			method: &FakeHS512Method{
+				Name: "FAKE_HS512",
+				Hash: crypto.SHA512,
+			},
+		},
+	}
 )
 
 func TestNewJWTHS256(t *testing.T) {
@@ -39,23 +66,33 @@ func TestCreate(t *testing.T) {
 		time  time.Time
 		token string
 		jwt   Token
+		err   error
 	}{
 		{
 			time.UnixMicro(timestamp),
 			tokenHS256,
 			NewJWTHS256(secret),
+			nil,
 		},
 		{
 			time.UnixMicro(timestamp),
 			tokenHS512,
 			NewJWTHS512(secret),
+			nil,
+		},
+		{
+			time.UnixMicro(timestamp),
+			"",
+			fakeHS512,
+			ErrSigningToken,
 		},
 	}
 
 	for _, tc := range tt {
 		t.Run(tc.jwt.Name(), func(t *testing.T) {
 			ss, err := tc.jwt.Create(u, tc.time)
-			if err != nil {
+			if err != tc.err {
+				t.Errorf("incorrect error, got %v, want %v", err, tc.err)
 				t.Errorf("error creating user %v : %v", *u, err)
 				t.FailNow()
 			}
