@@ -7,6 +7,7 @@ import (
 
 	"github.com/fairhive-labs/preregister/internal/data"
 	"github.com/golang-jwt/jwt/v4"
+	"golang.org/x/crypto/sha3"
 )
 
 type Token interface {
@@ -81,6 +82,10 @@ func (j JWTHS) Extract(token string) (u *data.User, err error) {
 	return
 }
 
-func (j JWTHS) Hash(token string) (h string) {
-	return
+func (JWTHS) Hash(token string) string {
+	return hash(token)
+}
+
+func hash(token string) string {
+	return fmt.Sprintf("%X", sha3.Sum512([]byte(token)))
 }
