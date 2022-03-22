@@ -1,28 +1,11 @@
 package crypto
 
 import (
-	"crypto"
-	"errors"
 	"testing"
 	"time"
 
 	"github.com/fairhive-labs/preregister/internal/data"
-	"github.com/golang-jwt/jwt/v4"
 )
-
-type FakeHS512Method jwt.SigningMethodHMAC
-
-func (*FakeHS512Method) Sign(signingString string, key interface{}) (string, error) {
-	return "", MockErrSigningHS512
-}
-
-func (*FakeHS512Method) Verify(signingString, signature string, key interface{}) error {
-	return nil
-}
-
-func (m *FakeHS512Method) Alg() string {
-	return m.Name
-}
 
 const (
 	secret     = "VERY_SECURE_JWT_SECRET_L0L"
@@ -40,16 +23,6 @@ var (
 		Email:   email,
 		Type:    utype,
 	}
-	MockErrSigningHS512 = errors.New("fake error signing with HS512")
-	fakeHS512           = &JWTHS{
-		[]byte(secret),
-		JWTBase{
-			method: &FakeHS512Method{
-				Name: "FAKE_HS512",
-				Hash: crypto.SHA512,
-			},
-		},
-	}
 )
 
 func TestNewJWTHS256(t *testing.T) {
@@ -65,35 +38,42 @@ func TestCreate(t *testing.T) {
 	tt := []struct {
 		time  time.Time
 		token string
+		user  *data.User
 		jwt   Token
 		err   error
 	}{
 		{
 			time.UnixMicro(timestamp),
 			tokenHS256,
+			u,
 			NewJWTHS256(secret),
 			nil,
 		},
 		{
 			time.UnixMicro(timestamp),
 			tokenHS512,
+			u,
 			NewJWTHS512(secret),
 			nil,
 		},
 		{
 			time.UnixMicro(timestamp),
 			"",
-			fakeHS512,
+			&data.User{
+				Email: email,
+				Type:  utype,
+			},
+			NewJWTHS256(secret),
 			ErrSigningToken,
 		},
 	}
 
 	for _, tc := range tt {
 		t.Run(tc.jwt.Name(), func(t *testing.T) {
-			ss, err := tc.jwt.Create(u, tc.time)
+			ss, err := tc.jwt.Create(tc.user, tc.time)
 			if err != tc.err {
 				t.Errorf("incorrect error, got %v, want %v", err, tc.err)
-				t.Errorf("error creating user %v : %v", *u, err)
+				t.Errorf("error creating user %v : %v", tc.user, err)
 				t.FailNow()
 			}
 
@@ -109,28 +89,75 @@ func TestExtract(t *testing.T) {
 	j := NewJWTHS256(secret)
 	now := time.Now()
 	ss, err := j.Create(u, now)
-	if err != nil {
-		t.Errorf("error creating user %v : %v", *u, err)
-		t.FailNow()
+	tt := []struct {
+		name                  string
+		jwt                   Token
+		ss                    string
+		address, email, utype string
+		err                   error
+	}{
+		{
+			"valid token",
+			j,
+			ss,
+			address, email, utype,
+			err,
+		},
+		{
+			"expired token",
+			j,
+			tokenHS256,
+			"", "", "",
+			ErrInvalidToken,
+		},
 	}
 
-	a, e, ut, err := j.Extract(ss)
-	if err != nil {
-		t.Errorf("error extracting JWT %v : %v", ss, err)
-		t.FailNow()
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			user, err := tc.jwt.Extract(tc.ss)
+			if err != tc.err {
+				t.Errorf("incorrect error, got %v, want %v", err, tc.err)
+				t.FailNow()
+			}
+			if user != nil {
+				t.Logf("valid token : %v\n", tc.ss)
+				if user.Address != tc.address {
+					t.Errorf("incorrect address, got %v, want %v", user.Address, tc.address)
+					t.FailNow()
+				}
+				if user.Email != tc.email {
+					t.Errorf("incorrect email, got %v, want %v", user.Email, tc.email)
+					t.FailNow()
+				}
+				if user.Type != tc.utype {
+					t.Errorf("incorrect type, got %v, want %v", user.Type, tc.utype)
+					t.FailNow()
+				}
+				if user.UUID == "" {
+					t.Errorf("UUID is incorrect, cannot be empty string")
+					t.FailNow()
+				}
+				if user.Timestamp == 0 {
+					t.Errorf("Timestamp is incorrect, cannot be 0")
+					t.FailNow()
+				}
+			}
+		})
 	}
-	if a != address {
-		t.Errorf("incorrect address, got %v, want %v", a, address)
-		t.FailNow()
-	}
-	if e != email {
-		t.Errorf("incorrect email, got %v, want %v", e, email)
-		t.FailNow()
-	}
-	if ut != utype {
-		t.Errorf("incorrect type, got %v, want %v", ut, utype)
-		t.FailNow()
-	}
+
+	t.Run("token without address", func(t *testing.T) {
+		ss, _ = j.Create(&data.User{
+			Email: email,
+			Type:  utype,
+		}, now)
+		_, err = j.Extract(ss)
+		if err != ErrInvalidToken {
+			t.Errorf("incorrect error, got %v, want %v", err, ErrInvalidToken)
+			t.Errorf(ss)
+			t.FailNow()
+		}
+	})
+
 }
 
 func TestHash(t *testing.T) {

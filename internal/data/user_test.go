@@ -85,7 +85,7 @@ func TestNewUser(t *testing.T) {
 	}
 
 	if u.UUID == "" {
-		t.Errorf("UUID is incorrect, cannot be empty")
+		t.Errorf("UUID is incorrect, cannot be empty string")
 		t.FailNow()
 	}
 
@@ -95,7 +95,7 @@ func TestNewUser(t *testing.T) {
 	}
 
 	if u.Timestamp == 0 {
-		t.Errorf("Timestamp is incorrect, cannot be set")
+		t.Errorf("Timestamp is incorrect, cannot be 0")
 		t.FailNow()
 	}
 

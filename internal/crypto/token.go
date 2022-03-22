@@ -11,7 +11,7 @@ import (
 
 type Token interface {
 	Create(user *data.User, t time.Time) (string, error)
-	Extract(token string) (a, e, t string, err error)
+	Extract(token string) (*data.User, error)
 	Hash(token string) string
 	Name() string
 }
@@ -44,6 +44,12 @@ var (
 )
 
 func (j JWTHS) Create(user *data.User, t time.Time) (string, error) {
+	if user.Address == "" ||
+		user.Email == "" ||
+		user.Type == "" { // mandatory Fields...
+		fmt.Printf("error creating token: mandatory Field missing")
+		return "", ErrSigningToken
+	}
 	claims := UserClaims{
 		*user,
 		jwt.RegisteredClaims{
@@ -62,23 +68,28 @@ func (j JWTHS) Create(user *data.User, t time.Time) (string, error) {
 	return ss, err
 }
 
-func (j JWTHS) Extract(token string) (a, e, t string, err error) {
-	u := &UserClaims{}
-	tk, err := jwt.ParseWithClaims(token, u, func(token *jwt.Token) (interface{}, error) {
+func (j JWTHS) Extract(token string) (u *data.User, err error) {
+	uclaims := &UserClaims{}
+	tk, err := jwt.ParseWithClaims(token, uclaims, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			fmt.Printf("Unexpected signing method: %v", token.Header["alg"])
 			return nil, jwt.ErrSignatureInvalid
 		}
 		return j.secret, nil
 	})
-	if tk.Valid {
-		a, e, t = u.Address, u.Email, u.Type
+
+	if tk.Valid &&
+		uclaims.Address != "" &&
+		uclaims.Email != "" &&
+		uclaims.Type != "" { // mandatory Fields...
+		return data.NewUser(uclaims.Address, uclaims.Email, uclaims.Type), nil
 	}
+	err = ErrInvalidToken
 	return
 }
 
-func (j JWTHS) Hash(token string) string {
-	return "hash"
+func (j JWTHS) Hash(token string) (h string) {
+	return
 }
 
 func (j JWTHS) Name() string {
