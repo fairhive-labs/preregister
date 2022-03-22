@@ -6,7 +6,6 @@ type Token interface {
 	Create(user *data.User) string
 	Extract(token string) (string, string, string)
 	Hash(token string) string
-	Verify(token string) bool
 }
 
 type JWTHS256 struct {
@@ -27,8 +26,4 @@ func (j *JWTHS256) Extract(token string) (string, string, string) {
 
 func (j *JWTHS256) Hash(token string) string {
 	return "hash"
-}
-
-func (j *JWTHS256) Verify(token string) bool {
-	return false
 }
