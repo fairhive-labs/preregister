@@ -9,8 +9,8 @@ import (
 
 func TestNewJWTHS256(t *testing.T) {
 	j := NewJWTHS256(secret)
-	if secret != string(j.secret) {
-		t.Errorf("incorrect NewJWTHS256 secret, got %s, want %s", j.secret, secret)
+	if secret != string(j.k) {
+		t.Errorf("incorrect NewJWTHS256 secret, got %s, want %s", j.k, secret)
 		t.FailNow()
 	}
 }
