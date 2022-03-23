@@ -30,5 +30,5 @@ func NewJWTECDSA(k string, m *jwt.SigningMethodECDSA) (*JWTECDSA, error) {
 }
 
 func (j JWTECDSA) Extract(token string) (u *data.User, err error) {
-	return extract[*jwt.SigningMethodECDSA](token, j.k)
+	return extract[*jwt.SigningMethodECDSA](token, j.k.Public())
 }

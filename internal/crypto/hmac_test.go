@@ -15,7 +15,7 @@ func TestNewJWTHS256(t *testing.T) {
 	}
 }
 
-func TestCreate(t *testing.T) {
+func TestCreateHMAC(t *testing.T) {
 	tt := []struct {
 		name  string
 		time  time.Time
@@ -70,7 +70,7 @@ func TestCreate(t *testing.T) {
 	}
 }
 
-func TestExtract(t *testing.T) {
+func TestExtractHMAC(t *testing.T) {
 	j := NewJWTHS256(secret)
 	now := time.Now()
 	ss, err := j.Create(u, now)
