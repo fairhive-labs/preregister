@@ -138,17 +138,17 @@ func TestExtractECDSA(t *testing.T) {
 	}
 }
 
-func TestRotationECDSA(t *testing.T) {
-	j, err := NewJWTECDSA(privateKey, jwt.SigningMethodES256)
-	if err != nil {
-		t.Errorf("error creating NewJWTECDSA: %v", err)
-		t.FailNow()
-	}
+func TestHeavyRotationECDSA(t *testing.T) {
+	var jwts [3]*JWTECDSA
+	jwts[0], _ = NewJWTECDSA(privateKey, jwt.SigningMethodES256)
+	jwts[1], _ = NewJWTES256()
+	jwts[2], _ = NewJWTES512()
 	R := 1000
 	now := time.Now()
 	m := map[string]int{}
 	for i := 0; i < R; i++ {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			j := jwts[i%len(jwts)]
 			ss, err := j.Create(u, now)
 			if err != nil {
 				t.Errorf("error creating ECDSA token: %v", err)

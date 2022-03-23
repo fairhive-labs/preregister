@@ -21,6 +21,14 @@ func NewJWTES256() (*JWTECDSA, error) {
 	return &JWTECDSA{JWTBase[*ecdsa.PrivateKey]{jwt.SigningMethodES256, pvk}}, nil
 }
 
+func NewJWTES512() (*JWTECDSA, error) {
+	pvk, err := ecdsa.GenerateKey(elliptic.P521(), rand.Reader)
+	if err != nil {
+		return nil, err
+	}
+	return &JWTECDSA{JWTBase[*ecdsa.PrivateKey]{jwt.SigningMethodES512, pvk}}, nil
+}
+
 func NewJWTECDSA(k string, m *jwt.SigningMethodECDSA) (*JWTECDSA, error) {
 	pvk, err := jwt.ParseECPrivateKeyFromPEM([]byte(k))
 	if err != nil {
