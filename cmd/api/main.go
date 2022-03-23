@@ -18,8 +18,16 @@ type App struct {
 	jwt crypto.Token
 }
 
+var jwts = map[string]crypto.Token{
+	"HS512": crypto.NewJWTHS512(pwdgen.Generate(64)),
+}
+
+func init() {
+	jwts["ES256"], _ = crypto.NewJWTES256()
+}
+
 func NewApp(db data.DB) *App {
-	return &App{&db, crypto.NewJWTHS512(pwdgen.Generate(64))}
+	return &App{&db, jwts["ES256"]}
 }
 
 var jwtregexp = regexp.MustCompile(`^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]*$`)
