@@ -1,6 +1,7 @@
 package crypto
 
 import (
+	"crypto/ecdsa"
 	"errors"
 	"fmt"
 	"time"
@@ -16,8 +17,13 @@ type Token interface {
 	Hash(token string) string
 }
 
-type JWTBase struct {
+type KeyConstraint interface {
+	[]byte | *ecdsa.PrivateKey
+}
+
+type JWTBase[K KeyConstraint] struct {
 	method jwt.SigningMethod
+	k      K
 }
 
 type UserClaims struct {
@@ -34,7 +40,7 @@ func hash(token string) string {
 	return fmt.Sprintf("%X", sha3.Sum512([]byte(token)))
 }
 
-func (JWTBase) Hash(token string) string {
+func (JWTBase[K]) Hash(token string) string {
 	return hash(token)
 }
 
@@ -57,10 +63,14 @@ func create(user *data.User, t time.Time, m jwt.SigningMethod, k interface{}) (s
 	return ss, err
 }
 
-func extract[T *jwt.SigningMethodHMAC | *jwt.SigningMethodECDSA](token string, k interface{}) (u *data.User, err error) {
+func (j JWTBase[K]) Create(user *data.User, t time.Time) (string, error) {
+	return create(user, t, j.method, j.k)
+}
+
+func extract[SM *jwt.SigningMethodHMAC | *jwt.SigningMethodECDSA](token string, k interface{}) (u *data.User, err error) {
 	uclaims := &UserClaims{}
 	tk, err := jwt.ParseWithClaims(token, uclaims, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(T); !ok {
+		if _, ok := token.Method.(SM); !ok {
 			fmt.Printf("Unexpected signing method: %v", token.Header["alg"])
 			return nil, jwt.ErrSignatureInvalid
 		}

@@ -5,12 +5,12 @@ import (
 	"crypto/elliptic"
 	"crypto/rand"
 
+	"github.com/fairhive-labs/preregister/internal/data"
 	"github.com/golang-jwt/jwt/v4"
 )
 
 type JWTECDSA struct {
-	k *ecdsa.PrivateKey
-	JWTBase
+	JWTBase[*ecdsa.PrivateKey]
 }
 
 func NewJWTES256() (*JWTECDSA, error) {
@@ -18,7 +18,7 @@ func NewJWTES256() (*JWTECDSA, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &JWTECDSA{pvk, JWTBase{jwt.SigningMethodES256}}, nil
+	return &JWTECDSA{JWTBase[*ecdsa.PrivateKey]{jwt.SigningMethodES256, pvk}}, nil
 }
 
 func NewJWTECDSA(k string, m *jwt.SigningMethodECDSA) (*JWTECDSA, error) {
@@ -26,5 +26,9 @@ func NewJWTECDSA(k string, m *jwt.SigningMethodECDSA) (*JWTECDSA, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &JWTECDSA{pvk, JWTBase{m}}, nil
+	return &JWTECDSA{JWTBase[*ecdsa.PrivateKey]{m, pvk}}, nil
+}
+
+func (j JWTECDSA) Extract(token string) (u *data.User, err error) {
+	return extract[*jwt.SigningMethodECDSA](token, j.k)
 }
