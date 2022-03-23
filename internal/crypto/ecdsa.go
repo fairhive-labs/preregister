@@ -4,8 +4,6 @@ import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
-	"fmt"
-	"os"
 
 	"github.com/golang-jwt/jwt/v4"
 )
@@ -15,12 +13,18 @@ type JWTECDSA struct {
 	JWTBase
 }
 
-func NewJWTES256() *JWTECDSA {
-	rng := rand.Reader
-	pvk, err := ecdsa.GenerateKey(elliptic.P256(), rng)
+func NewJWTES256() (*JWTECDSA, error) {
+	pvk, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	if err != nil {
-		fmt.Println("cannot generate ECDSA key")
-		os.Exit(1)
+		return nil, err
 	}
-	return &JWTECDSA{pvk, JWTBase{jwt.SigningMethodES256}}
+	return &JWTECDSA{pvk, JWTBase{jwt.SigningMethodES256}}, nil
+}
+
+func NewJWTECDSA(k string, m *jwt.SigningMethodECDSA) (*JWTECDSA, error) {
+	pvk, err := jwt.ParseECPrivateKeyFromPEM([]byte(k))
+	if err != nil {
+		return nil, err
+	}
+	return &JWTECDSA{pvk, JWTBase{m}}, nil
 }
