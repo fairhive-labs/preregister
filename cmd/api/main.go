@@ -23,7 +23,9 @@ var jwts = map[string]crypto.Token{
 }
 
 func init() {
+	jwts["HS256"] = crypto.NewJWTHS256(pwdgen.Generate(64))
 	jwts["ES256"], _ = crypto.NewJWTES256()
+	jwts["ES512"], _ = crypto.NewJWTES512()
 }
 
 func NewApp(db data.DB) *App {

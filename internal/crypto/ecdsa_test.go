@@ -14,6 +14,10 @@ import (
 )
 
 const (
+	publicKey = `-----BEGIN PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE+xszAkYoKJP5CEvCaLuCGxAGDKIW
+ecgPQxYElRWn/183SnpMHDREfXa4/Jzadq8dmo4taNQucoOLjD7IaN5OcA==
+-----END PUBLIC KEY-----`
 	privateKey = `-----BEGIN PRIVATE KEY-----
 MHcCAQEEIAwRtGkYqi732qh84HafnKE7YkW0CNpvvNseNGbxpsgGoAoGCCqGSM49
 AwEHoUQDQgAE+xszAkYoKJP5CEvCaLuCGxAGDKIWecgPQxYElRWn/183SnpMHDRE
@@ -201,5 +205,16 @@ func TestHeavyRotationECDSA(t *testing.T) {
 			}
 		})
 	}
+}
 
+func TestForgedToken(t *testing.T) {
+	j, _ := NewJWTECDSA(privateKey, jwt.SigningMethodES256)
+	ft, _ := j.Create(u, time.Now()) // token forged with old valid ECDSA key
+	j, _ = NewJWTES256()             // change jwt generator
+
+	_, err := j.Extract(ft)
+	if !errors.Is(err, ErrInvalidToken) { // expired token
+		t.Errorf("incorrect error, err = %v, want %v", err, ErrInvalidToken)
+		t.FailNow()
+	}
 }
