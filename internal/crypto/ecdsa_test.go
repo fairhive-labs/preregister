@@ -147,7 +147,7 @@ func TestHeavyRotationECDSA(t *testing.T) {
 	jwts[0], _ = NewJWTECDSA(privateKey, jwt.SigningMethodES256)
 	jwts[1], _ = NewJWTES256()
 	jwts[2], _ = NewJWTES512()
-	R := 1000
+	R := 100 // tested with billions, it was heavy ;)
 	now := time.Now()
 	m := map[string]int{}
 	for i := 0; i < R; i++ {
