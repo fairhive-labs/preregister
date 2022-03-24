@@ -11,6 +11,10 @@ const (
 	headers = "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
 )
 
+type Mailer interface {
+	SendActivationEmail(e, u, h string) error
+}
+
 type smtpConfig struct {
 	from     string
 	password string
@@ -19,14 +23,16 @@ type smtpConfig struct {
 	server   string
 }
 
-type Mailer struct {
+type SmtpMailer struct {
 	*smtpConfig
 	t *template.Template
 }
 
-func NewMailer(from, password, host string, port int, tmplPath string) *Mailer {
+type MockSmtpMailer struct{}
+
+func NewMailer(from, password, host string, port int, tmplPath string) *SmtpMailer {
 	t := template.Must(template.ParseGlob(tmplPath)) //@TODO : use go-embed
-	return &Mailer{&smtpConfig{
+	return &SmtpMailer{&smtpConfig{
 		from:     from,
 		password: password,
 		host:     host,
@@ -35,9 +41,8 @@ func NewMailer(from, password, host string, port int, tmplPath string) *Mailer {
 	}, t}
 }
 
-func (m *Mailer) SendActivationEmail(e, u, h string) {
+func (m *SmtpMailer) SendActivationEmail(e, u, h string) (err error) {
 	to := []string{e}
-	fmt.Println("PlainAuth:", m.from, m.password, m.host)
 	auth := smtp.PlainAuth("", m.from, m.password, m.host)
 
 	var body bytes.Buffer
@@ -50,9 +55,19 @@ func (m *Mailer) SendActivationEmail(e, u, h string) {
 		Url:  u,
 	})
 
-	err := smtp.SendMail(m.server, auth, m.from, to, body.Bytes())
+	err = smtp.SendMail(m.server, auth, m.from, to, body.Bytes())
+	confirmEmailSent(e, h, err)
+	return
+}
+
+func (m *MockSmtpMailer) SendActivationEmail(e, u, h string) (err error) {
+	confirmEmailSent(e, h, err)
+	return
+}
+
+func confirmEmailSent(e, h string, err error) {
 	if err != nil {
-		fmt.Println(err)
+		fmt.Printf("error sending email to %q: %v", e, err)
 	} else {
 		fmt.Printf("💌 Email to %q: [ \033[1;32mSent\033[0m ]\n🧬 Hash: %s\n", e, h)
 	}

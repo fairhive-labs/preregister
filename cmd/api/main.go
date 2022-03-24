@@ -19,7 +19,7 @@ import (
 type App struct {
 	db     *data.DB
 	jwt    crypto.Token
-	mailer *mailer.Mailer
+	mailer mailer.Mailer
 }
 
 var jwts = map[string]crypto.Token{

@@ -46,5 +46,8 @@ func TestNewMailer(t *testing.T) {
 
 func TestSendActivationEmail(t *testing.T) {
 	m := NewMailer(from, password, host, port, tmplPath)
-	m.SendActivationEmail(email, fmt.Sprintf("http://fairhive.io/activate/%s", token), hash)
+	if err := m.SendActivationEmail(email, fmt.Sprintf("http://fairhive.io/activate/%s", token), hash); err != nil {
+		t.Errorf("error sending activation email : %v", err)
+		t.FailNow()
+	}
 }

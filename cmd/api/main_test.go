@@ -8,12 +8,20 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/fairhive-labs/preregister/internal/crypto"
 	"github.com/fairhive-labs/preregister/internal/data"
+	"github.com/fairhive-labs/preregister/internal/mailer"
+	pwdgen "github.com/trendev/go-pwdgen/generator"
 )
 
 func TestRegister(t *testing.T) {
-	app := *NewApp(data.MockDB, "../../internal/mailer/templates/**") //@TODO: mock smtp service
-	r := setupRouter(app)
+	var db data.DB = data.MockDB
+	app := &App{
+		&db,
+		crypto.NewJWTHS256(pwdgen.Generate(64)),
+		&mailer.MockSmtpMailer{},
+	}
+	r := setupRouter(*app)
 	tt := []struct {
 		name    string
 		address string
@@ -224,8 +232,13 @@ func TestRegister(t *testing.T) {
 }
 
 func TestActivate(t *testing.T) {
-	app := *NewApp(data.MockDB, "../../internal/mailer/templates/**") //@TODO: mock smtp service
-	r := setupRouter(app)
+	var db data.DB = data.MockDB
+	app := &App{
+		&db,
+		crypto.NewJWTHS256(pwdgen.Generate(64)),
+		&mailer.MockSmtpMailer{},
+	}
+	r := setupRouter(*app)
 
 	tt := []struct {
 		name   string
