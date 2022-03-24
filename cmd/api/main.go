@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"regexp"
 	"time"
 
@@ -10,12 +12,14 @@ import (
 
 	"github.com/fairhive-labs/preregister/internal/crypto"
 	"github.com/fairhive-labs/preregister/internal/data"
+	"github.com/fairhive-labs/preregister/internal/mailer"
 	pwdgen "github.com/trendev/go-pwdgen/generator"
 )
 
 type App struct {
-	db  *data.DB
-	jwt crypto.Token
+	db     *data.DB
+	jwt    crypto.Token
+	mailer *mailer.Mailer
 }
 
 var jwts = map[string]crypto.Token{
@@ -28,8 +32,15 @@ func init() {
 	jwts["ES512"], _ = crypto.NewJWTES512()
 }
 
-func NewApp(db data.DB) *App {
-	return &App{&db, jwts["ES256"]}
+func NewApp(db data.DB, tmplPath string) *App {
+	return &App{&db,
+		jwts["ES256"],
+		mailer.NewMailer(os.Getenv("MAILTRAP_USER"),
+			os.Getenv("MAILTRAP_PASSWORD"),
+			"smtp.mailtrap.io",
+			2525,
+			tmplPath),
+	}
 }
 
 var jwtregexp = regexp.MustCompile(`^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]*$`)
@@ -46,10 +57,10 @@ func (app App) register(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	h := app.jwt.Hash(token)
-	// Send JWT Token + Hash (email using template)
+	hash := app.jwt.Hash(token)
+	go app.mailer.SendActivationEmail(u.Email, fmt.Sprintf("http://fairhive.io/activate/%s", token), hash) //@TODO : handle graceful shutdown...
 	c.JSON(http.StatusAccepted, gin.H{
-		"hash": h,
+		"hash": hash,
 	})
 }
 
@@ -78,7 +89,7 @@ func setupRouter(app App) *gin.Engine {
 }
 
 func main() {
-	app := *NewApp(data.MockDB)
+	app := *NewApp(data.MockDB, "internal/mailer/templates/**")
 	r := setupRouter(app)
 	log.Fatal(r.Run())
 }

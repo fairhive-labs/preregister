@@ -1,0 +1,23 @@
+{{define "emailActivation"}}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+
+<body>
+    <p>Hi there !</p>
+    <p>Thanks for your preregistration on <a href="http://fairhive.io">fairhive.io</a> 🙏</p>
+    <p>Please, copy/paste the following hash in order to complete the preregistration process.</p>
+    <h3>Hash:</h3>
+    <span>{{.Hash}}</span><br />
+    <p>
+        <a href="{{.Url}}" style="margin-top: 16px; text-decoration: none;">Go to fairhive</a>
+    </p>
+
+</body>
+
+</html>
+{{end}}

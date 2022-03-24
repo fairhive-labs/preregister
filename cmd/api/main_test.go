@@ -12,7 +12,7 @@ import (
 )
 
 func TestRegister(t *testing.T) {
-	app := *NewApp(data.MockDB)
+	app := *NewApp(data.MockDB, "../../internal/mailer/templates/**") //@TODO: mock smtp service
 	r := setupRouter(app)
 	tt := []struct {
 		name    string
@@ -224,7 +224,7 @@ func TestRegister(t *testing.T) {
 }
 
 func TestActivate(t *testing.T) {
-	app := *NewApp(data.MockDB)
+	app := *NewApp(data.MockDB, "../../internal/mailer/templates/**") //@TODO: mock smtp service
 	r := setupRouter(app)
 
 	tt := []struct {
