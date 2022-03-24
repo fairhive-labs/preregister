@@ -257,7 +257,7 @@ func TestActivate(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			w := httptest.NewRecorder()
 			token := tc.token
-			req, _ := http.NewRequest("GET", fmt.Sprintf("/activate/%s", token), nil)
+			req, _ := http.NewRequest("POST", fmt.Sprintf("/activate/%s", token), nil)
 			r.ServeHTTP(w, req)
 
 			switch tc.status {

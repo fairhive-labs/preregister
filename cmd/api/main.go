@@ -73,7 +73,7 @@ func (app App) activate(c *gin.Context) {
 func setupRouter(app App) *gin.Engine {
 	r := gin.Default()
 	r.POST("/", app.register)
-	r.GET("/activate/:token", app.activate)
+	r.POST("/activate/:token", app.activate)
 	return r
 }
 
