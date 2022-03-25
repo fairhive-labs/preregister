@@ -83,6 +83,7 @@ func extract[SM *jwt.SigningMethodHMAC | *jwt.SigningMethodECDSA](token string, 
 		uclaims.Type != "" { // mandatory Fields...
 		return data.NewUser(uclaims.Address, uclaims.Email, uclaims.Type), nil
 	}
+	fmt.Printf("Error extracting JWT: %v", err)
 	err = ErrInvalidToken
 	return
 }

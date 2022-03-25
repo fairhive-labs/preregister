@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/fairhive-labs/preregister/internal/crypto"
 	"github.com/fairhive-labs/preregister/internal/data"
@@ -240,27 +241,59 @@ func TestActivate(t *testing.T) {
 	}
 	r := setupRouter(*app)
 
+	address, email, utype := "0x8ba1f109551bD432803012645Ac136ddd64DBA72", "john.doe@mailservice.com", "talent"
+	vt, _ := app.jwt.Create(&data.User{
+		Address: address,
+		Email:   email,
+		Type:    utype}, time.Now())
+	vh := app.jwt.Hash(vt)
+
 	tt := []struct {
-		name   string
-		token  string
-		status int
-		err    string
+		name        string
+		token, hash string
+		status      int
+		err         string
 	}{
 		{
-			"valid token",
-			"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpvaG4uZG9lQG1haWxzZXJ2aWNlLmNvbSIsInV1aWQiOiI4MGM3MWVlZS01ZGIyLTRlODctOWIwNC02ODZhYWRkOGQ1N2EifQ.96OWDzW6mL78KjAuVOwa4erGSeMeusWTYFv6Wsnv5-k",
-			http.StatusOK,
+			"valid token+hash",
+			vt, vh,
+			http.StatusCreated,
 			"",
 		},
 		{
-			"no token",
-			"",
-			http.StatusNotFound,
+			"valid token invalid hash",
+			vt, "hA5h",
+			http.StatusUnauthorized,
+			`{"error":"Unauthorized"}`,
+		},
+		{
+			"no token no hash",
+			"", "",
+			http.StatusTemporaryRedirect,
 			"",
 		},
 		{
 			"malformated token",
-			"eyJhbGciOiJIUzI1N.ZZZZZ.dczrracv.de",
+			"eyJhbGciOiJIUzI1N.ZZZZZ.dczrracv.de", "hA5h",
+			http.StatusUnauthorized,
+			`{"error":"Unauthorized"}`,
+		},
+		{
+			"malformated token no hash",
+			"eyJhbGciOiJIUzI1N.ZZZZZ.dczrracv.de", "",
+			http.StatusTemporaryRedirect,
+			"",
+		},
+		{
+			"malformated token fake hash",
+			"eyJhbGciOiJIUzI1N.ZZZZZ.dczrracv.de", "hA5h",
+			http.StatusUnauthorized,
+			`{"error":"Unauthorized"}`,
+		},
+		{
+			"fake token valid hash",
+			"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZGRyZXNzIjoiIiwiZW1haWwiOiJqb2huLmRvZUBtYWlsc2VydmljZS5jb20iLCJ0eXBlIjoidGFsZW50IiwiaXNzIjoiZmFpcmhpdmUuaW8iLCJleHAiOjE2NDg1NTIsIm5iZiI6MTY0Nzk1MiwiaWF0IjoxNjQ3OTUyfQ.fU_Vi8s1vxU59oRSAnTGj3bN4veMeNuFYBLNWKuOnJE",
+			"69E045328DCE6EAD2F52068EF4FB2232EBF12E82FF4712947B2DBC3CCEA8035000CF037B22EE1DD6B0C938AA9B7D329CC6DD111824F01D494FDD75B1150BD628",
 			http.StatusUnauthorized,
 			`{"error":"Unauthorized"}`,
 		},
@@ -270,13 +303,14 @@ func TestActivate(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			w := httptest.NewRecorder()
 			token := tc.token
-			req, _ := http.NewRequest("POST", fmt.Sprintf("/activate/%s", token), nil)
+			hash := tc.hash
+			req, _ := http.NewRequest("POST", fmt.Sprintf("/activate/%s/%s", token, hash), nil)
 			r.ServeHTTP(w, req)
 
 			switch tc.status {
-			case http.StatusOK:
-				if w.Code != http.StatusOK {
-					t.Errorf("Status code is incorrect, got %d, want %d", w.Code, http.StatusOK)
+			case http.StatusCreated:
+				if w.Code != http.StatusCreated {
+					t.Errorf("Status code is incorrect, got %d, want %d", w.Code, http.StatusCreated)
 					t.Errorf(w.Body.String())
 					t.FailNow()
 				}
@@ -300,6 +334,12 @@ func TestActivate(t *testing.T) {
 			case http.StatusNotFound:
 				if w.Code != http.StatusNotFound {
 					t.Errorf("Status code is incorrect, got %d, want %d", w.Code, http.StatusNotFound)
+					t.Errorf(w.Body.String())
+					t.FailNow()
+				}
+			case http.StatusTemporaryRedirect:
+				if w.Code != http.StatusTemporaryRedirect {
+					t.Errorf("Status code is incorrect, got %d, want %d", w.Code, http.StatusTemporaryRedirect)
 					t.Errorf(w.Body.String())
 					t.FailNow()
 				}

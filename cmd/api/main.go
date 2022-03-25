@@ -64,18 +64,24 @@ func (app App) register(c *gin.Context) {
 }
 
 func (app App) activate(c *gin.Context) {
-	token := c.Param("token")
-	if !jwtregexp.MatchString(token) {
+	t := c.Param("token")
+	h := c.Param("hash")
+	if !jwtregexp.MatchString(t) || app.jwt.Hash(t) != h {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
 
-	//@TODO: get email, address, uuid from JWT
-	a, e, t2 := "", "", ""
-	(*app.db).Save(data.NewUser(a, e, t2))
+	u, err := app.jwt.Extract(t) // verify + extract
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"token":     token,
+	(*app.db).Save(data.NewUser(u.Address, u.Email, u.Type)) // @TODO : get errors
+	go app.mailer.SendConfirmationEmail(u.Address)           //@TODO : handle graceful shutdown...
+
+	c.JSON(http.StatusCreated, gin.H{
+		"token":     t,
 		"activated": true,
 	})
 }
@@ -83,12 +89,12 @@ func (app App) activate(c *gin.Context) {
 func setupRouter(app App) *gin.Engine {
 	r := gin.Default()
 	r.POST("/", app.register)
-	r.POST("/activate/:token", app.activate)
+	r.POST("/activate/:token/:hash", app.activate)
 	return r
 }
 
 func main() {
-	app := *NewApp(data.MockDB)
+	app := *NewApp(data.MockDB) //@TODO : use dev / prod DB
 	r := setupRouter(app)
 	log.Fatal(r.Run())
 }
