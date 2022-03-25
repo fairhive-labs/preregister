@@ -15,6 +15,7 @@ const (
 
 type Mailer interface {
 	SendActivationEmail(e, u, h string) error
+	SendConfirmationEmail(e string) error
 }
 
 type smtpConfig struct {
@@ -29,8 +30,6 @@ type SmtpMailer struct {
 	*smtpConfig
 	t *template.Template
 }
-
-type MockSmtpMailer struct{}
 
 //go:embed templates/*.html
 var tfs embed.FS
@@ -84,20 +83,21 @@ func (m *SmtpMailer) SendActivationEmail(e, u, h string) (err error) {
 			Hash: h,
 			Url:  u,
 		})
-	logEmailSent(e, h, err)
+	logEmailSent(e, fmt.Sprintf("💌 Email to %q: [ \033[1;32mSent\033[0m ]\n🧬 Hash: %s\n", e, h), err)
 	return
 }
 
-func (m *MockSmtpMailer) SendActivationEmail(e, u, h string) (err error) {
-	// do nothing just log
-	logEmailSent(e, h, err)
+func (m *SmtpMailer) SendConfirmationEmail(e string) (err error) {
+	err = sendEmail(m, e, "fairhive - preregistration completed", "emailConfirmation",
+		struct{}{})
+	logEmailSent(e, fmt.Sprintf("💌 Email to %q: [ \033[1;32mSent\033[0m ]\n", e), err)
 	return
 }
 
-func logEmailSent(e, h string, err error) {
+func logEmailSent(e, m string, err error) {
 	if err != nil {
-		fmt.Printf("error sending email to %q: %v", e, err)
+		fmt.Printf("Error sending email to %q: %v", e, err)
 	} else {
-		fmt.Printf("💌 Email to %q: [ \033[1;32mSent\033[0m ]\n🧬 Hash: %s\n", e, h)
+		fmt.Println(m)
 	}
 }

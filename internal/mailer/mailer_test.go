@@ -39,3 +39,11 @@ func TestSendActivationEmail(t *testing.T) {
 		t.FailNow()
 	}
 }
+
+func TestSendConfirmationEmail(t *testing.T) {
+	m := NewMailer(from, password, host, port)
+	if err := m.SendConfirmationEmail(email); err != nil {
+		t.Errorf("error sending confirmation email : %v", err)
+		t.FailNow()
+	}
+}
