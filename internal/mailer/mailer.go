@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/smtp"
+	"time"
 )
 
 const (
@@ -59,17 +60,23 @@ func (m *SmtpMailer) SendActivationEmail(e, u, h string) (err error) {
 		Url:  u,
 	})
 
-	err = smtp.SendMail(m.server, auth, m.from, to, body.Bytes())
-	confirmEmailSent(e, h, err)
+	for i := 0; i < 3; i++ {
+		err = smtp.SendMail(m.server, auth, m.from, to, body.Bytes())
+		if nil == err {
+			break
+		}
+		time.Sleep(1 * time.Second)
+	}
+	logEmailSent(e, h, err)
 	return
 }
 
 func (m *MockSmtpMailer) SendActivationEmail(e, u, h string) (err error) {
-	confirmEmailSent(e, h, err)
+	logEmailSent(e, h, err)
 	return
 }
 
-func confirmEmailSent(e, h string, err error) {
+func logEmailSent(e, h string, err error) {
 	if err != nil {
 		fmt.Printf("error sending email to %q: %v", e, err)
 	} else {
