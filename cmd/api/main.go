@@ -83,7 +83,7 @@ func (app App) activate(c *gin.Context) {
 		return
 	}
 
-	go app.mailer.SendConfirmationEmail(u.Address) //@TODO : handle graceful shutdown...
+	go app.mailer.SendConfirmationEmail(u.Email) //@TODO : handle graceful shutdown...
 
 	c.JSON(http.StatusCreated, gin.H{
 		"token":     t,
