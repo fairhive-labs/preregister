@@ -8,15 +8,17 @@
 </head>
 
 <body>
-    <p>Hi there !</p>
-    <p>Thanks for your preregistration on <a href="http://fairhive.io">fairhive.io</a> 🙏</p>
-    <p>Please, copy/paste the following hash in order to complete the preregistration process.</p>
-    <h3>Hash:</h3>
-    <span>{{.Hash}}</span><br />
-    <p>
-        <a href="{{.Url}}" style="margin-top: 16px; text-decoration: none;">Go to fairhive</a>
+    <p style="font-family: Arial, Helvetica, sans-serif;">Hi there !</p>
+    <p style="font-family: Arial, Helvetica, sans-serif;">Thanks for your preregistration 🙏</p>
+    <p style="font-family: Arial, Helvetica, sans-serif;">Please, copy the following hash and complete the
+        preregistration...
     </p>
-
+    <span style="font-family: Arial, Helvetica, sans-serif; font-weight: bolder;">Hash:</span><br/>
+    <code>{{.Hash}}</code>
+    <p>
+        <a style="text-decoration: none; background-color: #ff914d; color: white; font-weight: bolder; padding: 4px;" href="{{.Url}}">
+            <span style="font-family: Arial, Helvetica, sans-serif;">Complete Preregistration</span></a>
+    </p>
 </body>
 
 </html>
