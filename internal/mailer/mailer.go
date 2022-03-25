@@ -2,6 +2,7 @@ package mailer
 
 import (
 	"bytes"
+	"embed"
 	"fmt"
 	"html/template"
 	"net/smtp"
@@ -30,8 +31,11 @@ type SmtpMailer struct {
 
 type MockSmtpMailer struct{}
 
-func NewMailer(from, password, host string, port int, tmplPath string) *SmtpMailer {
-	t := template.Must(template.ParseGlob(tmplPath)) //@TODO : use go-embed
+//go:embed templates/*.html
+var tfs embed.FS
+
+func NewMailer(from, password, host string, port int) *SmtpMailer {
+	t := template.Must(template.ParseFS(tfs, "templates/*"))
 	return &SmtpMailer{&smtpConfig{
 		from:     from,
 		password: password,

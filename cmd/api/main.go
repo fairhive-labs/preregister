@@ -32,14 +32,13 @@ func init() {
 	jwts["ES512"], _ = crypto.NewJWTES512()
 }
 
-func NewApp(db data.DB, tmplPath string) *App {
+func NewApp(db data.DB) *App {
 	return &App{&db,
 		jwts["ES256"],
 		mailer.NewMailer(os.Getenv("MAILTRAP_USER"),
 			os.Getenv("MAILTRAP_PASSWORD"),
 			"smtp.mailtrap.io",
-			2525,
-			tmplPath),
+			2525),
 	}
 }
 
@@ -89,7 +88,7 @@ func setupRouter(app App) *gin.Engine {
 }
 
 func main() {
-	app := *NewApp(data.MockDB, "internal/mailer/templates/**")
+	app := *NewApp(data.MockDB)
 	r := setupRouter(app)
 	log.Fatal(r.Run())
 }
