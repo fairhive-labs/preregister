@@ -365,4 +365,17 @@ func TestActivate(t *testing.T) {
 			}
 		})
 	}
+
+	(*app.db) = data.MockErrDB
+	t.Run("faulty DB", func(t *testing.T) {
+		w := httptest.NewRecorder()
+		token := vt
+		hash := vh
+		req, _ := http.NewRequest("POST", fmt.Sprintf("/activate/%s/%s", token, hash), nil)
+		r.ServeHTTP(w, req)
+		if w.Code != http.StatusInternalServerError {
+			t.Errorf("Status code is incorrect, got %d, want %d", w.Code, http.StatusInternalServerError)
+			t.FailNow()
+		}
+	})
 }

@@ -1,5 +1,5 @@
 package data
 
 type DB interface {
-	Save(u *User)
+	Save(u *User) error
 }

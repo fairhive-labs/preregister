@@ -77,8 +77,13 @@ func (app App) activate(c *gin.Context) {
 		return
 	}
 
-	(*app.db).Save(data.NewUser(u.Address, u.Email, u.Type)) // @TODO : get errors
-	go app.mailer.SendConfirmationEmail(u.Address)           //@TODO : handle graceful shutdown...
+	err = (*app.db).Save(data.NewUser(u.Address, u.Email, u.Type))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	go app.mailer.SendConfirmationEmail(u.Address) //@TODO : handle graceful shutdown...
 
 	c.JSON(http.StatusCreated, gin.H{
 		"token":     t,
