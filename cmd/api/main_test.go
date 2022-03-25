@@ -19,7 +19,7 @@ func TestRegister(t *testing.T) {
 	app := &App{
 		&db,
 		crypto.NewJWTHS256(pwdgen.Generate(64)),
-		&mailer.MockSmtpMailer{},
+		&mailer.MockSmtpMailer,
 	}
 	r := setupRouter(*app)
 	tt := []struct {
@@ -236,7 +236,7 @@ func TestActivate(t *testing.T) {
 	app := &App{
 		&db,
 		crypto.NewJWTHS256(pwdgen.Generate(64)),
-		&mailer.MockSmtpMailer{},
+		&mailer.MockSmtpMailer,
 	}
 	r := setupRouter(*app)
 

@@ -1,15 +1,17 @@
 package mailer
 
-type MockSmtpMailer struct{}
+type mockSmtpMailer struct{}
 
-func (m *MockSmtpMailer) SendActivationEmail(e, u, h string) (err error) {
+func (m *mockSmtpMailer) SendActivationEmail(e, u, h string) (err error) {
 	// do nothing just log
-	logEmailSent(e, "Activation Email Sent !!!", err)
+	logEmailSent(e, "📧 Activation Email Sent !!!", err)
 	return
 }
 
-func (m *MockSmtpMailer) SendConfirmationEmail(e string) (err error) {
+func (m *mockSmtpMailer) SendConfirmationEmail(e string) (err error) {
 	// do nothing just log
-	logEmailSent(e, "Confirmation Email Sent !!!", err)
+	logEmailSent(e, "📧 Confirmation Email Sent !!!", err)
 	return
 }
+
+var MockSmtpMailer = mockSmtpMailer{}
