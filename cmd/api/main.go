@@ -35,10 +35,10 @@ func init() {
 func NewApp(db data.DB) *App {
 	return &App{&db,
 		jwts["ES256"],
-		mailer.NewMailer(os.Getenv("MAILTRAP_USER"),
-			os.Getenv("MAILTRAP_PASSWORD"),
-			"smtp.mailtrap.io",
-			2525),
+		mailer.NewMailer(os.Getenv("FAIRHIVE_GSUITE_USER"),
+			os.Getenv("FAIRHIVE_GSUITE_PASSWORD"),
+			"smtp.gmail.com",
+			587),
 	}
 }
 

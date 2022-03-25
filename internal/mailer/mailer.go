@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	headers = "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
+	headers = "MIME-Version: 1.0\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
 )
 
 type Mailer interface {
@@ -51,7 +51,14 @@ func (m *SmtpMailer) SendActivationEmail(e, u, h string) (err error) {
 	auth := smtp.PlainAuth("", m.from, m.password, m.host)
 
 	var body bytes.Buffer
-	body.Write([]byte(fmt.Sprintf("Subject: Complete Preregistration\n%s\n\n", headers)))
+	body.Write([]byte(fmt.Sprintf(`From: %s
+To: %s
+Subject: fairhive - preregistration
+%s
+`, "no_reply@fairhive-labs.com",
+		e,
+		headers)))
+
 	m.t.ExecuteTemplate(&body, "emailActivation", struct {
 		Hash string
 		Url  string
@@ -60,11 +67,14 @@ func (m *SmtpMailer) SendActivationEmail(e, u, h string) (err error) {
 		Url:  u,
 	})
 
-	for i := 0; i < 3; i++ {
+	fmt.Println("Sending email...")
+	r := 3
+	for i := 0; i < r; i++ {
 		err = smtp.SendMail(m.server, auth, m.from, to, body.Bytes())
 		if nil == err {
 			break
 		}
+		fmt.Printf("failed %d/%d, retrying in 1s...\n", i+1, r)
 		time.Sleep(1 * time.Second)
 	}
 	logEmailSent(e, h, err)

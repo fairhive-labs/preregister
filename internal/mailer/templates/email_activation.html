@@ -8,15 +8,28 @@
 </head>
 
 <body>
-    <p style="font-family: Arial, Helvetica, sans-serif;">Hi there !</p>
-    <p style="font-family: Arial, Helvetica, sans-serif;">Thanks for your preregistration 🙏</p>
-    <p style="font-family: Arial, Helvetica, sans-serif;">Please, copy the following hash and complete the
-        preregistration...
-    </p>
-    <span style="font-family: Arial, Helvetica, sans-serif; font-weight: bolder;">Hash:</span><br/>
-    <code>{{.Hash}}</code>
+    <div>
+        <span style="font-family: Arial, Helvetica, sans-serif; ">Hi there 🤗</span><br /><br />
+        <span style="font-family: Arial, Helvetica, sans-serif; ">Thanks for your preregistration 🙏</span><br />
+        <span style="font-family: Arial, Helvetica, sans-serif; ">We're super excited to have you on
+            board </span>
+        <span style="font-family: Arial, Helvetica, sans-serif; font-weight: bold;">but your
+            preregistration is not yet complete...</span><br /><br />
+        <span style="font-family: Arial, Helvetica, sans-serif; ">Please: </span>
+        <ol style="font-family: Arial, Helvetica, sans-serif; ">
+            <li><span>copy the hash code,</span></li>
+            <li><span>click on "Complete Preregistration" button,</span></li>
+            <li><span>paste it,</span></li>
+            <li><span>... and just activate your preregistration 🥳</span></li>
+        </ol>
+        <span style="font-family: Arial, Helvetica, sans-serif; ">⏳ You have less than 10 minutes...</span><br /><br />
+        <span style="font-family: Arial, Helvetica, sans-serif; font-weight: bolder;">hash code:</span><br />
+        <code>{{.Hash}}</code>
+    </div>
+
     <p>
-        <a style="text-decoration: none; background-color: #ff914d; color: white; font-weight: bolder; padding: 4px;" href="{{.Url}}">
+        <a style="text-decoration: none; background-color: #ff914d; color: white; font-weight: bolder; padding: 4px;"
+            href="{{.Url}}">
             <span style="font-family: Arial, Helvetica, sans-serif;">Complete Preregistration</span></a>
     </p>
 </body>
