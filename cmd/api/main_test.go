@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"sync"
 	"testing"
 	"time"
 
@@ -21,6 +22,7 @@ func TestRegister(t *testing.T) {
 		&db,
 		crypto.NewJWTHS256(pwdgen.Generate(64)),
 		&mailer.MockSmtpMailer,
+		sync.WaitGroup{},
 	}
 	r := setupRouter(*app)
 	tt := []struct {
@@ -238,6 +240,7 @@ func TestActivate(t *testing.T) {
 		&db,
 		crypto.NewJWTHS256(pwdgen.Generate(64)),
 		&mailer.MockSmtpMailer,
+		sync.WaitGroup{},
 	}
 	r := setupRouter(*app)
 

@@ -1,13 +1,16 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
 	"regexp"
 	"sync"
+	"syscall"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -61,7 +64,12 @@ func (app App) register(c *gin.Context) {
 		return
 	}
 	hash := app.jwt.Hash(token)
-	go app.mailer.SendActivationEmail(u.Email, fmt.Sprintf("http://fairhive.io/activate/%s", token), hash) //@TODO : handle graceful shutdown...
+	app.wg.Add(1)
+	go func() {
+		defer app.wg.Done()
+		app.mailer.SendActivationEmail(u.Email, fmt.Sprintf("http://fairhive.io/activate/%s", token), hash)
+	}()
+
 	c.JSON(http.StatusAccepted, gin.H{
 		"hash": hash,
 	})
@@ -87,7 +95,11 @@ func (app App) activate(c *gin.Context) {
 		return
 	}
 
-	go app.mailer.SendConfirmationEmail(u.Email) //@TODO : handle graceful shutdown...
+	app.wg.Add(1)
+	go func() {
+		defer app.wg.Done()
+		app.mailer.SendConfirmationEmail(u.Email)
+	}()
 
 	c.JSON(http.StatusCreated, gin.H{
 		"token":     t,
@@ -123,9 +135,33 @@ func main() {
 		MaxHeaderBytes: 1 << 20, // 1 MB
 	}
 
-	fmt.Printf("Listening and serving HTTP on %s\n", addr)
+	idleConnsClosed := make(chan struct{})
+	go func() {
+		quit := make(chan os.Signal, 1)
+		signal.Notify(quit, syscall.SIGINT, syscall.SIGQUIT, syscall.SIGTERM)
+		s := <-quit
+		log.Printf("🚨 Shutdown signal \"%v\" received\n", s)
+
+		log.Printf("🚦 Here we go for a graceful Shutdown...\n")
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		if err := srv.Shutdown(ctx); err != nil {
+			// Error from closing listeners, or context timeout:
+			log.Printf("⚠️ HTTP server Shutdown: %v", err)
+		}
+
+		log.Printf("⏳ Waiting the end of all go-routines...")
+		app.wg.Wait() // wait for all go-routines
+		log.Printf("👍 go-routines are over")
+		close(idleConnsClosed)
+	}()
+
+	log.Printf("✅ Listening and serving HTTP on %s\n", addr)
 	err := srv.ListenAndServe()
 	if !errors.Is(err, http.ErrServerClosed) {
-		log.Fatal(err)
+		log.Fatalf("👹 HTTP server ListenAndServe: %v", err)
 	}
+
+	<-idleConnsClosed
+	log.Printf("😴 Server stopped")
 }
