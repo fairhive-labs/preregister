@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -100,6 +101,23 @@ func setupRouter(app App) *gin.Engine {
 
 func main() {
 	app := *NewApp(data.MockDB) //@TODO : use dev / prod DB
+	// gin.SetMode(gin.ReleaseMode)
 	r := setupRouter(app)
-	log.Fatal(r.Run())
+
+	var addr string
+	if p := os.Getenv("PORT"); p != "" {
+		addr = "" + p
+	} else {
+		addr = ":8080" // default port
+	}
+
+	srv := &http.Server{
+		Addr:    addr,
+		Handler: r,
+	}
+	fmt.Printf("Listening and serving HTTP on %s\n", addr)
+	err := srv.ListenAndServe()
+	if !errors.Is(err, http.ErrServerClosed) {
+		log.Fatal(err)
+	}
 }
