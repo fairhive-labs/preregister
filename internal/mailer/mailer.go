@@ -68,8 +68,8 @@ Subject: %s
 		if nil == err {
 			break
 		}
-		fmt.Printf("failed %d/%d, retrying in 1s...\n", i+1, r)
-		time.Sleep(1 * time.Second)
+		fmt.Printf("failed %d/%d, retrying in 500ms...\n", i+1, r)
+		time.Sleep(500 * time.Millisecond)
 	}
 	return
 }
