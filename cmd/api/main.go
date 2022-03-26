@@ -112,8 +112,12 @@ func main() {
 	}
 
 	srv := &http.Server{
-		Addr:    addr,
-		Handler: r,
+		Addr:           addr,
+		Handler:        r,
+		ReadTimeout:    10 * time.Second,
+		WriteTimeout:   20 * time.Second,
+		IdleTimeout:    time.Minute,
+		MaxHeaderBytes: 1 << 20, // 1 MB
 	}
 	fmt.Printf("Listening and serving HTTP on %s\n", addr)
 	err := srv.ListenAndServe()
