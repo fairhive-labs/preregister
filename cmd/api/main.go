@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"regexp"
+	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -21,6 +22,7 @@ type App struct {
 	db     *data.DB
 	jwt    crypto.Token
 	mailer mailer.Mailer
+	wg     sync.WaitGroup
 }
 
 var jwts = map[string]crypto.Token{
@@ -34,9 +36,10 @@ func init() {
 }
 
 func NewApp(db data.DB) *App {
-	return &App{&db,
-		jwts["ES256"],
-		mailer.NewMailer(os.Getenv("FAIRHIVE_GSUITE_USER"),
+	return &App{
+		db:  &db,
+		jwt: jwts["ES256"],
+		mailer: mailer.NewMailer(os.Getenv("FAIRHIVE_GSUITE_USER"),
 			os.Getenv("FAIRHIVE_GSUITE_PASSWORD"),
 			"smtp.gmail.com",
 			587),
@@ -119,6 +122,7 @@ func main() {
 		IdleTimeout:    time.Minute,
 		MaxHeaderBytes: 1 << 20, // 1 MB
 	}
+
 	fmt.Printf("Listening and serving HTTP on %s\n", addr)
 	err := srv.ListenAndServe()
 	if !errors.Is(err, http.ErrServerClosed) {
