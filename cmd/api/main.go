@@ -18,7 +18,6 @@ import (
 	"github.com/fairhive-labs/preregister/internal/crypto"
 	"github.com/fairhive-labs/preregister/internal/data"
 	"github.com/fairhive-labs/preregister/internal/mailer"
-	pwdgen "github.com/trendev/go-pwdgen/generator"
 )
 
 type App struct {
@@ -28,12 +27,13 @@ type App struct {
 	wg     sync.WaitGroup
 }
 
-var jwts = map[string]crypto.Token{
-	"HS512": crypto.NewJWTHS512(pwdgen.Generate(64)),
-}
+var jwts = map[string]crypto.Token{}
 
 func init() {
-	jwts["HS256"] = crypto.NewJWTHS256(pwdgen.Generate(64))
+	k, _ := crypto.GenerateKey(32)
+	jwts["HS512"] = crypto.NewJWTHS512(k)
+	k, _ = crypto.GenerateKey(16)
+	jwts["HS256"] = crypto.NewJWTHS256(k)
 	jwts["ES256"], _ = crypto.NewJWTES256()
 	jwts["ES512"], _ = crypto.NewJWTES512()
 }
