@@ -13,14 +13,14 @@ import (
 	"github.com/fairhive-labs/preregister/internal/crypto"
 	"github.com/fairhive-labs/preregister/internal/data"
 	"github.com/fairhive-labs/preregister/internal/mailer"
-	pwdgen "github.com/trendev/go-pwdgen/generator"
 )
 
 func TestRegister(t *testing.T) {
 	var db data.DB = data.MockDB
+	k, _ := crypto.GenerateKey(32)
 	app := &App{
 		&db,
-		crypto.NewJWTHS256(pwdgen.Generate(64)),
+		crypto.NewJWTHS256(k),
 		&mailer.MockSmtpMailer,
 		sync.WaitGroup{},
 	}
@@ -236,9 +236,10 @@ func TestRegister(t *testing.T) {
 
 func TestActivate(t *testing.T) {
 	var db data.DB = data.MockDB
+	k, _ := crypto.GenerateKey(32)
 	app := &App{
 		&db,
-		crypto.NewJWTHS256(pwdgen.Generate(64)),
+		crypto.NewJWTHS256(k),
 		&mailer.MockSmtpMailer,
 		sync.WaitGroup{},
 	}
