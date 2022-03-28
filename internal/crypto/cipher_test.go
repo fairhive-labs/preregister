@@ -106,7 +106,7 @@ func TestDecrypt(t *testing.T) {
 }
 
 func TestEncryptDecryptRotation(t *testing.T) {
-	n := 1000
+	n := 100
 	s := []int{16, 24, 32}
 	for i := 0; i < n; i++ {
 		t.Run(fmt.Sprintf("%d", i+1), func(t *testing.T) {
