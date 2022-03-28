@@ -5,9 +5,12 @@ import (
 	"crypto/cipher"
 	"crypto/rand"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"io"
 )
+
+var ErrTooShortCipherText = errors.New("ciphertext too short")
 
 func GenerateKey(size int) (s string, err error) {
 	b := make([]byte, size)
@@ -18,7 +21,7 @@ func GenerateKey(size int) (s string, err error) {
 	return
 }
 
-func Encrypt(plaintext, ks string) (string, error) {
+func Encrypt(text, ks string) (string, error) {
 	k, err := hex.DecodeString(ks)
 	if err != nil {
 		return "", err
@@ -31,9 +34,41 @@ func Encrypt(plaintext, ks string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	nonce := make([]byte, gcm.NonceSize())
 	if _, err = io.ReadFull(rand.Reader, nonce); err != nil {
 		return "", err
 	}
-	return fmt.Sprintf("%x", gcm.Seal(nonce, nonce, []byte(plaintext), nil)), nil
+	return fmt.Sprintf("%x", gcm.Seal(nonce, nonce, []byte(text), nil)), nil
+}
+
+func Decrypt(ctext, ks string) (string, error) {
+	k, err := hex.DecodeString(ks)
+	if err != nil {
+		return "", err
+	}
+	enc, err := hex.DecodeString(ctext)
+	if err != nil {
+		return "", err
+	}
+	c, err := aes.NewCipher(k)
+	if err != nil {
+		return "", err
+	}
+	gcm, err := cipher.NewGCM(c)
+	if err != nil {
+		return "", err
+	}
+
+	nonceSize := gcm.NonceSize()
+	if len(ctext) < nonceSize {
+		return "nil", ErrTooShortCipherText
+	}
+
+	nonce, ciphertext := enc[:nonceSize], enc[nonceSize:]
+	b, err := gcm.Open(nil, nonce, ciphertext, nil)
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("%s", b), nil
 }
