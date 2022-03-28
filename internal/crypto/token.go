@@ -71,7 +71,7 @@ func extract[SM *jwt.SigningMethodHMAC | *jwt.SigningMethodECDSA](token string, 
 	uclaims := &UserClaims{}
 	tk, err := jwt.ParseWithClaims(token, uclaims, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(SM); !ok {
-			fmt.Printf("Unexpected signing method: %v", token.Header["alg"])
+			fmt.Printf("Unexpected signing method: %v\n", token.Header["alg"])
 			return nil, jwt.ErrSignatureInvalid
 		}
 		return k, nil
@@ -83,7 +83,7 @@ func extract[SM *jwt.SigningMethodHMAC | *jwt.SigningMethodECDSA](token string, 
 		uclaims.Type != "" { // mandatory Fields...
 		return data.NewUser(uclaims.Address, uclaims.Email, uclaims.Type), nil
 	}
-	fmt.Printf("Error extracting JWT: %v", err)
+	fmt.Printf("Error extracting JWT: %v\n", err)
 	err = ErrInvalidToken
 	return
 }
