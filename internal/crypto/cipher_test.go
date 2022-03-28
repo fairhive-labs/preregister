@@ -76,7 +76,7 @@ func TestEncrypt(t *testing.T) {
 func TestDecrypt(t *testing.T) {
 	tt := []int{16, 24, 32}
 	for _, tc := range tt {
-		t.Run(fmt.Sprintf("%d", tc), func(t *testing.T) {
+		t.Run(fmt.Sprintf("valid key %d bytes", tc), func(t *testing.T) {
 			txt, err := Decrypt(ctexts[tc], keys[tc])
 			if err != nil {
 				t.Errorf("incorrect error, got %v, want %v", err, nil)
@@ -89,19 +89,20 @@ func TestDecrypt(t *testing.T) {
 		})
 	}
 
-	t.Run("fake 32 bytes key", func(t *testing.T) {
-		n := 32
-		ks, _ := GenerateKey(n)
-		txt, err := Decrypt(ctexts[n], ks)
-		if err == nil {
-			t.Errorf("incorrect error, should be nil")
-			t.FailNow()
-		}
-		if txt == plaintext {
-			t.Errorf("decrypted text and plaintext cannot be equal")
-			t.FailNow()
-		}
-	})
+	for _, tc := range tt {
+		t.Run(fmt.Sprintf("wrong key %d bytes", tc), func(t *testing.T) {
+			ks, _ := GenerateKey(tc)
+			txt, err := Decrypt(ctexts[tc], ks)
+			if err == nil {
+				t.Errorf("incorrect error, should be nil")
+				t.FailNow()
+			}
+			if txt == plaintext {
+				t.Errorf("decrypted text and plaintext cannot be equal")
+				t.FailNow()
+			}
+		})
+	}
 }
 
 func TestEncryptDecryptRotation(t *testing.T) {
