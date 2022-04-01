@@ -34,7 +34,7 @@ type SmtpMailer struct {
 //go:embed templates/*.html
 var tfs embed.FS
 
-func NewMailer(from, password, host string, port int) *SmtpMailer {
+func New(from, password, host string, port int) *SmtpMailer {
 	t := template.Must(template.ParseFS(tfs, "templates/*"))
 	return &SmtpMailer{&smtpConfig{
 		from:     from,

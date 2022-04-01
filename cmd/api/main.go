@@ -44,7 +44,7 @@ func NewApp(db data.DB) *App {
 	return &App{
 		db:  &db,
 		jwt: jwts["ES256"],
-		mailer: mailer.NewMailer(os.Getenv("FAIRHIVE_GSUITE_USER"),
+		mailer: mailer.New(os.Getenv("FAIRHIVE_GSUITE_USER"),
 			os.Getenv("FAIRHIVE_GSUITE_PASSWORD"),
 			"smtp.gmail.com",
 			587),

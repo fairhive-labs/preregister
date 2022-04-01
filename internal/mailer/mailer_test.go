@@ -21,7 +21,7 @@ var (
 )
 
 func TestNewMailer(t *testing.T) {
-	mailer := NewMailer(from, password, host, port)
+	mailer := New(from, password, host, port)
 	if mailer.server == "" {
 		t.Errorf("incorrect server, got empty string, want %q", fmt.Sprintf("%s:%d", host, port))
 		t.FailNow()
@@ -33,7 +33,7 @@ func TestNewMailer(t *testing.T) {
 }
 
 func TestSendActivationEmail(t *testing.T) {
-	m := NewMailer(from, password, host, port)
+	m := New(from, password, host, port)
 	if err := m.SendActivationEmail(email, fmt.Sprintf("http://fairhive.io/activate/%s", token), hash); err != nil {
 		t.Errorf("error sending activation email : %v", err)
 		t.FailNow()
@@ -41,7 +41,7 @@ func TestSendActivationEmail(t *testing.T) {
 }
 
 func TestSendConfirmationEmail(t *testing.T) {
-	m := NewMailer(from, password, host, port)
+	m := New(from, password, host, port)
 	if err := m.SendConfirmationEmail(email); err != nil {
 		t.Errorf("error sending confirmation email : %v", err)
 		t.FailNow()
