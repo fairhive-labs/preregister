@@ -14,7 +14,6 @@ import (
 	"github.com/fairhive-labs/preregister/internal/data"
 	"github.com/fairhive-labs/preregister/internal/limiter"
 	"github.com/fairhive-labs/preregister/internal/mailer"
-	"golang.org/x/time/rate"
 )
 
 func TestRegister(t *testing.T) {
@@ -25,7 +24,7 @@ func TestRegister(t *testing.T) {
 		crypto.NewJWTHS256(k),
 		&mailer.MockSmtpMailer,
 		sync.WaitGroup{},
-		limiter.New(rate.Inf, 1), // no rate limit
+		limiter.NewUnlimited(),
 	}
 	r := setupRouter(*app)
 	tt := []struct {
@@ -245,7 +244,7 @@ func TestActivate(t *testing.T) {
 		crypto.NewJWTHS256(k),
 		&mailer.MockSmtpMailer,
 		sync.WaitGroup{},
-		limiter.New(rate.Inf, 1), // no rate limit
+		limiter.NewUnlimited(),
 	}
 	r := setupRouter(*app)
 

@@ -27,6 +27,10 @@ func New(l rate.Limit, b int) *RateLimiter {
 	}
 }
 
+func NewUnlimited() *RateLimiter {
+	return New(rate.Inf, 0)
+}
+
 func (rl *RateLimiter) GetAccess(ip string) *rate.Limiter {
 	rl.Lock()
 	defer rl.Unlock()
