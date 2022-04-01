@@ -25,5 +25,6 @@ require (
 	github.com/ugorji/go/codec v1.2.7 // indirect
 	golang.org/x/crypto v0.0.0-20220321153916-2c7772ba3064
 	golang.org/x/sys v0.0.0-20220325203850-36772127a21f // indirect
+	golang.org/x/time v0.0.0-20220224211638-0e9765cccd65
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )

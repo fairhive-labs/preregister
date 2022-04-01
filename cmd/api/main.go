@@ -17,6 +17,7 @@ import (
 
 	"github.com/fairhive-labs/preregister/internal/crypto"
 	"github.com/fairhive-labs/preregister/internal/data"
+	"github.com/fairhive-labs/preregister/internal/limiter"
 	"github.com/fairhive-labs/preregister/internal/mailer"
 )
 
@@ -25,6 +26,7 @@ type App struct {
 	jwt    crypto.Token
 	mailer mailer.Mailer
 	wg     sync.WaitGroup
+	rl     *limiter.RateLimiter
 }
 
 var jwts = map[string]crypto.Token{}
@@ -46,6 +48,7 @@ func NewApp(db data.DB) *App {
 			os.Getenv("FAIRHIVE_GSUITE_PASSWORD"),
 			"smtp.gmail.com",
 			587),
+		rl: limiter.New(0.1, 1),
 	}
 }
 
@@ -107,8 +110,22 @@ func (app App) activate(c *gin.Context) {
 	})
 }
 
+func (app App) limit(c *gin.Context) {
+	ip := c.ClientIP()
+	l := app.rl.GetAccess(ip)
+	if !l.Allow() {
+		c.AbortWithStatusJSON(http.StatusTooManyRequests, gin.H{
+			"error": "Too Many Requests",
+			"ip":    ip,
+		})
+		return
+	}
+	c.Next()
+}
+
 func setupRouter(app App) *gin.Engine {
 	r := gin.Default()
+	r.Use(app.limit)
 	r.POST("/", app.register)
 	r.POST("/activate/:token/:hash", app.activate)
 	return r
