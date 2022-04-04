@@ -13,16 +13,16 @@ type Access struct {
 }
 
 type RateLimiter struct {
-	l          rate.Limit // limit
-	b          int        // burst
+	limit      rate.Limit
+	burst      int
 	access     map[string]*Access
 	sync.Mutex //@TODO : RWMutex ?
 }
 
 func New(l rate.Limit, b int) *RateLimiter {
 	return &RateLimiter{
-		l:      l,
-		b:      b,
+		limit:  l,
+		burst:  b,
 		access: make(map[string]*Access),
 	}
 }
@@ -37,7 +37,7 @@ func (rl *RateLimiter) GetAccess(ip string) *rate.Limiter {
 
 	a, ok := rl.access[ip]
 	if !ok {
-		l := rate.NewLimiter(rl.l, rl.b)
+		l := rate.NewLimiter(rl.limit, rl.burst)
 		rl.access[ip] = &Access{
 			lat:     time.Now(),
 			limiter: l,
