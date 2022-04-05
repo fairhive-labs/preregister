@@ -96,4 +96,14 @@ func TestSave(t *testing.T) {
 		t.FailNow()
 	}
 
+	u = &User{
+		Address: "",
+		Email:   email,
+		Type:    utype,
+	}
+	if err := db.Save(u); err == nil {
+		t.Errorf("impossible to save user with an empty string Address: ValidationException")
+		t.FailNow()
+	}
+
 }
