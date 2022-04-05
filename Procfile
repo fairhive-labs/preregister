@@ -1,1 +1,1 @@
-web: ./bin/preregister-api
+web: ./bin/api
