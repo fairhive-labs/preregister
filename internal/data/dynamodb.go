@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
+	"github.com/fairhive-labs/preregister/internal/crypto/cipher"
 )
 
 type dynamoDB struct {
@@ -32,13 +33,18 @@ func NewDynamoDB(tn, ek string) (db *dynamoDB, err error) {
 	return
 }
 
-func (db *dynamoDB) Save(u *User) error {
+func (db *dynamoDB) Save(user *User) error {
 	sess := session.Must(session.NewSession())
 	svc := dynamodb.New(sess)
 	if svc == nil {
 		return errors.New("cannot create dynamodb client")
 	}
 
+	encEmail, err := cipher.Encrypt(user.Email, db.ek)
+	if err != nil {
+		return err
+	}
+	u := NewUser(user.Address, encEmail, user.Type)
 	av, err := dynamodbattribute.MarshalMap(*u)
 	if err != nil {
 		return err

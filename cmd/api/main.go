@@ -16,6 +16,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/fairhive-labs/preregister/internal/crypto"
+	"github.com/fairhive-labs/preregister/internal/crypto/cipher"
 	"github.com/fairhive-labs/preregister/internal/data"
 	"github.com/fairhive-labs/preregister/internal/limiter"
 	"github.com/fairhive-labs/preregister/internal/mailer"
@@ -35,9 +36,9 @@ var (
 )
 
 func init() {
-	k, _ := crypto.GenerateKey(32)
+	k, _ := cipher.GenerateKey(32)
 	jwts["HS512"] = crypto.NewJWTHS512(k)
-	k, _ = crypto.GenerateKey(16)
+	k, _ = cipher.GenerateKey(16)
 	jwts["HS256"] = crypto.NewJWTHS256(k)
 	jwts["ES256"], _ = crypto.NewJWTES256()
 	jwts["ES512"], _ = crypto.NewJWTES512()
@@ -102,12 +103,7 @@ func (app App) activate(c *gin.Context) {
 		return
 	}
 
-	encEmail, err := crypto.Encrypt(u.Email, ek)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	err = (*app.db).Save(data.NewUser(u.Address, encEmail, u.Type)) //store encrypted email
+	err = (*app.db).Save(u)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

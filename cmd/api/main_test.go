@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/fairhive-labs/preregister/internal/crypto"
+	"github.com/fairhive-labs/preregister/internal/crypto/cipher"
 	"github.com/fairhive-labs/preregister/internal/data"
 	"github.com/fairhive-labs/preregister/internal/limiter"
 	"github.com/fairhive-labs/preregister/internal/mailer"
@@ -18,7 +19,7 @@ import (
 
 func TestRegister(t *testing.T) {
 	var db data.DB = data.MockDB
-	k, _ := crypto.GenerateKey(32)
+	k, _ := cipher.GenerateKey(32)
 	app := &App{
 		&db,
 		crypto.NewJWTHS256(k),
@@ -238,7 +239,7 @@ func TestRegister(t *testing.T) {
 
 func TestActivate(t *testing.T) {
 	var db data.DB = data.MockDB
-	k, _ := crypto.GenerateKey(32)
+	k, _ := cipher.GenerateKey(32)
 	app := &App{
 		&db,
 		crypto.NewJWTHS256(k),
