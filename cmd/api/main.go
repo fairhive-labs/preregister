@@ -157,7 +157,7 @@ func main() {
 
 	var addr string
 	if p := os.Getenv("PORT"); p != "" {
-		addr = "" + p
+		addr = ":" + p
 	} else {
 		addr = ":8080" // default port
 	}
