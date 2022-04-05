@@ -29,7 +29,10 @@ type App struct {
 	rl     *limiter.RateLimiter
 }
 
-var jwts = map[string]crypto.Token{}
+var (
+	jwts = map[string]crypto.Token{}
+	ek   string
+)
 
 func init() {
 	k, _ := crypto.GenerateKey(32)
@@ -38,6 +41,13 @@ func init() {
 	jwts["HS256"] = crypto.NewJWTHS256(k)
 	jwts["ES256"], _ = crypto.NewJWTES256()
 	jwts["ES512"], _ = crypto.NewJWTES512()
+	log.Println("🔐 JWT Services: OK")
+
+	ek = os.Getenv("FAIRHIVE_ENCRYPTION_KEY")
+	if ek == "" {
+		panic("encryption key is missing")
+	}
+	log.Println("🔑 Encryption Key: OK")
 }
 
 func NewApp(db data.DB) *App {
