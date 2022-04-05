@@ -83,6 +83,7 @@ func TestBurst(t *testing.T) {
 	}{
 		{5.0, 3, nil},
 		{5.0, 5, nil},
+		{rate.Every(200 * time.Millisecond), 5, nil}, //same as previous one
 		{10.0, 10, nil},
 		{2.0, 3, errNotAllowed},
 		{99.0, 100, errNotAllowed},
