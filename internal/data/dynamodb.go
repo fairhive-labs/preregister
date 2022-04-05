@@ -58,6 +58,6 @@ func (db *dynamoDB) Save(user *User) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("💾 User [ %v ] saved in DB\n", *u)
+	fmt.Printf("💾 User [%v] saved in DB\n", *u)
 	return nil
 }
