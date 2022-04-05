@@ -102,7 +102,12 @@ func (app App) activate(c *gin.Context) {
 		return
 	}
 
-	err = (*app.db).Save(data.NewUser(u.Address, u.Email, u.Type))
+	encEmail, err := crypto.Encrypt(u.Email, ek)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	err = (*app.db).Save(data.NewUser(u.Address, encEmail, u.Type)) //store encrypted email
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
