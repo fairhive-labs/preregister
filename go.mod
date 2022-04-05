@@ -2,6 +2,9 @@ module github.com/fairhive-labs/preregister
 
 go 1.18
 
+// +heroku install ./cmd/...
+// +heroku goVersion 1.18
+
 require github.com/gin-gonic/gin v1.7.7
 
 require (
