@@ -21,7 +21,7 @@ func TestRegister(t *testing.T) {
 	var db data.DB = data.MockDB
 	k, _ := cipher.GenerateKey(32)
 	app := &App{
-		&db,
+		db,
 		crypto.NewJWTHS256(k),
 		&mailer.MockSmtpMailer,
 		sync.WaitGroup{},
@@ -241,7 +241,7 @@ func TestActivate(t *testing.T) {
 	var db data.DB = data.MockDB
 	k, _ := cipher.GenerateKey(32)
 	app := &App{
-		&db,
+		db,
 		crypto.NewJWTHS256(k),
 		&mailer.MockSmtpMailer,
 		sync.WaitGroup{},
@@ -374,7 +374,8 @@ func TestActivate(t *testing.T) {
 		})
 	}
 
-	(*app.db) = data.MockErrDB
+	app.db = data.MockErrDB
+	r = setupRouter(*app)
 	t.Run("faulty DB", func(t *testing.T) {
 		w := httptest.NewRecorder()
 		token := vt

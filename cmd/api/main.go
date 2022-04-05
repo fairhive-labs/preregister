@@ -23,12 +23,16 @@ import (
 )
 
 type App struct {
-	db     *data.DB
+	db     data.DB
 	jwt    crypto.Token
 	mailer mailer.Mailer
 	wg     sync.WaitGroup
 	rl     *limiter.RateLimiter
 }
+
+const (
+	tableName = "Users"
+)
 
 var (
 	jwts = map[string]crypto.Token{}
@@ -51,9 +55,13 @@ func init() {
 	log.Println("🔑 Encryption Key: OK")
 }
 
-func NewApp(db data.DB) *App {
+func NewApp() *App {
+	db, err := data.NewDynamoDB(tableName, ek)
+	if err != nil {
+		panic(err)
+	}
 	return &App{
-		db:  &db,
+		db:  db,
 		jwt: jwts["ES256"],
 		mailer: mailer.New(os.Getenv("FAIRHIVE_GSUITE_USER"),
 			os.Getenv("FAIRHIVE_GSUITE_PASSWORD"),
@@ -103,7 +111,7 @@ func (app App) activate(c *gin.Context) {
 		return
 	}
 
-	err = (*app.db).Save(u)
+	err = app.db.Save(u)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -143,7 +151,7 @@ func setupRouter(app App) *gin.Engine {
 }
 
 func main() {
-	app := *NewApp(data.MockDB) //@TODO : use dev / prod DB
+	app := *NewApp()
 	// gin.SetMode(gin.ReleaseMode)
 	r := setupRouter(app)
 
