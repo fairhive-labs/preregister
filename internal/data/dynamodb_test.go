@@ -1,6 +1,7 @@
 package data
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/aws/aws-sdk-go/aws/awserr"
@@ -8,7 +9,10 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 )
 
-const tableName = "Users_TEST"
+const (
+	tableName = "Users_TEST"
+	ek        = "4e8e7d24d3a991f9e83005d96f8d5d69b4763143a48cf5bdf7941726a26a69ab"
+)
 
 func TestListTables(t *testing.T) {
 	sess := session.Must(session.NewSession())
@@ -52,5 +56,30 @@ func TestListTables(t *testing.T) {
 		t.Errorf("%s is not listed in DynamoDB tables", tableName)
 		t.FailNow()
 	}
+}
+
+func TestNewDynamoDB(t *testing.T) {
+	tt := []struct {
+		name   string
+		tn, ek string
+		err    error
+	}{
+		{"normal", tableName, ek, nil},
+		{"no table name", "", ek, ErrDynamoDBNoTableName},
+		{"no encryption key", tableName, "", ErrDynamoDBNoEncryptionKey},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			_, err := NewDynamoDB(tc.tn, tc.ek)
+			if !errors.Is(err, tc.err) {
+				t.Errorf("incorrect error, got %v, want %v", err, tc.err)
+				t.FailNow()
+			}
+		})
+	}
+}
+
+func TestSave(t *testing.T) {
 
 }
