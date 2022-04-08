@@ -67,7 +67,7 @@ func NewApp() *App {
 			os.Getenv("FAIRHIVE_GSUITE_PASSWORD"),
 			"smtp.gmail.com",
 			587),
-		rl: limiter.New(0.1, 1),
+		rl: limiter.New(0.1, 10), // 10 token in bucket, add 1 token in 10s
 	}
 }
 
