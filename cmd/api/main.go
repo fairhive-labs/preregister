@@ -142,9 +142,22 @@ func (app App) limit(c *gin.Context) {
 	c.Next()
 }
 
+func (app App) cors(c *gin.Context) {
+	c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+	c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+	c.Writer.Header().Set("Access-Control-Allow-Headers", "origin, content-type, accept, authorization")
+	c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
+
+	if c.Request.Method == "OPTIONS" {
+		c.AbortWithStatus(204)
+		return
+	}
+	c.Next()
+}
+
 func setupRouter(app App) *gin.Engine {
 	r := gin.Default()
-	r.Use(app.limit)
+	r.Use(app.cors, app.limit)
 	r.POST("/", app.register)
 	r.POST("/activate/:token/:hash", app.activate)
 	return r
