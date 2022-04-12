@@ -205,9 +205,9 @@ func main() {
 		close(idleConnsClosed)
 	}()
 
-	go func() { // every minute, purge the rate limiters older than 10 minutes
+	go func() { // every 5 minutes, purge the rate limiters older than 10 minutes
 		for {
-			time.Sleep(time.Minute)
+			time.Sleep(5 * time.Minute)
 			app.rl.Cleanup(10 * time.Minute)
 		}
 	}()
