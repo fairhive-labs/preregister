@@ -205,6 +205,13 @@ func main() {
 		close(idleConnsClosed)
 	}()
 
+	go func() { // every minute, purge the rate limiters older than 10 minutes
+		for {
+			time.Sleep(time.Minute)
+			app.rl.Cleanup(10 * time.Minute)
+		}
+	}()
+
 	log.Printf("✅ Listening and serving HTTP on %s\n", addr)
 	err := srv.ListenAndServe()
 	if !errors.Is(err, http.ErrServerClosed) {

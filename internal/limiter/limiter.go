@@ -48,15 +48,14 @@ func (rl *RateLimiter) GetAccess(ip string) *rate.Limiter {
 	return a.limiter
 }
 
-// func (rl *RateLimiter) Cleanup() {
-// 	for {
-// 		time.Sleep(time.Minute)
-// 		rl.Lock()
-// 		for ip, a := range rl.access {
-// 			if time.Since(a.lat) > 10*time.Minute {
-// 				delete(rl.access, ip)
-// 			}
-// 		}
-// 		rl.Unlock()
-// 	}
-// }
+func (rl *RateLimiter) Cleanup(t time.Duration) {
+	rl.Lock()
+	defer rl.Unlock()
+
+	for ip, a := range rl.access {
+		if time.Since(a.lat) > t {
+			delete(rl.access, ip)
+		}
+	}
+
+}

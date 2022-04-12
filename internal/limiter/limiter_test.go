@@ -111,3 +111,20 @@ func simulateNRequests(ip string, n int, limiter *RateLimiter) error {
 	}
 	return nil
 }
+
+func Test(t *testing.T) {
+	ip := "10.10.10.10"
+	limiter := New(10, 10)
+	l := limiter.GetAccess(ip)
+	if ok := l.Allow(); !ok {
+		t.Errorf("incorrect Allow() value, got %v, should be true", ok)
+		t.FailNow()
+	}
+
+	time.Sleep(200 * time.Millisecond)
+	limiter.Cleanup(100 * time.Millisecond)
+	if v, ok := limiter.access[ip]; ok {
+		t.Errorf("access map should not contain value for ip %s but contain value %v", ip, v)
+		t.FailNow()
+	}
+}
