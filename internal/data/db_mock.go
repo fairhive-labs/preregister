@@ -13,6 +13,15 @@ func (db mockDB) Save(u *User) (err error) {
 	return
 }
 
+func (db mockDB) Count() (map[string]int, error) {
+	m := map[string]int{
+		"talent": 3,
+		"agent":  2,
+		"mentor": 1,
+	}
+	return m, nil
+}
+
 var MockDB = mockDB{}
 
 type mockErrDB struct {
@@ -22,6 +31,12 @@ func (db mockErrDB) Save(u *User) (err error) {
 	m := fmt.Sprintf("🔥 Error saving User [ %v ] in DB\n", *u)
 	fmt.Print(m)
 	return errors.New(m)
+}
+
+func (db mockErrDB) Count() (map[string]int, error) {
+	m := fmt.Sprintf("🔥 Error counting Users in DB\n")
+	fmt.Print(m)
+	return nil, errors.New(m)
 }
 
 var MockErrDB = mockErrDB{}

@@ -61,3 +61,9 @@ func (db *dynamoDB) Save(user *User) error {
 	fmt.Printf("💾 User [%v] saved in DB\n", *u)
 	return nil
 }
+
+//@TODO : complete function with AWS dynamoDB scan
+func (db *dynamoDB) Count() (map[string]int, error) {
+	m := map[string]int{}
+	return m, nil
+}

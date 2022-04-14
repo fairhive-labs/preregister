@@ -388,3 +388,47 @@ func TestActivate(t *testing.T) {
 		}
 	})
 }
+
+func TestCount(t *testing.T) {
+	var db data.DB = data.MockDB
+	k, _ := cipher.GenerateKey(32)
+	app := &App{
+		db,
+		crypto.NewJWTHS256(k),
+		&mailer.MockSmtpMailer,
+		sync.WaitGroup{},
+		limiter.NewUnlimited(),
+	}
+	r := setupRouter(*app)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/count", nil)
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Errorf("incorrect status, got %d, want %d", w.Code, http.StatusOK)
+		t.FailNow()
+	}
+	if w.Body == nil {
+		t.Errorf("Response body cannot be nil")
+		t.FailNow()
+	}
+
+	var res map[string]int = make(map[string]int)
+	err := json.NewDecoder(w.Body).Decode(&res)
+	if err != nil {
+		t.Errorf("Cannot decode response body %v, %v", w.Body, err)
+		t.FailNow()
+	}
+	if res["agent"] != 2 {
+		t.Errorf("incorrect agent count, got %d, want %d", res["agent"], 2)
+		t.FailNow()
+	}
+	if res["talent"] != 3 {
+		t.Errorf("incorrect talent count, got %d, want %d", res["talent"], 3)
+		t.FailNow()
+	}
+	if res["mentor"] != 1 {
+		t.Errorf("incorrect mentor count, got %d, want %d", res["mentor"], 1)
+		t.FailNow()
+	}
+}

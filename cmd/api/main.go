@@ -155,9 +155,19 @@ func (app App) cors(c *gin.Context) {
 	c.Next()
 }
 
+func (app App) count(c *gin.Context) {
+	cn, err := app.db.Count()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, cn)
+}
+
 func setupRouter(app App) *gin.Engine {
 	r := gin.Default()
 	r.Use(app.cors, app.limit)
+	r.GET("/count", app.count)
 	r.POST("/", app.register)
 	r.POST("/activate/:token/:hash", app.activate)
 	return r
