@@ -62,8 +62,37 @@ func (db *dynamoDB) Save(user *User) error {
 	return nil
 }
 
-//@TODO : complete function with AWS dynamoDB scan
 func (db *dynamoDB) Count() (map[string]int, error) {
 	m := map[string]int{}
+	sess := session.Must(session.NewSession())
+	svc := dynamodb.New(sess)
+	if svc == nil {
+		return nil, errors.New("cannot create dynamodb client")
+	}
+
+	input := &dynamodb.ScanInput{
+		TableName: aws.String(db.tn),
+	}
+	for {
+		result, err := svc.Scan(input)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, u := range result.Items {
+			user := User{}
+			err = dynamodbattribute.UnmarshalMap(u, &user)
+			if err != nil {
+				return nil, err
+			}
+			m[user.Type]++
+		}
+		// pagination
+		input.ExclusiveStartKey = result.LastEvaluatedKey
+		if result.LastEvaluatedKey == nil {
+			break
+		}
+	}
+
 	return m, nil
 }

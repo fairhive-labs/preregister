@@ -105,5 +105,17 @@ func TestSave(t *testing.T) {
 		t.Errorf("impossible to save user with an empty string Address: ValidationException")
 		t.FailNow()
 	}
+}
 
+func TestCount(t *testing.T) {
+	db, _ := NewDynamoDB(tableName, ek)
+	mc, err := db.Count()
+	if err != nil {
+		t.Errorf("cannot count users: %v", err)
+		t.FailNow()
+	}
+	if mc["talent"] == 0 {
+		t.Errorf("incorrect talent count: must be greater than 0")
+		t.FailNow()
+	}
 }
