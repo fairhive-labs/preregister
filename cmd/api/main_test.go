@@ -413,24 +413,32 @@ func TestCount(t *testing.T) {
 		t.FailNow()
 	}
 
-	var res map[string]int = make(map[string]int)
+	var res struct {
+		Users map[string]int
+		Total int
+	}
 	err := json.NewDecoder(w.Body).Decode(&res)
 	if err != nil {
 		t.Errorf("Cannot decode response body %v, %v", w.Body, err)
 		t.FailNow()
 	}
-	if res["agent"] != 2 {
-		t.Errorf("incorrect agent count, got %d, want %d", res["agent"], 2)
+	if res.Users["agent"] != 2 {
+		t.Errorf("incorrect agent count, got %d, want %d", res.Users["agent"], 2)
 		t.FailNow()
 	}
-	if res["talent"] != 3 {
-		t.Errorf("incorrect talent count, got %d, want %d", res["talent"], 3)
+	if res.Users["talent"] != 3 {
+		t.Errorf("incorrect talent count, got %d, want %d", res.Users["talent"], 3)
 		t.FailNow()
 	}
-	if res["mentor"] != 1 {
-		t.Errorf("incorrect mentor count, got %d, want %d", res["mentor"], 1)
+	if res.Users["mentor"] != 1 {
+		t.Errorf("incorrect mentor count, got %d, want %d", res.Users["mentor"], 1)
 		t.FailNow()
 	}
+	if res.Total != 6 {
+		t.Errorf("incorrect total count, got %d, want %d", res.Total, 6)
+		t.FailNow()
+	}
+
 	app.db = data.MockErrDB
 	r = setupRouter(*app)
 	t.Run("faulty DB", func(t *testing.T) {

@@ -161,13 +161,20 @@ func (app App) count(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, cn)
+	t := 0
+	for _, v := range cn {
+		t += v
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"users": cn,
+		"total": t,
+	})
 }
 
 func setupRouter(app App) *gin.Engine {
 	r := gin.Default()
 	r.Use(app.cors, app.limit)
-	r.GET("/count", app.count)
+	r.GET("/count", app.count) //@TODO : protect access
 	r.POST("/", app.register)
 	r.POST("/activate/:token/:hash", app.activate)
 	return r
