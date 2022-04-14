@@ -431,4 +431,15 @@ func TestCount(t *testing.T) {
 		t.Errorf("incorrect mentor count, got %d, want %d", res["mentor"], 1)
 		t.FailNow()
 	}
+	app.db = data.MockErrDB
+	r = setupRouter(*app)
+	t.Run("faulty DB", func(t *testing.T) {
+		w := httptest.NewRecorder()
+		http.NewRequest("GET", "/count", nil)
+		r.ServeHTTP(w, req)
+		if w.Code != http.StatusInternalServerError {
+			t.Errorf("Status code is incorrect, got %d, want %d", w.Code, http.StatusInternalServerError)
+			t.FailNow()
+		}
+	})
 }
