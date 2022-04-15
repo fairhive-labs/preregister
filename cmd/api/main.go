@@ -28,6 +28,8 @@ type App struct {
 	mailer mailer.Mailer
 	wg     sync.WaitGroup
 	rl     *limiter.RateLimiter
+	path1  string
+	path2  string
 }
 
 const (
@@ -149,13 +151,18 @@ func (app App) cors(c *gin.Context) {
 	c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
 
 	if c.Request.Method == "OPTIONS" {
-		c.AbortWithStatus(204)
+		c.AbortWithStatus(http.StatusNoContent)
 		return
 	}
 	c.Next()
 }
 
 func (app App) count(c *gin.Context) {
+	p1, p2 := c.Param("path1"), c.Param("path2")
+	if p1 != app.path1 || p2 != app.path2 {
+		c.AbortWithStatus(http.StatusNotFound)
+		return
+	}
 	cn, err := app.db.Count()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -174,7 +181,7 @@ func (app App) count(c *gin.Context) {
 func setupRouter(app App) *gin.Engine {
 	r := gin.Default()
 	r.Use(app.cors, app.limit)
-	r.GET("/count", app.count) //@TODO : protect access
+	r.GET("/:path1/:path2/count", app.count)
 	r.POST("/", app.register)
 	r.POST("/activate/:token/:hash", app.activate)
 	return r

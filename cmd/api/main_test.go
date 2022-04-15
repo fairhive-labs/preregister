@@ -26,6 +26,8 @@ func TestRegister(t *testing.T) {
 		&mailer.MockSmtpMailer,
 		sync.WaitGroup{},
 		limiter.NewUnlimited(),
+		"path1",
+		"path2",
 	}
 	r := setupRouter(*app)
 	tt := []struct {
@@ -246,6 +248,8 @@ func TestActivate(t *testing.T) {
 		&mailer.MockSmtpMailer,
 		sync.WaitGroup{},
 		limiter.NewUnlimited(),
+		"path1",
+		"path2",
 	}
 	r := setupRouter(*app)
 
@@ -398,52 +402,85 @@ func TestCount(t *testing.T) {
 		&mailer.MockSmtpMailer,
 		sync.WaitGroup{},
 		limiter.NewUnlimited(),
+		"path1",
+		"path2",
 	}
 	r := setupRouter(*app)
 
-	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/count", nil)
-	r.ServeHTTP(w, req)
-	if w.Code != http.StatusOK {
-		t.Errorf("incorrect status, got %d, want %d", w.Code, http.StatusOK)
-		t.FailNow()
-	}
-	if w.Body == nil {
-		t.Errorf("Response body cannot be nil")
-		t.FailNow()
-	}
+	t.Run("normal", func(t *testing.T) {
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest("GET", fmt.Sprintf("/%s/%s/count", app.path1, app.path2), nil)
+		r.ServeHTTP(w, req)
+		if w.Code != http.StatusOK {
+			t.Errorf("incorrect status, got %d, want %d", w.Code, http.StatusOK)
+			t.FailNow()
+		}
+		if w.Body == nil {
+			t.Errorf("Response body cannot be nil")
+			t.FailNow()
+		}
 
-	var res struct {
-		Users map[string]int
-		Total int
+		var res struct {
+			Users map[string]int
+			Total int
+		}
+		err := json.NewDecoder(w.Body).Decode(&res)
+		if err != nil {
+			t.Errorf("Cannot decode response body %v, %v", w.Body, err)
+			t.FailNow()
+		}
+		if res.Users["agent"] != 2 {
+			t.Errorf("incorrect agent count, got %d, want %d", res.Users["agent"], 2)
+			t.FailNow()
+		}
+		if res.Users["talent"] != 3 {
+			t.Errorf("incorrect talent count, got %d, want %d", res.Users["talent"], 3)
+			t.FailNow()
+		}
+		if res.Users["mentor"] != 1 {
+			t.Errorf("incorrect mentor count, got %d, want %d", res.Users["mentor"], 1)
+			t.FailNow()
+		}
+		if res.Total != 6 {
+			t.Errorf("incorrect total count, got %d, want %d", res.Total, 6)
+			t.FailNow()
+		}
+	})
+
+	tt := []struct {
+		name         string
+		path1, path2 string
+		status       int
+		body         string
+	}{
+		{"fakepath1", "fakepath1", app.path2, http.StatusNotFound, ""},
+		{"fakepath2", app.path1, "fakepath2", http.StatusNotFound, ""},
+		{"fakepaths", "fakepath1", "fakepath2", http.StatusNotFound, ""},
+		{"missing path1", "", "fakepath2", http.StatusNotFound, "404 page not found"},
+		{"missing path2", "fakepath1", "", http.StatusNotFound, ""},
+		{"no path", "", "", http.StatusNotFound, ""},
 	}
-	err := json.NewDecoder(w.Body).Decode(&res)
-	if err != nil {
-		t.Errorf("Cannot decode response body %v, %v", w.Body, err)
-		t.FailNow()
-	}
-	if res.Users["agent"] != 2 {
-		t.Errorf("incorrect agent count, got %d, want %d", res.Users["agent"], 2)
-		t.FailNow()
-	}
-	if res.Users["talent"] != 3 {
-		t.Errorf("incorrect talent count, got %d, want %d", res.Users["talent"], 3)
-		t.FailNow()
-	}
-	if res.Users["mentor"] != 1 {
-		t.Errorf("incorrect mentor count, got %d, want %d", res.Users["mentor"], 1)
-		t.FailNow()
-	}
-	if res.Total != 6 {
-		t.Errorf("incorrect total count, got %d, want %d", res.Total, 6)
-		t.FailNow()
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			w := httptest.NewRecorder()
+			req, _ := http.NewRequest("GET", fmt.Sprintf("/%s/%s/count", tc.path1, tc.path2), nil)
+			r.ServeHTTP(w, req)
+			if w.Code != tc.status {
+				t.Errorf("incorrect status, got %d, want %d", w.Code, tc.status)
+				t.FailNow()
+			}
+			if w.Body.String() != tc.body {
+				t.Errorf("incorrect body, got %q, want %q", w.Body.String(), tc.body)
+				t.FailNow()
+			}
+		})
 	}
 
 	app.db = data.MockErrDB
 	r = setupRouter(*app)
 	t.Run("faulty DB", func(t *testing.T) {
 		w := httptest.NewRecorder()
-		http.NewRequest("GET", "/count", nil)
+		req, _ := http.NewRequest("GET", fmt.Sprintf("/%s/%s/count", app.path1, app.path2), nil)
 		r.ServeHTTP(w, req)
 		if w.Code != http.StatusInternalServerError {
 			t.Errorf("Status code is incorrect, got %d, want %d", w.Code, http.StatusInternalServerError)
