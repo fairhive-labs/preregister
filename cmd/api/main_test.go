@@ -409,7 +409,7 @@ func TestCount(t *testing.T) {
 
 	t.Run("normal", func(t *testing.T) {
 		w := httptest.NewRecorder()
-		req, _ := http.NewRequest("GET", fmt.Sprintf("/%s/%s/count", app.path1, app.path2), nil)
+		req, _ := http.NewRequest("GET", fmt.Sprintf("/%s/%s/count", app.secpath1, app.secpath2), nil)
 		r.ServeHTTP(w, req)
 		if w.Code != http.StatusOK {
 			t.Errorf("incorrect status, got %d, want %d", w.Code, http.StatusOK)
@@ -453,8 +453,8 @@ func TestCount(t *testing.T) {
 		status       int
 		body         string
 	}{
-		{"fakepath1", "fakepath1", app.path2, http.StatusNotFound, ""},
-		{"fakepath2", app.path1, "fakepath2", http.StatusNotFound, ""},
+		{"fakepath1", "fakepath1", app.secpath2, http.StatusNotFound, ""},
+		{"fakepath2", app.secpath1, "fakepath2", http.StatusNotFound, ""},
 		{"fakepaths", "fakepath1", "fakepath2", http.StatusNotFound, ""},
 		{"missing path1", "", "fakepath2", http.StatusNotFound, "404 page not found"},
 		{"missing path2", "fakepath1", "", http.StatusNotFound, ""},
@@ -480,7 +480,7 @@ func TestCount(t *testing.T) {
 	r = setupRouter(*app)
 	t.Run("faulty DB", func(t *testing.T) {
 		w := httptest.NewRecorder()
-		req, _ := http.NewRequest("GET", fmt.Sprintf("/%s/%s/count", app.path1, app.path2), nil)
+		req, _ := http.NewRequest("GET", fmt.Sprintf("/%s/%s/count", app.secpath1, app.secpath2), nil)
 		r.ServeHTTP(w, req)
 		if w.Code != http.StatusInternalServerError {
 			t.Errorf("Status code is incorrect, got %d, want %d", w.Code, http.StatusInternalServerError)

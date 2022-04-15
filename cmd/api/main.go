@@ -23,13 +23,12 @@ import (
 )
 
 type App struct {
-	db     data.DB
-	jwt    crypto.Token
-	mailer mailer.Mailer
-	wg     sync.WaitGroup
-	rl     *limiter.RateLimiter
-	path1  string
-	path2  string
+	db                 data.DB
+	jwt                crypto.Token
+	mailer             mailer.Mailer
+	wg                 sync.WaitGroup
+	rl                 *limiter.RateLimiter
+	secpath1, secpath2 string
 }
 
 const (
@@ -37,8 +36,9 @@ const (
 )
 
 var (
-	jwts = map[string]crypto.Token{}
-	ek   string
+	jwts               = map[string]crypto.Token{}
+	ek                 string
+	secpath1, secpath2 string
 )
 
 func init() {
@@ -55,6 +55,15 @@ func init() {
 		panic("encryption key is missing")
 	}
 	log.Println("🔑 Encryption Key: OK")
+
+	secpath1 = os.Getenv("FAIRHIVE_API_SECURE_PATH1")
+	if secpath1 == "" {
+		panic("secure path #1 must be set")
+	}
+	secpath2 = os.Getenv("FAIRHIVE_API_SECURE_PATH2")
+	if secpath2 == "" {
+		panic("secure path #1 must be set")
+	}
 }
 
 func NewApp() *App {
@@ -63,13 +72,13 @@ func NewApp() *App {
 		panic(err)
 	}
 	return &App{
-		db:  db,
-		jwt: jwts["ES256"],
-		mailer: mailer.New(os.Getenv("FAIRHIVE_GSUITE_USER"),
-			os.Getenv("FAIRHIVE_GSUITE_PASSWORD"),
-			"smtp.gmail.com",
-			587),
-		rl: limiter.New(0.1, 10), // 10 token in bucket, add 1 token in 10s
+		db:       db,
+		jwt:      jwts["ES256"],
+		mailer:   mailer.New(os.Getenv("FAIRHIVE_GSUITE_USER"), os.Getenv("FAIRHIVE_GSUITE_PASSWORD"), "smtp.gmail.com", 587),
+		wg:       sync.WaitGroup{},
+		rl:       limiter.New(0.1, 10),
+		secpath1: secpath1,
+		secpath2: secpath2,
 	}
 }
 
@@ -159,7 +168,7 @@ func (app App) cors(c *gin.Context) {
 
 func (app App) count(c *gin.Context) {
 	p1, p2 := c.Param("path1"), c.Param("path2")
-	if p1 != app.path1 || p2 != app.path2 {
+	if p1 != app.secpath1 || p2 != app.secpath2 {
 		c.AbortWithStatus(http.StatusNotFound)
 		return
 	}
