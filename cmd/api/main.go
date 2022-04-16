@@ -38,7 +38,7 @@ type App struct {
 var tfs embed.FS
 
 const (
-	tableName = "Users"
+	tableName = "Waitlist"
 )
 
 var (

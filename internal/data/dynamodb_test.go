@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	tableName = "Users_TEST"
+	tableName = "Waitlist_TEST"
 	ek        = "4e8e7d24d3a991f9e83005d96f8d5d69b4763143a48cf5bdf7941726a26a69ab"
 )
 
