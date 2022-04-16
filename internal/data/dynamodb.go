@@ -63,7 +63,15 @@ func (db *dynamoDB) Save(user *User) error {
 }
 
 func (db *dynamoDB) Count() (map[string]int, error) {
-	m := map[string]int{}
+	m := map[string]int{
+		"advisor":     0,
+		"agent":       0,
+		"client":      0,
+		"contributor": 0,
+		"investor":    0,
+		"mentor":      0,
+		"talent":      0,
+	}
 	sess := session.Must(session.NewSession())
 	svc := dynamodb.New(sess)
 	if svc == nil {
