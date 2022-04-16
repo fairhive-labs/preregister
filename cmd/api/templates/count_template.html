@@ -49,13 +49,10 @@
                     Count
                 </th>
             </tr>
-            {{range $type,$count := .users}}
-            <tr>
-                <td><code>{{$type}}</code></td>
-                <td class="count"><code>{{$count}}</code></td>
+            {{range $type,$count := .users}}<tr>
+                <td><code>{{$type}}</code></td><td class="count"><code>{{$count}}</code></td>
             </tr>
-            {{end}}
-            <tr>
+            {{end}}<tr>
                 <td colspan="2">Total: {{.total}}</td>
             </tr>
         </table>

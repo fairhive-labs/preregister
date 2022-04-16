@@ -15,9 +15,13 @@ func (db mockDB) Save(u *User) (err error) {
 
 func (db mockDB) Count() (map[string]int, error) {
 	m := map[string]int{
-		"talent": 3,
-		"agent":  2,
-		"mentor": 1,
+		"advisor":     0,
+		"agent":       2,
+		"client":      0,
+		"contributor": 0,
+		"investor":    0,
+		"mentor":      1,
+		"talent":      3,
 	}
 	return m, nil
 }

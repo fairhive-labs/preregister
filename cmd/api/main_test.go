@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -497,7 +498,54 @@ func TestCount(t *testing.T) {
 					t.FailNow()
 				}
 			default:
-				t.Errorf("incorrect type, %s is not supported", xu.Type)
+				if xu.Value != 0 {
+					t.Errorf("incorrect %s count, got %d, want %d", xu.Type, xu.Value, 0)
+					t.FailNow()
+				}
+			}
+		}
+	})
+
+	t.Run("html normal", func(t *testing.T) {
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest("GET", fmt.Sprintf("/%s/%s/count", app.secpath1, app.secpath2), nil)
+		r.ServeHTTP(w, req)
+		if w.Code != http.StatusOK {
+			t.Errorf("incorrect status, got %d, want %d", w.Code, http.StatusOK)
+			t.FailNow()
+		}
+		if w.Body == nil {
+			t.Errorf("Response body cannot be nil")
+			t.FailNow()
+		}
+
+		users := map[string]int{
+			"advisor":     0,
+			"agent":       2,
+			"client":      0,
+			"contributor": 0,
+			"investor":    0,
+			"mentor":      1,
+			"talent":      3,
+		}
+		m := map[string]bool{
+			`<td colspan="2">Total: 6</td>`: false,
+		}
+		for t, v := range users {
+			k := fmt.Sprintf(`<td><code>%s</code></td><td class="count"><code>%d</code></td>`, t, v)
+			m[k] = false
+		}
+		for l, err := w.Body.ReadString('\n'); err == nil; {
+			for k := range m {
+				if strings.Contains(l, k) {
+					m[k] = true
+				}
+			}
+			l, err = w.Body.ReadString('\n')
+		}
+		for k, v := range m {
+			if !v {
+				t.Errorf("response body should contain %q", k)
 				t.FailNow()
 			}
 		}
