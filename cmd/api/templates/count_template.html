@@ -1,0 +1,53 @@
+<!-- count_template.html -->
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>🔑 PWDGEN</title>
+    <style>
+        html,
+        body {
+            height: 100%;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+        }
+
+        td,
+        th {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <table>
+            <tr>
+                <th>
+                    Length
+                </th>
+                <th>
+                    Password
+                </th>
+            </tr>
+            <tr>
+                <td><code>{{.length}}</code></td>
+                <td><code>{{.password}}</code></td>
+            </tr>
+        </table>
+    </div>
+</body>
+
+</html>
