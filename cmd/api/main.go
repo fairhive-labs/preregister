@@ -181,10 +181,15 @@ func (app App) count(c *gin.Context) {
 	for _, v := range cn {
 		t += v
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"users": cn,
-		"total": t,
-	})
+	mime := c.DefaultQuery("mime", "html")
+	if mime == "json" {
+		c.JSON(http.StatusOK, gin.H{
+			"users": cn,
+			"total": t,
+		})
+		return
+	}
+
 }
 
 func setupRouter(app App) *gin.Engine {

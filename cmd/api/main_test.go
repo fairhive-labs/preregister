@@ -407,9 +407,9 @@ func TestCount(t *testing.T) {
 	}
 	r := setupRouter(*app)
 
-	t.Run("normal", func(t *testing.T) {
+	t.Run("json normal", func(t *testing.T) {
 		w := httptest.NewRecorder()
-		req, _ := http.NewRequest("GET", fmt.Sprintf("/%s/%s/count", app.secpath1, app.secpath2), nil)
+		req, _ := http.NewRequest("GET", fmt.Sprintf("/%s/%s/count?mime=json", app.secpath1, app.secpath2), nil)
 		r.ServeHTTP(w, req)
 		if w.Code != http.StatusOK {
 			t.Errorf("incorrect status, got %d, want %d", w.Code, http.StatusOK)
@@ -461,9 +461,9 @@ func TestCount(t *testing.T) {
 		{"no path", "", "", http.StatusNotFound, ""},
 	}
 	for _, tc := range tt {
-		t.Run(tc.name, func(t *testing.T) {
+		t.Run("json_"+tc.name, func(t *testing.T) {
 			w := httptest.NewRecorder()
-			req, _ := http.NewRequest("GET", fmt.Sprintf("/%s/%s/count", tc.path1, tc.path2), nil)
+			req, _ := http.NewRequest("GET", fmt.Sprintf("/%s/%s/count?mime=json", tc.path1, tc.path2), nil)
 			r.ServeHTTP(w, req)
 			if w.Code != tc.status {
 				t.Errorf("incorrect status, got %d, want %d", w.Code, tc.status)
@@ -478,9 +478,9 @@ func TestCount(t *testing.T) {
 
 	app.db = data.MockErrDB
 	r = setupRouter(*app)
-	t.Run("faulty DB", func(t *testing.T) {
+	t.Run("json faulty DB", func(t *testing.T) {
 		w := httptest.NewRecorder()
-		req, _ := http.NewRequest("GET", fmt.Sprintf("/%s/%s/count", app.secpath1, app.secpath2), nil)
+		req, _ := http.NewRequest("GET", fmt.Sprintf("/%s/%s/count?mime=json", app.secpath1, app.secpath2), nil)
 		r.ServeHTTP(w, req)
 		if w.Code != http.StatusInternalServerError {
 			t.Errorf("Status code is incorrect, got %d, want %d", w.Code, http.StatusInternalServerError)
