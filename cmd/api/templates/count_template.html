@@ -3,7 +3,7 @@
 <html>
 
 <head>
-    <title>🔑 PWDGEN</title>
+    <title>fairhive waitlist</title>
     <style>
         html,
         body {
@@ -22,10 +22,17 @@
             border-collapse: collapse;
         }
 
-        td,
-        th {
+        td {
             border: 1px solid #dddddd;
             text-align: left;
+            padding: 8px;
+            min-width: 120px;
+        }
+
+        th,
+        td.count {
+            border: 1px solid #dddddd;
+            text-align: center;
             padding: 8px;
         }
     </style>
@@ -36,15 +43,20 @@
         <table>
             <tr>
                 <th>
-                    Length
+                    Type
                 </th>
                 <th>
-                    Password
+                    Count
                 </th>
             </tr>
+            {{range $type,$count := .users}}
             <tr>
-                <td><code>{{.length}}</code></td>
-                <td><code>{{.password}}</code></td>
+                <td><code>{{$type}}</code></td>
+                <td class="count"><code>{{$count}}</code></td>
+            </tr>
+            {{end}}
+            <tr>
+                <td colspan="2">Total: {{.total}}</td>
             </tr>
         </table>
     </div>

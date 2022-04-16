@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
+	"embed"
 	"errors"
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"os"
@@ -31,6 +33,9 @@ type App struct {
 	rl                 *limiter.RateLimiter
 	secpath1, secpath2 string
 }
+
+//go:embed templates
+var tfs embed.FS
 
 const (
 	tableName = "Users"
@@ -213,12 +218,18 @@ func (app App) count(c *gin.Context) {
 		})
 		return
 	default:
+		c.HTML(http.StatusOK, "count_template.html", gin.H{
+			"users": cn,
+			"total": t,
+		})
 		return
 	}
 }
 
 func setupRouter(app App) *gin.Engine {
 	r := gin.Default()
+	t := template.Must(template.ParseFS(tfs, "templates/*"))
+	r.SetHTMLTemplate(t)
 	r.Use(app.cors, app.limit)
 	r.GET("/:path1/:path2/count", app.count)
 	r.POST("/", app.register)
