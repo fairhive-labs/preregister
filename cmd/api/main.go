@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/signal"
 	"regexp"
+	"sort"
 	"sync"
 	"syscall"
 	"time"
@@ -177,19 +178,43 @@ func (app App) count(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
 	t := 0
 	for _, v := range cn {
 		t += v
 	}
 	mime := c.DefaultQuery("mime", "html")
-	if mime == "json" {
+	switch mime {
+	case "json":
 		c.JSON(http.StatusOK, gin.H{
 			"users": cn,
 			"total": t,
 		})
 		return
+	case "xml":
+		type xmlUser struct {
+			Type  string
+			Value int
+		}
+		type Count struct {
+			Total int
+			Users []xmlUser
+		}
+		u := []xmlUser{}
+		for t, v := range cn {
+			u = append(u, xmlUser{t, v})
+		}
+		sort.Slice(u, func(i, j int) bool {
+			return u[i].Type < u[j].Type
+		})
+		c.XML(http.StatusOK, Count{
+			Total: t,
+			Users: u,
+		})
+		return
+	default:
+		return
 	}
-
 }
 
 func setupRouter(app App) *gin.Engine {

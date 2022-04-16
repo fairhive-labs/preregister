@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -444,6 +445,61 @@ func TestCount(t *testing.T) {
 		if res.Total != 6 {
 			t.Errorf("incorrect total count, got %d, want %d", res.Total, 6)
 			t.FailNow()
+		}
+	})
+
+	t.Run("xml normal", func(t *testing.T) {
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest("GET", fmt.Sprintf("/%s/%s/count?mime=xml", app.secpath1, app.secpath2), nil)
+		r.ServeHTTP(w, req)
+		if w.Code != http.StatusOK {
+			t.Errorf("incorrect status, got %d, want %d", w.Code, http.StatusOK)
+			t.FailNow()
+		}
+		if w.Body == nil {
+			t.Errorf("Response body cannot be nil")
+			t.FailNow()
+		}
+
+		type xmlUser struct {
+			Type  string
+			Value int
+		}
+		type Count struct {
+			Total int
+			Users []xmlUser
+		}
+		var res Count
+		err := xml.NewDecoder(w.Body).Decode(&res)
+		if err != nil {
+			t.Errorf("Cannot decode response body %v, %v", w.Body, err)
+			t.FailNow()
+		}
+		if res.Total != 6 {
+			t.Errorf("incorrect total count, got %d, want %d", res.Total, 6)
+			t.FailNow()
+		}
+		for _, xu := range res.Users {
+			switch xu.Type {
+			case "agent":
+				if xu.Value != 2 {
+					t.Errorf("incorrect agent count, got %d, want %d", xu.Value, 2)
+					t.FailNow()
+				}
+			case "mentor":
+				if xu.Value != 1 {
+					t.Errorf("incorrect mentor count, got %d, want %d", xu.Value, 1)
+					t.FailNow()
+				}
+			case "talent":
+				if xu.Value != 3 {
+					t.Errorf("incorrect talent count, got %d, want %d", xu.Value, 3)
+					t.FailNow()
+				}
+			default:
+				t.Errorf("incorrect type, %s is not supported", xu.Type)
+				t.FailNow()
+			}
 		}
 	})
 
