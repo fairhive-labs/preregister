@@ -532,7 +532,7 @@ func TestCount(t *testing.T) {
 			`<td colspan="2">Total: 6</td>`: false,
 		}
 		for t, v := range users {
-			k := fmt.Sprintf(`<td><code>%s</code></td><td class="count"><code>%d</code></td>`, t, v)
+			k := fmt.Sprintf(`%s</td><td class="count">%d</td>`, t, v)
 			m[k] = false
 		}
 		for l, err := w.Body.ReadString('\n'); err == nil; {

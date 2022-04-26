@@ -1,7 +1,7 @@
-build: clean
-	go build -o bin/preregister-api -v ./cmd/api/main.go
 run: clean build
-	./bin/preregister-api
+	./bin/api
+build: clean
+	go build -o bin/api -v ./cmd/api/main.go
 clean:
 	rm -rf ./bin
 test:
