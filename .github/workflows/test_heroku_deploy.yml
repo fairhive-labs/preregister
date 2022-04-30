@@ -6,6 +6,17 @@ on:
 name: Test & Heroku Deployment
 jobs:
   test:
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      FAIRHIVE_API_SECURE_PATH1: ${{ secrets.FAIRHIVE_API_SECURE_PATH1 }}
+      FAIRHIVE_API_SECURE_PATH2: ${{ secrets.FAIRHIVE_API_SECURE_PATH2 }}
+      FAIRHIVE_ENCRYPTION_KEY: ${{ secrets.FAIRHIVE_ENCRYPTION_KEY }}
+      FAIRHIVE_GSUITE_PASSWORD: ${{ secrets.FAIRHIVE_GSUITE_PASSWORD }}
+      FAIRHIVE_GSUITE_USER: ${{ secrets.FAIRHIVE_GSUITE_USER }}
+      MAILTRAP_PASSWORD: ${{ secrets.MAILTRAP_PASSWORD }}
+      MAILTRAP_USER: ${{ secrets.MAILTRAP_USER }}
     strategy:
       matrix:
         go-version: [1.18.x]
