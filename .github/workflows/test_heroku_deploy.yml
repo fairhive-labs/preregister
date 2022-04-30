@@ -57,7 +57,16 @@ jobs:
           delay: 5
           rollbackonhealthcheckfailed: true
         env:
-          HD_PRETTY_SECRET: "It is s3crET"
+          HD_AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          HD_AWS_REGION: ${{ secrets.AWS_REGION }}
+          HD_AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          HD_FAIRHIVE_API_SECURE_PATH1: ${{ secrets.FAIRHIVE_API_SECURE_PATH1 }}
+          HD_FAIRHIVE_API_SECURE_PATH2: ${{ secrets.FAIRHIVE_API_SECURE_PATH2 }}
+          HD_FAIRHIVE_ENCRYPTION_KEY: ${{ secrets.FAIRHIVE_ENCRYPTION_KEY }}
+          HD_FAIRHIVE_GSUITE_PASSWORD: ${{ secrets.FAIRHIVE_GSUITE_PASSWORD }}
+          HD_FAIRHIVE_GSUITE_USER: ${{ secrets.FAIRHIVE_GSUITE_USER }}
+          HD_MAILTRAP_PASSWORD: ${{ secrets.MAILTRAP_PASSWORD }}
+          HD_MAILTRAP_USER: ${{ secrets.MAILTRAP_USER }}
       - name: Slack Notification
         uses: rtCamp/action-slack-notify@v2
         env:
