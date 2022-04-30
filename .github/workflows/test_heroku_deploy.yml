@@ -56,6 +56,8 @@ jobs:
           checkstring: "ok"
           delay: 5
           rollbackonhealthcheckfailed: true
+        env:
+          HD_PRETTY_SECRET: "It is s3crET"
       - name: Slack Notification
         uses: rtCamp/action-slack-notify@v2
         env:
