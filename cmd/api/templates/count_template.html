@@ -87,8 +87,7 @@
             <tbody>
                 {{range $type,$count := .users}}<tr>
                     {{ if or (eq $type "agent") (eq $type "client") (eq $type "mentor") (eq $type "talent")}}
-                    <td class="{{$type}}">{{$type}}</td>{{else}}<td>{{$type}}</td>{{end}}<td class="count">{{$count}}
-                    </td>
+                    <td class="{{$type}}">{{$type}}</td>{{else}}<td>{{$type}}</td>{{end}}<td class="count">{{$count}}</td>
                 </tr>
                 {{end}}
             <tfoot>
