@@ -86,7 +86,7 @@ func TestBurst(t *testing.T) {
 		{rate.Every(200 * time.Millisecond), 5, nil}, //same as previous one
 		{10.0, 10, nil},
 		{2.0, 3, errNotAllowed},
-		{99.0, 100, errNotAllowed},
+		{80.0, 100, errNotAllowed},
 	}
 	for _, tc := range tt {
 		t.Run(fmt.Sprintf("l=%.2f b=%d", tc.l, tc.b), func(t *testing.T) {
@@ -95,7 +95,7 @@ func TestBurst(t *testing.T) {
 			simulateNRequests(ip, n, limiter)
 			time.Sleep(time.Second) //pause, add tokens in the bucket
 			if err := simulateNRequests(ip, n, limiter); !errors.Is(err, tc.err) {
-				t.Errorf("incorrect error: got %v, want %v", err, tc.err)
+				t.Errorf("incorrect error: got %q, want %q", err, tc.err)
 				t.FailNow()
 			}
 		})
