@@ -1,4 +1,5 @@
 # preregister
+[![Test & Heroku Deployment](https://github.com/fairhive-labs/preregister/actions/workflows/test_heroku_deploy.yml/badge.svg)](https://github.com/fairhive-labs/preregister/actions/workflows/test_heroku_deploy.yml)
 
 Microservice used during preregistration process
 
