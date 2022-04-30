@@ -231,6 +231,9 @@ func setupRouter(app App) *gin.Engine {
 	t := template.Must(template.ParseFS(tfs, "templates/*"))
 	r.SetHTMLTemplate(t)
 	r.Use(app.cors, app.limit)
+	r.GET("/health", func(c *gin.Context) {
+		c.String(http.StatusOK, "ok")
+	})
 	r.GET("/:path1/:path2/count", app.count)
 	r.POST("/", app.register)
 	r.POST("/activate/:token/:hash", app.activate)
