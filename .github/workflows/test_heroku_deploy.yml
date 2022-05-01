@@ -10,8 +10,8 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_REGION: ${{ secrets.AWS_REGION }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      FAIRHIVE_API_SECURE_PATH1: ${{ secrets.FAIRHIVE_API_SECURE_PATH1 }}
-      FAIRHIVE_API_SECURE_PATH2: ${{ secrets.FAIRHIVE_API_SECURE_PATH2 }}
+      FAIRHIVE_API_SECURE_PATH1: "foo"
+      FAIRHIVE_API_SECURE_PATH2: "bar"
       FAIRHIVE_ENCRYPTION_KEY: ${{ secrets.FAIRHIVE_ENCRYPTION_KEY }}
       FAIRHIVE_GSUITE_PASSWORD: ${{ secrets.FAIRHIVE_GSUITE_PASSWORD }}
       FAIRHIVE_GSUITE_USER: ${{ secrets.FAIRHIVE_GSUITE_USER }}
@@ -46,12 +46,10 @@ jobs:
     needs: test
     # if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
     steps:
-      - name: Generate uuid
+      - name: Generate Secured Path
         run: |
-          echo "MY_UUID=$(uuidgen)" >> $GITHUB_ENV
-      - name: Use uuid
-        run: |
-          echo "UUID = ${{ env.MY_UUID }}"
+          echo "FAIRHIVE_API_SECURE_PATH1=$(uuidgen)" >> $GITHUB_ENV
+          echo "FAIRHIVE_API_SECURE_PATH2=$(uuidgen)" >> $GITHUB_ENV
       - uses: actions/checkout@v2
       - uses: akhileshns/heroku-deploy@v3.12.12
         with:
@@ -66,20 +64,19 @@ jobs:
           HD_AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           HD_AWS_REGION: ${{ secrets.AWS_REGION }}
           HD_AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          HD_FAIRHIVE_API_SECURE_PATH1: ${{ secrets.FAIRHIVE_API_SECURE_PATH1 }}
-          HD_FAIRHIVE_API_SECURE_PATH2: ${{ secrets.FAIRHIVE_API_SECURE_PATH2 }}
+          HD_FAIRHIVE_API_SECURE_PATH1: ${{ env.FAIRHIVE_API_SECURE_PATH1 }}
+          HD_FAIRHIVE_API_SECURE_PATH2: ${{ env.FAIRHIVE_API_SECURE_PATH2 }}
           HD_FAIRHIVE_ENCRYPTION_KEY: ${{ secrets.FAIRHIVE_ENCRYPTION_KEY }}
           HD_FAIRHIVE_GSUITE_PASSWORD: ${{ secrets.FAIRHIVE_GSUITE_PASSWORD }}
           HD_FAIRHIVE_GSUITE_USER: ${{ secrets.FAIRHIVE_GSUITE_USER }}
           HD_MAILTRAP_PASSWORD: ${{ secrets.MAILTRAP_PASSWORD }}
           HD_MAILTRAP_USER: ${{ secrets.MAILTRAP_USER }}
-          HD_UUID: ${{ env.MY_UUID }}
       - name: Slack Notification
         uses: rtCamp/action-slack-notify@v2
         env:
           SLACK_CHANNEL: _github
           SLACK_COLOR: ${{ job.status }}
           SLACK_TITLE: Heroku Deployment
-          SLACK_MESSAGE: ${{ env.MY_UUID }}
+          SLACK_MESSAGE: ${{ env.FAIRHIVE_API_SECURE_PATH1 }}/${{ env.FAIRHIVE_API_SECURE_PATH2 }}
           SLACK_USERNAME: _whyvrafvr
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
