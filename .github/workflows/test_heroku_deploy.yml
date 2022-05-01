@@ -76,7 +76,7 @@ jobs:
         env:
           SLACK_CHANNEL: _github
           SLACK_COLOR: ${{ job.status }}
-          SLACK_TITLE: Heroku Deployment
+          SLACK_TITLE: Heroku Deployment - preregister/waitlist
           SLACK_MESSAGE: "https://polar-plains-98105.herokuapp.com/${{ env.FAIRHIVE_API_SECURE_PATH1 }}/${{ env.FAIRHIVE_API_SECURE_PATH2 }}/count"
           SLACK_USERNAME: _whyvrafvr
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
