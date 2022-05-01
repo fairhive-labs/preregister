@@ -5,6 +5,12 @@ on:
 
 name: Test & Heroku Deployment
 jobs:
+  setPath:
+    name: "Set Secured Path"
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "MY_UUID=$(uuidgen)" >> $GITHUB_ENV
   test:
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -67,6 +73,7 @@ jobs:
           HD_FAIRHIVE_GSUITE_USER: ${{ secrets.FAIRHIVE_GSUITE_USER }}
           HD_MAILTRAP_PASSWORD: ${{ secrets.MAILTRAP_PASSWORD }}
           HD_MAILTRAP_USER: ${{ secrets.MAILTRAP_USER }}
+          HD_UUID: ${{ env.MY_UUID }}
       - name: Slack Notification
         uses: rtCamp/action-slack-notify@v2
         env:
