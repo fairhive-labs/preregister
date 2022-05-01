@@ -6,11 +6,16 @@ on:
 name: Test & Heroku Deployment
 jobs:
   setPath:
-    name: "Set Secured Path"
+    name: "Set UUID"
     runs-on: ubuntu-latest
     steps:
-      - run: |
+      - name: Get uuid
+        run: |
           echo "MY_UUID=$(uuidgen)" >> $GITHUB_ENV
+      - name: Use uuid
+        run: |
+          echo "UUID = ${{ env.MY_UUID }}" 
+
   test:
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
