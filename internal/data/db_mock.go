@@ -26,6 +26,36 @@ func (db mockDB) Count() (map[string]int, error) {
 	return m, nil
 }
 
+func (db mockDB) List(offset, max int) ([]*User, error) {
+	m := map[string]int{
+		"advisor":     1,
+		"agent":       5,
+		"client":      7,
+		"contributor": 0,
+		"investor":    10,
+		"mentor":      5,
+		"talent":      31,
+	}
+
+	users := []*User{}
+	for k, v := range m {
+		for i := 0; i < v; i++ {
+			u := NewUser(fmt.Sprintf("0x%d", (i+1)), fmt.Sprintf("%s_%d@domain.com", k, (i+1)), k)
+			users = append(users, u)
+		}
+	}
+	if offset < 0 || offset > len(users) {
+		return nil, fmt.Errorf("incorrect offset")
+	}
+	if max < 0 || max > len(users) {
+		return nil, fmt.Errorf("incorrect max")
+	}
+	if offset+max > len(users) {
+		return nil, fmt.Errorf("ouf of bounds [%d:%d]", offset, offset+max)
+	}
+	return users[offset : offset+max], nil
+}
+
 var MockDB = mockDB{}
 
 type mockErrDB struct {
@@ -39,6 +69,12 @@ func (db mockErrDB) Save(u *User) (err error) {
 
 func (db mockErrDB) Count() (map[string]int, error) {
 	m := fmt.Sprintf("🔥 Error counting Users in DB\n")
+	fmt.Print(m)
+	return nil, errors.New(m)
+}
+
+func (db mockErrDB) List(offset, max int) ([]*User, error) {
+	m := fmt.Sprintf("🔥 Error listing Users in DB\n")
 	fmt.Print(m)
 	return nil, errors.New(m)
 }

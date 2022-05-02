@@ -104,3 +104,7 @@ func (db *dynamoDB) Count() (map[string]int, error) {
 
 	return m, nil
 }
+
+func (db *dynamoDB) List(offset, max int) ([]*User, error) {
+	return []*User{}, nil
+}
