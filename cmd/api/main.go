@@ -226,6 +226,23 @@ func (app App) count(c *gin.Context) {
 	}
 }
 
+func (app App) users(c *gin.Context) {
+	p1, p2 := c.Param("path1"), c.Param("path2")
+	if p1 != app.secpath1 || p2 != app.secpath2 {
+		c.AbortWithStatus(http.StatusNotFound)
+		return
+	}
+	users, err := app.db.List(0, 0)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"users": users,
+	})
+	return
+}
+
 func setupRouter(app App) *gin.Engine {
 	r := gin.Default()
 	t := template.Must(template.ParseFS(tfs, "templates/*"))
@@ -235,6 +252,7 @@ func setupRouter(app App) *gin.Engine {
 		c.String(http.StatusOK, "ok")
 	})
 	r.GET("/:path1/:path2/count", app.count)
+	r.GET("/:path1/:path2/users", app.users)
 	r.POST("/", app.register)
 	r.POST("/activate/:token/:hash", app.activate)
 	return r
