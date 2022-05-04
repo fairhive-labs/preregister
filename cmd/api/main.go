@@ -12,6 +12,7 @@ import (
 	"os/signal"
 	"regexp"
 	"sort"
+	"strconv"
 	"sync"
 	"syscall"
 	"time"
@@ -232,7 +233,27 @@ func (app App) users(c *gin.Context) {
 		c.AbortWithStatus(http.StatusNotFound)
 		return
 	}
-	users, err := app.db.List(0, 0)
+
+	options := []int{}
+	offset := c.Query("offset")
+	if offset != "" {
+		v, err := strconv.Atoi(offset)
+		if err != nil {
+			c.AbortWithStatus(http.StatusBadRequest)
+			return
+		}
+		options = append(options, v)
+	}
+	if max := c.Query("max"); max != "" && offset != "" { // offset & max required
+		v, err := strconv.Atoi(max)
+		if err != nil {
+			c.AbortWithStatus(http.StatusBadRequest)
+			return
+		}
+		options = append(options, v)
+	}
+
+	users, err := app.db.List(options...)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
