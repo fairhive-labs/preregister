@@ -18,7 +18,7 @@ require (
 
 require (
 	github.com/aws/aws-sdk-go v1.44.6
-	github.com/fairhive-labs/ethkeygen v0.0.0-20220504154900-010d97af8f6d
+	github.com/fairhive-labs/ethkeygen v1.0.1
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect
