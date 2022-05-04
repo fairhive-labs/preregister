@@ -3,6 +3,8 @@ package data
 import (
 	"errors"
 	"fmt"
+
+	key "github.com/fairhive-labs/ethkeygen/pkg"
 )
 
 type mockDB struct {
@@ -40,7 +42,8 @@ func (db mockDB) List(offset, max int) ([]*User, error) {
 	users := []*User{}
 	for k, v := range m {
 		for i := 0; i < v; i++ {
-			u := NewUser(fmt.Sprintf("0x%d", (i+1)), fmt.Sprintf("%s_%d@domain.com", k, (i+1)), k)
+			_, a, _ := key.Generate()
+			u := NewUser(a, fmt.Sprintf("%s_%d@domain.com", k, (i+1)), k)
 			users = append(users, u)
 		}
 	}
