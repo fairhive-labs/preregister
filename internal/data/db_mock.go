@@ -28,7 +28,7 @@ func (db mockDB) Count() (map[string]int, error) {
 	return m, nil
 }
 
-func (db mockDB) List(offset, max int) ([]*User, error) {
+func (db mockDB) List(options ...int) ([]*User, error) {
 	m := map[string]int{
 		"advisor":     1,
 		"agent":       5,
@@ -47,6 +47,14 @@ func (db mockDB) List(offset, max int) ([]*User, error) {
 			users = append(users, u)
 		}
 	}
+
+	offset, max := 0, len(users)
+	if len(options) >= 1 {
+		offset = options[0]
+	}
+	if len(options) == 2 {
+		max = options[1]
+	}
 	if offset < 0 || offset > len(users) {
 		return nil, fmt.Errorf("incorrect offset")
 	}
@@ -56,6 +64,7 @@ func (db mockDB) List(offset, max int) ([]*User, error) {
 	if offset+max > len(users) {
 		return nil, fmt.Errorf("ouf of bounds [%d:%d]", offset, offset+max)
 	}
+
 	return users[offset : offset+max], nil
 }
 
@@ -76,7 +85,7 @@ func (db mockErrDB) Count() (map[string]int, error) {
 	return nil, errors.New(m)
 }
 
-func (db mockErrDB) List(offset, max int) ([]*User, error) {
+func (db mockErrDB) List(options ...int) ([]*User, error) {
 	m := fmt.Sprintf("🔥 Error listing Users in DB\n")
 	fmt.Print(m)
 	return nil, errors.New(m)

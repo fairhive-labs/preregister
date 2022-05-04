@@ -105,6 +105,6 @@ func (db *dynamoDB) Count() (map[string]int, error) {
 	return m, nil
 }
 
-func (db *dynamoDB) List(offset, max int) ([]*User, error) {
+func (db *dynamoDB) List(options ...int) ([]*User, error) {
 	return []*User{}, nil
 }
