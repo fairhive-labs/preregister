@@ -7,6 +7,25 @@ import (
 	key "github.com/fairhive-labs/ethkeygen/pkg"
 )
 
+var (
+	UsersMapMock = map[string]int{
+		"advisor":     1,
+		"agent":       5,
+		"client":      7,
+		"contributor": 0,
+		"investor":    10,
+		"mentor":      5,
+		"talent":      31,
+	}
+	UsersCountMock = 0
+)
+
+func init() {
+	for _, v := range UsersMapMock {
+		UsersCountMock += v
+	}
+}
+
 type mockDB struct {
 }
 
@@ -16,28 +35,12 @@ func (db mockDB) Save(u *User) (err error) {
 }
 
 func (db mockDB) Count() (map[string]int, error) {
-	m := map[string]int{
-		"advisor":     0,
-		"agent":       2,
-		"client":      0,
-		"contributor": 0,
-		"investor":    0,
-		"mentor":      1,
-		"talent":      3,
-	}
+	m := UsersMapMock
 	return m, nil
 }
 
 func (db mockDB) List(options ...int) ([]*User, error) {
-	m := map[string]int{
-		"advisor":     1,
-		"agent":       5,
-		"client":      7,
-		"contributor": 0,
-		"investor":    10,
-		"mentor":      5,
-		"talent":      31,
-	}
+	m := UsersMapMock
 
 	users := []*User{}
 	for k, v := range m {

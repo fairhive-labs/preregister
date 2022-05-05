@@ -431,20 +431,16 @@ func TestCount(t *testing.T) {
 			t.Errorf("Cannot decode response body %v, %v", w.Body, err)
 			t.FailNow()
 		}
-		if res.Users["agent"] != 2 {
-			t.Errorf("incorrect agent count, got %d, want %d", res.Users["agent"], 2)
-			t.FailNow()
+
+		for ut, uc := range data.UsersMapMock {
+			if res.Users[ut] != uc {
+				t.Errorf("incorrect %q count, got %d, want %d", ut, res.Users[ut], uc)
+				t.FailNow()
+			}
 		}
-		if res.Users["talent"] != 3 {
-			t.Errorf("incorrect talent count, got %d, want %d", res.Users["talent"], 3)
-			t.FailNow()
-		}
-		if res.Users["mentor"] != 1 {
-			t.Errorf("incorrect mentor count, got %d, want %d", res.Users["mentor"], 1)
-			t.FailNow()
-		}
-		if res.Total != 6 {
-			t.Errorf("incorrect total count, got %d, want %d", res.Total, 6)
+
+		if res.Total != data.UsersCountMock {
+			t.Errorf("incorrect total count, got %d, want %d", res.Total, data.UsersCountMock)
 			t.FailNow()
 		}
 	})
@@ -476,32 +472,14 @@ func TestCount(t *testing.T) {
 			t.Errorf("Cannot decode response body %v, %v", w.Body, err)
 			t.FailNow()
 		}
-		if res.Total != 6 {
-			t.Errorf("incorrect total count, got %d, want %d", res.Total, 6)
+		if res.Total != data.UsersCountMock {
+			t.Errorf("incorrect total count, got %d, want %d", res.Total, data.UsersCountMock)
 			t.FailNow()
 		}
 		for _, xu := range res.Users {
-			switch xu.Type {
-			case "agent":
-				if xu.Value != 2 {
-					t.Errorf("incorrect agent count, got %d, want %d", xu.Value, 2)
-					t.FailNow()
-				}
-			case "mentor":
-				if xu.Value != 1 {
-					t.Errorf("incorrect mentor count, got %d, want %d", xu.Value, 1)
-					t.FailNow()
-				}
-			case "talent":
-				if xu.Value != 3 {
-					t.Errorf("incorrect talent count, got %d, want %d", xu.Value, 3)
-					t.FailNow()
-				}
-			default:
-				if xu.Value != 0 {
-					t.Errorf("incorrect %s count, got %d, want %d", xu.Type, xu.Value, 0)
-					t.FailNow()
-				}
+			if xu.Value != data.UsersMapMock[xu.Type] {
+				t.Errorf("incorrect agent count, got %d, want %d", xu.Value, data.UsersMapMock[xu.Type])
+				t.FailNow()
 			}
 		}
 	})
@@ -519,17 +497,9 @@ func TestCount(t *testing.T) {
 			t.FailNow()
 		}
 
-		users := map[string]int{
-			"advisor":     0,
-			"agent":       2,
-			"client":      0,
-			"contributor": 0,
-			"investor":    0,
-			"mentor":      1,
-			"talent":      3,
-		}
+		users := data.UsersMapMock
 		m := map[string]bool{
-			`<td colspan="2">Total: 6</td>`: false,
+			fmt.Sprintf(`<td colspan="2">Total: %d</td>`, data.UsersCountMock): false,
 		}
 		for t, v := range users {
 			k := fmt.Sprintf(`%s</td><td class="count">%d</td>`, t, v)
