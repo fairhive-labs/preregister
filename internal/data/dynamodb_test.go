@@ -2,7 +2,11 @@ package data
 
 import (
 	"errors"
+	"fmt"
+	"sort"
+	"strings"
 	"testing"
+	"time"
 
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -116,6 +120,39 @@ func TestCount(t *testing.T) {
 	}
 	if mc["talent"] == 0 {
 		t.Errorf("incorrect talent count: must be greater than 0")
+		t.FailNow()
+	}
+}
+
+func TestList(t *testing.T) {
+	db, _ := NewDynamoDB(tableName, ek)
+	users, err := db.List()
+	if err != nil {
+		t.Errorf("cannot list users: %v", err)
+		t.FailNow()
+	}
+	if users == nil || len(users) == 0 {
+		t.Errorf("users list cannot be nil or empty")
+		t.FailNow()
+	}
+
+	sort.Slice(users, func(i, j int) bool {
+		if users[i].Timestamp == users[j].Timestamp {
+			return strings.Compare(users[i].Email, users[i].Email) < 1
+		}
+		return users[i].Timestamp > users[j].Timestamp // more recent first
+	})
+	var johndoe *User
+	for i, u := range users {
+		fmt.Printf("%0.2d - ethaddress = %s; email = %s; type = %s; timestamp = %s\n", i, u.Address, u.Email, u.Type, time.UnixMilli(u.Timestamp))
+		if u.Address == "0x8ba1f109551bD432803012645Ac136ddd64DBA72" &&
+			u.Email == "john.doe@mailservice.com" &&
+			u.Type == "talent" {
+			johndoe = u
+		}
+	}
+	if johndoe == nil {
+		t.Errorf("johndoe must be present in DB")
 		t.FailNow()
 	}
 }

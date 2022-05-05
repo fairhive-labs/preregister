@@ -107,5 +107,41 @@ func (db *dynamoDB) Count() (map[string]int, error) {
 
 func (db *dynamoDB) List(options ...int) ([]*User, error) {
 	users := []*User{}
+
+	sess := session.Must(session.NewSession())
+	svc := dynamodb.New(sess)
+	if svc == nil {
+		return nil, errors.New("cannot create dynamodb client")
+	}
+
+	input := &dynamodb.ScanInput{
+		TableName: aws.String(db.tn),
+	}
+	for {
+		result, err := svc.Scan(input)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, u := range result.Items {
+			user := User{}
+			err = dynamodbattribute.UnmarshalMap(u, &user)
+			if err != nil {
+				return nil, err
+			}
+			e, err := cipher.Decrypt(user.Email, db.ek)
+			if err != nil {
+				return nil, err
+			}
+			user.Email = e
+			users = append(users, &user)
+		}
+		// pagination
+		input.ExclusiveStartKey = result.LastEvaluatedKey
+		if result.LastEvaluatedKey == nil {
+			break
+		}
+	}
+
 	return users, nil
 }
