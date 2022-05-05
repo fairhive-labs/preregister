@@ -686,15 +686,15 @@ func TestList(t *testing.T) {
 		})
 	}
 
-	// app.db = data.MockErrDB
-	// r = setupRouter(*app)
-	// t.Run("json faulty DB", func(t *testing.T) {
-	// 	w := httptest.NewRecorder()
-	// 	req, _ := http.NewRequest("GET", fmt.Sprintf("/%s/%s/list", app.secpath1, app.secpath2), nil)
-	// 	r.ServeHTTP(w, req)
-	// 	if w.Code != http.StatusInternalServerError {
-	// 		t.Errorf("Status code is incorrect, got %d, want %d", w.Code, http.StatusInternalServerError)
-	// 		t.FailNow()
-	// 	}
-	// })
+	app.db = data.MockErrDB
+	r = setupRouter(*app)
+	t.Run("json faulty DB", func(t *testing.T) {
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest("GET", fmt.Sprintf("/%s/%s/list", app.secpath1, app.secpath2), nil)
+		r.ServeHTTP(w, req)
+		if w.Code != http.StatusInternalServerError {
+			t.Errorf("Status code is incorrect, got %d, want %d", w.Code, http.StatusInternalServerError)
+			t.FailNow()
+		}
+	})
 }
