@@ -644,28 +644,17 @@ func TestList(t *testing.T) {
 			t.FailNow()
 		}
 
-		count := 59
+		count := data.UsersCountMock
 		if res.Count != count {
 			t.Errorf("incorrect count, got %d, want %d", res.Count, count)
 			t.FailNow()
 		}
 
-		// if res.Users["agent"] != 2 {
-		// 	t.Errorf("incorrect agent count, got %d, want %d", res.Users["agent"], 2)
-		// 	t.FailNow()
-		// }
-		// if res.Users["talent"] != 3 {
-		// 	t.Errorf("incorrect talent count, got %d, want %d", res.Users["talent"], 3)
-		// 	t.FailNow()
-		// }
-		// if res.Users["mentor"] != 1 {
-		// 	t.Errorf("incorrect mentor count, got %d, want %d", res.Users["mentor"], 1)
-		// 	t.FailNow()
-		// }
-		// if res.Total != 6 {
-		// 	t.Errorf("incorrect total count, got %d, want %d", res.Total, 6)
-		// 	t.FailNow()
-		// }
+		if len(res.Users) != res.Count {
+			t.Errorf("incorrect length of Users array, got %d, want %d", len(res.Users), res.Count)
+			t.FailNow()
+		}
+
 	})
 
 	// tt := []struct {
