@@ -686,6 +686,57 @@ func TestList(t *testing.T) {
 		})
 	}
 
+	tt2 := []struct {
+		name        string
+		offset, max string
+		status      int
+		ln          int
+	}{
+		{"empty strings", "", "", http.StatusOK, data.UsersCountMock},
+		{"offset=foo", "foo", "", http.StatusBadRequest, 0},
+		{"offset=0 max=foo", "0", "foo", http.StatusBadRequest, 0},
+		{"max=foo", "", "foo", http.StatusBadRequest, 0},
+		{fmt.Sprintf("offset=0 max=%d", data.UsersCountMock), "0", fmt.Sprintf("%d", data.UsersCountMock), http.StatusOK, data.UsersCountMock},
+		{"offset=5", "5", "", http.StatusOK, data.UsersCountMock - 5},
+		{"offset=5 max=3", "5", "3", http.StatusOK, 3},
+		{"offset=5 max=0", "5", "0", http.StatusOK, 0},
+		{"max=2", "", "2", http.StatusBadRequest, 0},
+		{"offset=-2 max=5", fmt.Sprintf("%d", -2), "5", http.StatusInternalServerError, 0},
+		{fmt.Sprintf("offset=%d max=5", data.UsersCountMock+1), fmt.Sprintf("%d", data.UsersCountMock+1), "5", http.StatusInternalServerError, 0},
+		{"offset=5 max=-2", "5", fmt.Sprintf("%d", -2), http.StatusInternalServerError, 0},
+		{fmt.Sprintf("offset=5 max=%d", data.UsersCountMock+1), "5", fmt.Sprintf("%d", data.UsersCountMock+1), http.StatusInternalServerError, 0},
+		{fmt.Sprintf("offset=%d max=5", data.UsersCountMock), fmt.Sprintf("%d", data.UsersCountMock), "5", http.StatusInternalServerError, 0},
+	}
+	for _, tc := range tt2 {
+		t.Run("json_"+tc.name, func(t *testing.T) {
+			w := httptest.NewRecorder()
+			req, _ := http.NewRequest("GET", fmt.Sprintf("/%s/%s/list?offset=%s&max=%s", app.secpath1, app.secpath2, tc.offset, tc.max), nil)
+			r.ServeHTTP(w, req)
+			if w.Code != tc.status {
+				t.Errorf("incorrect status, got %d, want %d", w.Code, tc.status)
+				t.FailNow()
+			}
+
+			if w.Code == http.StatusOK {
+				var res struct {
+					Users []*data.User
+					Count int
+				}
+				err := json.NewDecoder(w.Body).Decode(&res)
+				if err != nil {
+					t.Errorf("Cannot decode response body %v, %v", w.Body, err)
+					t.FailNow()
+				}
+
+				count := tc.ln
+				if res.Count != count {
+					t.Errorf("incorrect count, got %d, want %d", res.Count, count)
+					t.FailNow()
+				}
+			}
+		})
+	}
+
 	app.db = data.MockErrDB
 	r = setupRouter(*app)
 	t.Run("json faulty DB", func(t *testing.T) {

@@ -41,7 +41,6 @@ func (db mockDB) Count() (map[string]int, error) {
 
 func (db mockDB) List(options ...int) ([]*User, error) {
 	m := UsersMapMock
-
 	users := []*User{}
 	for k, v := range m {
 		for i := 0; i < v; i++ {
@@ -54,6 +53,7 @@ func (db mockDB) List(options ...int) ([]*User, error) {
 	offset, max := 0, len(users)
 	if len(options) >= 1 {
 		offset = options[0]
+		max = len(users) - offset
 	}
 	if len(options) == 2 {
 		max = options[1]

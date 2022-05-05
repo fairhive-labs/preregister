@@ -244,9 +244,9 @@ func (app App) list(c *gin.Context) {
 		}
 		options = append(options, v)
 	}
-	if max := c.Query("max"); max != "" && offset != "" { // offset & max required
+	if max := c.Query("max"); max != "" {
 		v, err := strconv.Atoi(max)
-		if err != nil {
+		if err != nil || offset == "" { // offset & max required
 			c.AbortWithStatus(http.StatusBadRequest)
 			return
 		}
