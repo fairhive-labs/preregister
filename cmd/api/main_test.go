@@ -657,40 +657,40 @@ func TestList(t *testing.T) {
 
 	})
 
-	// tt := []struct {
-	// 	name         string
-	// 	path1, path2 string
-	// 	status       int
-	// 	body         string
-	// }{
-	// 	{"fakepath1", "fakepath1", app.secpath2, http.StatusNotFound, ""},
-	// 	{"fakepath2", app.secpath1, "fakepath2", http.StatusNotFound, ""},
-	// 	{"fakepaths", "fakepath1", "fakepath2", http.StatusNotFound, ""},
-	// 	{"missing path1", "", "fakepath2", http.StatusNotFound, "404 page not found"},
-	// 	{"missing path2", "fakepath1", "", http.StatusNotFound, ""},
-	// 	{"no path", "", "", http.StatusNotFound, ""},
-	// }
-	// for _, tc := range tt {
-	// 	t.Run("json_"+tc.name, func(t *testing.T) {
-	// 		w := httptest.NewRecorder()
-	// 		req, _ := http.NewRequest("GET", fmt.Sprintf("/%s/%s/count?mime=json", tc.path1, tc.path2), nil)
-	// 		r.ServeHTTP(w, req)
-	// 		if w.Code != tc.status {
-	// 			t.Errorf("incorrect status, got %d, want %d", w.Code, tc.status)
-	// 			t.FailNow()
-	// 		}
-	// 		if w.Body.String() != tc.body {
-	// 			t.Errorf("incorrect body, got %q, want %q", w.Body.String(), tc.body)
-	// 			t.FailNow()
-	// 		}
-	// 	})
-	// }
+	tt := []struct {
+		name         string
+		path1, path2 string
+		status       int
+		body         string
+	}{
+		{"fakepath1", "fakepath1", app.secpath2, http.StatusNotFound, ""},
+		{"fakepath2", app.secpath1, "fakepath2", http.StatusNotFound, ""},
+		{"fakepaths", "fakepath1", "fakepath2", http.StatusNotFound, ""},
+		{"missing path1", "", "fakepath2", http.StatusNotFound, "404 page not found"},
+		{"missing path2", "fakepath1", "", http.StatusNotFound, ""},
+		{"no path", "", "", http.StatusNotFound, ""},
+	}
+	for _, tc := range tt {
+		t.Run("json_"+tc.name, func(t *testing.T) {
+			w := httptest.NewRecorder()
+			req, _ := http.NewRequest("GET", fmt.Sprintf("/%s/%s/list", tc.path1, tc.path2), nil)
+			r.ServeHTTP(w, req)
+			if w.Code != tc.status {
+				t.Errorf("incorrect status, got %d, want %d", w.Code, tc.status)
+				t.FailNow()
+			}
+			if w.Body.String() != tc.body {
+				t.Errorf("incorrect body, got %q, want %q", w.Body.String(), tc.body)
+				t.FailNow()
+			}
+		})
+	}
 
 	// app.db = data.MockErrDB
 	// r = setupRouter(*app)
 	// t.Run("json faulty DB", func(t *testing.T) {
 	// 	w := httptest.NewRecorder()
-	// 	req, _ := http.NewRequest("GET", fmt.Sprintf("/%s/%s/count?mime=json", app.secpath1, app.secpath2), nil)
+	// 	req, _ := http.NewRequest("GET", fmt.Sprintf("/%s/%s/list", app.secpath1, app.secpath2), nil)
 	// 	r.ServeHTTP(w, req)
 	// 	if w.Code != http.StatusInternalServerError {
 	// 		t.Errorf("Status code is incorrect, got %d, want %d", w.Code, http.StatusInternalServerError)
