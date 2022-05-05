@@ -704,7 +704,7 @@ func TestList(t *testing.T) {
 		{"offset=-2 max=5", fmt.Sprintf("%d", -2), "5", http.StatusInternalServerError, 0},
 		{fmt.Sprintf("offset=%d max=5", data.UsersCountMock+1), fmt.Sprintf("%d", data.UsersCountMock+1), "5", http.StatusInternalServerError, 0},
 		{"offset=5 max=-2", "5", fmt.Sprintf("%d", -2), http.StatusInternalServerError, 0},
-		{fmt.Sprintf("offset=5 max=%d", data.UsersCountMock+1), "5", fmt.Sprintf("%d", data.UsersCountMock+1), http.StatusInternalServerError, 0},
+		{fmt.Sprintf("offset=5 max=%d", data.UsersCountMock+1), "5", fmt.Sprintf("%d", data.UsersCountMock+1), http.StatusOK, data.UsersCountMock - 5},
 		{fmt.Sprintf("offset=%d max=5", data.UsersCountMock), fmt.Sprintf("%d", data.UsersCountMock), "5", http.StatusInternalServerError, 0},
 	}
 	for _, tc := range tt2 {

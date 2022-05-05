@@ -61,9 +61,13 @@ func (db mockDB) List(options ...int) ([]*User, error) {
 	if offset < 0 || offset > len(users) {
 		return nil, fmt.Errorf("incorrect offset")
 	}
-	if max < 0 || max > len(users) {
+	if max < 0 {
 		return nil, fmt.Errorf("incorrect max")
 	}
+	if max > len(users) {
+		max = len(users) - offset
+	}
+
 	if offset+max > len(users) {
 		return nil, fmt.Errorf("ouf of bounds [%d:%d]", offset, offset+max)
 	}

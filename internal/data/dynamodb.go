@@ -106,5 +106,6 @@ func (db *dynamoDB) Count() (map[string]int, error) {
 }
 
 func (db *dynamoDB) List(options ...int) ([]*User, error) {
-	return []*User{}, nil
+	users := []*User{}
+	return users, nil
 }
