@@ -227,7 +227,7 @@ func (app App) count(c *gin.Context) {
 	}
 }
 
-func (app App) users(c *gin.Context) {
+func (app App) list(c *gin.Context) {
 	p1, p2 := c.Param("path1"), c.Param("path2")
 	if p1 != app.secpath1 || p2 != app.secpath2 {
 		c.AbortWithStatus(http.StatusNotFound)
@@ -260,6 +260,7 @@ func (app App) users(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"users": users,
+		"count": len(users),
 	})
 	return
 }
@@ -273,7 +274,7 @@ func setupRouter(app App) *gin.Engine {
 		c.String(http.StatusOK, "ok")
 	})
 	r.GET("/:path1/:path2/count", app.count)
-	r.GET("/:path1/:path2/users", app.users)
+	r.GET("/:path1/:path2/list", app.list)
 	r.POST("/", app.register)
 	r.POST("/activate/:token/:hash", app.activate)
 	return r
