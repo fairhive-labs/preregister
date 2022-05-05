@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"embed"
+	"encoding/csv"
 	"errors"
 	"fmt"
 	"html/template"
@@ -258,11 +260,37 @@ func (app App) list(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"users": users,
-		"count": len(users),
-	})
-	return
+
+	mime := c.DefaultQuery("mime", "json")
+	switch mime {
+	case "csv": //@TODO : test
+		b := new(bytes.Buffer)
+		w := csv.NewWriter(b)
+		err := w.Write([]string{"type", "address", "email", "uuid", "timestamp"})
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		for _, u := range users {
+			err := w.Write([]string{u.Type, u.Address, u.Email, u.UUID, fmt.Sprintf("%s", time.UnixMilli(u.Timestamp))})
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+				return
+			}
+		}
+		w.Flush()
+		c.Header("Content-Description", "File Transfer")
+		c.Header("Content-Disposition", "attachment; filename=users_list.csv")
+		c.Data(http.StatusOK, "text/csv", b.Bytes())
+		// c.Writer.Write(b.Bytes())
+		return
+	default:
+		c.JSON(http.StatusOK, gin.H{
+			"users": users,
+			"count": len(users),
+		})
+		return
+	}
 }
 
 func setupRouter(app App) *gin.Engine {
