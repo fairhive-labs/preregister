@@ -280,7 +280,7 @@ func (app App) list(c *gin.Context) {
 		}
 		w.Flush()
 		c.Header("Content-Description", "File Transfer")
-		c.Header("Content-Disposition", "attachment; filename=users_list.csv")
+		c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=users_list_%s.csv", time.Now().Format("20060102-150405")))
 		c.Data(http.StatusOK, "text/csv", b.Bytes())
 		// c.Writer.Write(b.Bytes())
 		return
