@@ -2,8 +2,8 @@ on:
   push:
     branches:
       - main
-  schedule:
-    - cron: "15 14 * * *"
+  schedule: 
+    - cron: "0 5 * * 0" # Every Sunday at 5:00am UTC 
 
 name: Test & Heroku Deployment
 jobs:
