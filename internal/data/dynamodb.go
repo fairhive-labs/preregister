@@ -16,8 +16,11 @@ type dynamoDB struct {
 	ek string
 }
 
-var ErrDynamoDBNoEncryptionKey = errors.New("cannot create DynamoDB: fairhive's encryption key is missing")
-var ErrDynamoDBNoTableName = errors.New("cannot create DynamoDB: no table name")
+var (
+	ErrDynamoDBNoEncryptionKey = errors.New("cannot create DynamoDB: fairhive's encryption key is missing")
+	ErrDynamoDBNoTableName     = errors.New("cannot create DynamoDB: no table name")
+	ErrBadMax                  = errors.New("incorrect max")
+)
 
 func NewDynamoDB(tn, ek string) (db *dynamoDB, err error) {
 	if tn == "" {
@@ -114,10 +117,24 @@ func (db *dynamoDB) List(options ...int) ([]*User, error) {
 		return nil, errors.New("cannot create dynamodb client")
 	}
 
+	var max *int64
+	if len(options) == 2 {
+		// offset ignored
+		max = new(int64)
+		*max = int64(options[1])
+	}
+	if max != nil && *max < 0 {
+		return nil, ErrBadMax
+	}
+
 	input := &dynamodb.ScanInput{
 		TableName: aws.String(db.tn),
+		Limit:     max,
 	}
 	for {
+		if input.Limit != nil && *input.Limit == 0 {
+			break
+		}
 		result, err := svc.Scan(input)
 		if err != nil {
 			return nil, err
@@ -138,6 +155,9 @@ func (db *dynamoDB) List(options ...int) ([]*User, error) {
 		}
 		// pagination
 		input.ExclusiveStartKey = result.LastEvaluatedKey
+		if input.Limit != nil {
+			*input.Limit = *input.Limit - *result.ScannedCount
+		}
 		if result.LastEvaluatedKey == nil {
 			break
 		}

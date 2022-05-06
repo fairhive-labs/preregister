@@ -126,33 +126,62 @@ func TestCount(t *testing.T) {
 
 func TestList(t *testing.T) {
 	db, _ := NewDynamoDB(tableName, ek)
-	users, err := db.List()
-	if err != nil {
-		t.Errorf("cannot list users: %v", err)
-		t.FailNow()
-	}
-	if users == nil || len(users) == 0 {
-		t.Errorf("users list cannot be nil or empty")
-		t.FailNow()
+	t.Run("no option", func(t *testing.T) {
+		users, err := db.List()
+		if err != nil {
+			t.Errorf("cannot list users: %v", err)
+			t.FailNow()
+		}
+		if users == nil || len(users) == 0 {
+			t.Errorf("users list cannot be nil or empty")
+			t.FailNow()
+		}
+
+		sort.Slice(users, func(i, j int) bool {
+			if users[i].Timestamp == users[j].Timestamp {
+				return strings.Compare(users[i].Email, users[i].Email) < 1
+			}
+			return users[i].Timestamp > users[j].Timestamp // more recent first
+		})
+		var johndoe *User
+		for i, u := range users {
+			fmt.Printf("%0.2d - ethaddress = %s; email = %s; type = %s; timestamp = %s\n", i+1, u.Address, u.Email, u.Type, time.UnixMilli(u.Timestamp))
+			if u.Address == "0x8ba1f109551bD432803012645Ac136ddd64DBA72" &&
+				u.Email == "john.doe@mailservice.com" &&
+				u.Type == "talent" {
+				johndoe = u
+			}
+		}
+		if johndoe == nil {
+			t.Errorf("johndoe must be present in DB")
+			t.FailNow()
+		}
+	})
+
+	tt := []struct {
+		offset, max int
+		len         int
+		err         error
+	}{
+		{0, 5, 5, nil},
+		{0, 10, 10, nil},
+		{10, 5, 5, nil},
+		{2, 3, 3, nil},
+		{0, -1, 0, ErrBadMax},
+		{0, 1000, 60, nil}, //  2022-05-06: 60 items in the test db
 	}
 
-	sort.Slice(users, func(i, j int) bool {
-		if users[i].Timestamp == users[j].Timestamp {
-			return strings.Compare(users[i].Email, users[i].Email) < 1
-		}
-		return users[i].Timestamp > users[j].Timestamp // more recent first
-	})
-	var johndoe *User
-	for i, u := range users {
-		fmt.Printf("%0.2d - ethaddress = %s; email = %s; type = %s; timestamp = %s\n", i, u.Address, u.Email, u.Type, time.UnixMilli(u.Timestamp))
-		if u.Address == "0x8ba1f109551bD432803012645Ac136ddd64DBA72" &&
-			u.Email == "john.doe@mailservice.com" &&
-			u.Type == "talent" {
-			johndoe = u
-		}
-	}
-	if johndoe == nil {
-		t.Errorf("johndoe must be present in DB")
-		t.FailNow()
+	for _, tc := range tt {
+		t.Run(fmt.Sprintf("offset=%d max=%d", tc.offset, tc.max), func(t *testing.T) {
+			users, err := db.List(tc.offset, tc.max)
+			if err != tc.err {
+				t.Errorf("incorrect error, got %v, want %v", err, tc.err)
+				t.FailNow()
+			}
+			if len(users) != tc.len {
+				t.Errorf("incorrect len(users), got %v, want %v", len(users), tc.len)
+				t.FailNow()
+			}
+		})
 	}
 }
