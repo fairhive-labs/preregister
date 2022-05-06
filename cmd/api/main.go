@@ -272,7 +272,8 @@ func (app App) list(c *gin.Context) {
 			return
 		}
 		for i, u := range users {
-			err := w.Write([]string{strconv.Itoa(i + 1), u.Type, u.Address, u.Email, u.UUID, fmt.Sprintf("%s", time.UnixMilli(u.Timestamp))})
+			l, _ := time.LoadLocation("Europe/Paris")
+			err := w.Write([]string{strconv.Itoa(i + 1), u.Type, u.Address, u.Email, u.UUID, fmt.Sprintf("%s", time.UnixMilli(u.Timestamp).In(l))})
 			if err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 				return
