@@ -263,7 +263,7 @@ func (app App) list(c *gin.Context) {
 
 	mime := c.DefaultQuery("mime", "json")
 	switch mime {
-	case "csv": //@TODO : test
+	case "csv":
 		b := new(bytes.Buffer)
 		w := csv.NewWriter(b)
 		err := w.Write([]string{"type", "address", "email", "uuid", "timestamp"})

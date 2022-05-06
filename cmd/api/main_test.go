@@ -654,6 +654,38 @@ func TestList(t *testing.T) {
 			t.Errorf("incorrect length of Users array, got %d, want %d", len(res.Users), res.Count)
 			t.FailNow()
 		}
+	})
+
+	t.Run("csv", func(t *testing.T) {
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest("GET", fmt.Sprintf("/%s/%s/list?mime=csv", app.secpath1, app.secpath2), nil)
+		r.ServeHTTP(w, req)
+		if w.Code != http.StatusOK {
+			t.Errorf("incorrect status, got %d, want %d", w.Code, http.StatusOK)
+			t.FailNow()
+		}
+		if w.Body == nil {
+			t.Errorf("Response body cannot be nil")
+			t.FailNow()
+		}
+		if w.Body.Len() == 0 {
+			t.Error("Body cannot be empty")
+			t.FailNow()
+		}
+
+		headers := w.Result().Header
+		if headers.Get("Content-Description") != "File Transfer" {
+			t.Errorf("incorrect Content-Description header, got %s, want %s", headers.Get("Content-Description"), "File Transfer")
+			t.FailNow()
+		}
+		if headers.Get("Content-Type") != "text/csv" {
+			t.Errorf("incorrect Content-Type, got %q, want %q\n", headers.Get("Content-Type"), "text/csv")
+			t.FailNow()
+		}
+		if !strings.Contains(headers.Get("Content-Disposition"), "attachment; filename=users_list_") {
+			t.Errorf("incorrect Content-Disposition, must contain %q", "attachment; filename=users_list_")
+			t.FailNow()
+		}
 
 	})
 
