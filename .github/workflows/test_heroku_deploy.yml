@@ -3,7 +3,7 @@ on:
     branches:
       - main
   schedule: 
-    - cron: "0 5 * * 0" # Every Sunday at 5:00am UTC 
+    - cron: "0 5 * * *" # Every Sunday at 5:00am UTC 
 
 name: Test & Heroku Deployment
 jobs:
@@ -79,6 +79,6 @@ jobs:
           SLACK_CHANNEL: _github
           SLACK_COLOR: ${{ job.status }}
           SLACK_TITLE: Heroku Deployment - preregister/waitlist
-          SLACK_MESSAGE: "https://polar-plains-98105.herokuapp.com/${{ env.FAIRHIVE_API_SECURE_PATH1 }}/${{ env.FAIRHIVE_API_SECURE_PATH2 }}/count"
-          SLACK_FOOTER: "<https://polar-plains-98105.herokuapp.com/${{ env.FAIRHIVE_API_SECURE_PATH1 }}/${{ env.FAIRHIVE_API_SECURE_PATH2 }}/list?mime=csv|_whyvrafvr>"
+          SLACK_MESSAGE: "<https://polar-plains-98105.herokuapp.com/${{ env.FAIRHIVE_API_SECURE_PATH1 }}/${{ env.FAIRHIVE_API_SECURE_PATH2 }}/count|Count>"
+          SLACK_FOOTER: "<https://polar-plains-98105.herokuapp.com/${{ env.FAIRHIVE_API_SECURE_PATH1 }}/${{ env.FAIRHIVE_API_SECURE_PATH2 }}/list?mime=csv| Users list - CSV>"
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
