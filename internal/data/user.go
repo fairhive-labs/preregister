@@ -20,11 +20,12 @@ func (u *User) Setup() {
 	u.Timestamp = time.Now().UnixMilli()
 }
 
-func NewUser(a, e, t string) *User {
+func NewUser(a, e, t, s string) *User {
 	u := &User{
 		Address: a,
 		Email:   e,
 		Type:    t,
+		Sponsor: s,
 	}
 	u.Setup()
 	return u

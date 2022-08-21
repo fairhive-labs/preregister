@@ -20,6 +20,7 @@ var (
 	ErrDynamoDBNoEncryptionKey = errors.New("cannot create DynamoDB: fairhive's encryption key is missing")
 	ErrDynamoDBNoTableName     = errors.New("cannot create DynamoDB: no table name")
 	ErrBadMax                  = errors.New("incorrect max")
+	ErrInvalidUser             = errors.New("nil user or missing required field")
 )
 
 func NewDynamoDB(tn, ek string) (db *dynamoDB, err error) {
@@ -37,6 +38,13 @@ func NewDynamoDB(tn, ek string) (db *dynamoDB, err error) {
 }
 
 func (db *dynamoDB) Save(user *User) error {
+	if user == nil ||
+		user.Address == "" ||
+		user.Email == "" ||
+		user.Type == "" ||
+		user.Sponsor == "" {
+		return ErrInvalidUser
+	}
 	sess := session.Must(session.NewSession())
 	svc := dynamodb.New(sess)
 	if svc == nil {
@@ -47,7 +55,7 @@ func (db *dynamoDB) Save(user *User) error {
 	if err != nil {
 		return err
 	}
-	u := NewUser(user.Address, encEmail, user.Type)
+	u := NewUser(user.Address, encEmail, user.Type, user.Sponsor)
 	av, err := dynamodbattribute.MarshalMap(*u)
 	if err != nil {
 		return err

@@ -86,12 +86,14 @@ func TestNewDynamoDB(t *testing.T) {
 
 func TestSave(t *testing.T) {
 	address := "0x8ba1f109551bD432803012645Ac136ddd64DBA72"
+	sponsor := "0x9ba1f109551bD432803012645Ac136ddd64DBA73"
 	email := "john.doe@mailservice.com"
 	utype := "talent"
 	u := &User{
 		Address: address,
 		Email:   email,
 		Type:    utype,
+		Sponsor: sponsor,
 	}
 
 	db, _ := NewDynamoDB(tableName, ek)
@@ -104,9 +106,21 @@ func TestSave(t *testing.T) {
 		Address: "",
 		Email:   email,
 		Type:    utype,
+		Sponsor: sponsor,
 	}
 	if err := db.Save(u); err == nil {
 		t.Errorf("impossible to save user with an empty string Address: ValidationException")
+		t.FailNow()
+	}
+
+	u = &User{
+		Address: address,
+		Email:   email,
+		Type:    utype,
+		Sponsor: "",
+	}
+	if err := db.Save(u); err == nil {
+		t.Errorf("impossible to save user with an empty string Sponsor: ValidationException")
 		t.FailNow()
 	}
 }

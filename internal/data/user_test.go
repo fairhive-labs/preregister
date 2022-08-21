@@ -28,46 +28,12 @@ func TestSetup(t *testing.T) {
 	}
 }
 
-func TestMarshalling(t *testing.T) {
-	address := "0x8ba1f109551bD432803012645Ac136ddd64DBA72"
-	email := "john.doe@mailservice.com"
-	utype := "talent"
-	u := NewUser(address, email, utype)
-	jsonUser, _ := json.Marshal(u)
-	n := 5
-	m := make(map[string]interface{}, n)
-	if err := json.Unmarshal(jsonUser, &m); err != nil {
-		t.Errorf("Cannot unmarshal marshaled user: %v", err)
-		t.FailNow()
-	}
-	if len(m) != n {
-		t.Errorf("Incorrect number of field in json, got %d, want %d", len(m), n)
-		t.FailNow()
-	}
-
-	u = &User{
-		Address: address,
-		Email:   email,
-		Type:    utype,
-	}
-	jsonUser, _ = json.Marshal(u)
-	n = 3
-	m = make(map[string]interface{}, n)
-	if err := json.Unmarshal(jsonUser, &m); err != nil {
-		t.Errorf("Cannot unmarshal marshaled user: %v", err)
-		t.FailNow()
-	}
-	if len(m) != n {
-		t.Errorf("Incorrect number of field in json, got %d, want %d", len(m), n)
-		t.FailNow()
-	}
-}
-
 func TestNewUser(t *testing.T) {
 	address := "0x8ba1f109551bD432803012645Ac136ddd64DBA72"
+	sponsor := "0x9ba1f109551bD432803012645Ac136ddd64DBA73"
 	email := "john.doe@mailservice.com"
 	utype := "talent"
-	u := NewUser(address, email, utype)
+	u := NewUser(address, email, utype, sponsor)
 
 	if u.Address != address {
 		t.Errorf("Address is incorrect, got %s, want %s", u.Address, address)
@@ -99,4 +65,46 @@ func TestNewUser(t *testing.T) {
 		t.FailNow()
 	}
 
+	if u.Sponsor != sponsor {
+		t.Errorf("Sponsor is incorrect, got %s, want %s", u.Sponsor, sponsor)
+		t.FailNow()
+	}
+
+}
+
+func TestMarshalling(t *testing.T) {
+	address := "0x8ba1f109551bD432803012645Ac136ddd64DBA72"
+	sponsor := "0x9ba1f109551bD432803012645Ac136ddd64DBA73"
+	email := "john.doe@mailservice.com"
+	utype := "talent"
+	u := NewUser(address, email, utype, sponsor)
+	jsonUser, _ := json.Marshal(u)
+	n := 6
+	m := make(map[string]interface{}, n)
+	if err := json.Unmarshal(jsonUser, &m); err != nil {
+		t.Errorf("Cannot unmarshal marshaled user: %v", err)
+		t.FailNow()
+	}
+	if len(m) != n {
+		t.Errorf("Incorrect number of field in json, got %d, want %d", len(m), n)
+		t.FailNow()
+	}
+
+	u = &User{
+		Address: address,
+		Email:   email,
+		Type:    utype,
+		Sponsor: sponsor,
+	}
+	jsonUser, _ = json.Marshal(u)
+	n = 4
+	m = make(map[string]interface{}, n)
+	if err := json.Unmarshal(jsonUser, &m); err != nil {
+		t.Errorf("Cannot unmarshal marshaled user: %v", err)
+		t.FailNow()
+	}
+	if len(m) != n {
+		t.Errorf("Incorrect number of field in json, got %d, want %d", len(m), n)
+		t.FailNow()
+	}
 }

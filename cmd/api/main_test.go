@@ -32,6 +32,7 @@ func TestRegister(t *testing.T) {
 		"path2",
 	}
 	r := setupRouter(*app)
+	sponsor := "0x9ba1f109551bD432803012645Ac136ddd64DBA73"
 	tt := []struct {
 		name    string
 		address string
@@ -192,6 +193,7 @@ func TestRegister(t *testing.T) {
 				Address: address,
 				Email:   email,
 				Type:    utype,
+				Sponsor: sponsor,
 			})
 
 			w := httptest.NewRecorder()
@@ -255,11 +257,12 @@ func TestActivate(t *testing.T) {
 	}
 	r := setupRouter(*app)
 
-	address, email, utype := "0x8ba1f109551bD432803012645Ac136ddd64DBA72", "john.doe@mailservice.com", "talent"
+	address, email, utype, sponsor := "0x8ba1f109551bD432803012645Ac136ddd64DBA72", "john.doe@mailservice.com", "talent", "0x9ba1f109551bD432803012645Ac136ddd64DBA73"
 	vt, _ := app.jwt.Create(&data.User{
 		Address: address,
 		Email:   email,
-		Type:    utype}, time.Now())
+		Type:    utype,
+		Sponsor: sponsor}, time.Now())
 	vh := app.jwt.Hash(vt)
 
 	tt := []struct {
