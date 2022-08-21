@@ -70,5 +70,5 @@ func Decrypt(ctext, ks string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return fmt.Sprintf("%s", b), nil
+	return string(b), nil
 }
