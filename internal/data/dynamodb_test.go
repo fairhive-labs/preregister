@@ -86,7 +86,6 @@ func TestNewDynamoDB(t *testing.T) {
 
 func TestSave(t *testing.T) {
 	address := "0x8ba1f109551bD432803012645Ac136ddd64DBA72"
-	sponsor := "0x9ba1f109551bD432803012645Ac136ddd64DBA73"
 	email := "john.doe@mailservice.com"
 	utype := "talent"
 	u := &User{

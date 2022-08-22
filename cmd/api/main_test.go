@@ -19,6 +19,8 @@ import (
 	"github.com/fairhive-labs/preregister/internal/mailer"
 )
 
+const sponsor = "0xD01efFE216E16a85Fc529db66c26aBeCf4D885f8" // real address but empty balance
+
 func TestRegister(t *testing.T) {
 	var db data.DB = data.MockDB
 	k, _ := cipher.GenerateKey(32)
@@ -32,7 +34,6 @@ func TestRegister(t *testing.T) {
 		"path2",
 	}
 	r := setupRouter(*app)
-	sponsor := "0x9ba1f109551bD432803012645Ac136ddd64DBA73"
 	tt := []struct {
 		name    string
 		address string
@@ -257,7 +258,7 @@ func TestActivate(t *testing.T) {
 	}
 	r := setupRouter(*app)
 
-	address, email, utype, sponsor := "0x8ba1f109551bD432803012645Ac136ddd64DBA72", "john.doe@mailservice.com", "talent", "0x9ba1f109551bD432803012645Ac136ddd64DBA73"
+	address, email, utype := "0x8ba1f109551bD432803012645Ac136ddd64DBA72", "john.doe@mailservice.com", "talent"
 	vt, _ := app.jwt.Create(&data.User{
 		Address: address,
 		Email:   email,

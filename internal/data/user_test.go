@@ -7,6 +7,8 @@ import (
 	"github.com/google/uuid"
 )
 
+const sponsor = "0xD01efFE216E16a85Fc529db66c26aBeCf4D885f8" // real address but empty balance
+
 func TestSetup(t *testing.T) {
 
 	u := User{}
@@ -30,7 +32,6 @@ func TestSetup(t *testing.T) {
 
 func TestNewUser(t *testing.T) {
 	address := "0x8ba1f109551bD432803012645Ac136ddd64DBA72"
-	sponsor := "0x9ba1f109551bD432803012645Ac136ddd64DBA73"
 	email := "john.doe@mailservice.com"
 	utype := "talent"
 	u := NewUser(address, email, utype, sponsor)
@@ -74,7 +75,6 @@ func TestNewUser(t *testing.T) {
 
 func TestMarshalling(t *testing.T) {
 	address := "0x8ba1f109551bD432803012645Ac136ddd64DBA72"
-	sponsor := "0x9ba1f109551bD432803012645Ac136ddd64DBA73"
 	email := "john.doe@mailservice.com"
 	utype := "talent"
 	u := NewUser(address, email, utype, sponsor)
