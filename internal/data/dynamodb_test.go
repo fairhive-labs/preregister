@@ -145,7 +145,7 @@ func TestList(t *testing.T) {
 			t.Errorf("cannot list users: %v", err)
 			t.FailNow()
 		}
-		if users == nil || len(users) == 0 {
+		if len(users) == 0 {
 			t.Errorf("users list cannot be nil or empty")
 			t.FailNow()
 		}

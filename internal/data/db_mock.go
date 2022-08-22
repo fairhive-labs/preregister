@@ -88,14 +88,14 @@ func (db mockErrDB) Save(u *User) (err error) {
 }
 
 func (db mockErrDB) Count() (map[string]int, error) {
-	m := fmt.Sprintf("🔥 Error counting Users in DB\n")
-	fmt.Print(m)
+	m := "🔥 Error counting Users in DB"
+	fmt.Println(m)
 	return nil, errors.New(m)
 }
 
 func (db mockErrDB) List(options ...int) ([]*User, error) {
-	m := fmt.Sprintf("🔥 Error listing Users in DB\n")
-	fmt.Print(m)
+	m := "🔥 Error listing Users in DB"
+	fmt.Println(m)
 	return nil, errors.New(m)
 }
 

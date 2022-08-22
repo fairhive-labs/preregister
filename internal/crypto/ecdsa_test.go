@@ -100,7 +100,7 @@ func TestNewJWTES256(t *testing.T) {
 		t.FailNow()
 	}
 
-	fmt.Print(string(pvkbuf.Bytes()))
+	fmt.Print(pvkbuf.String())
 
 }
 
