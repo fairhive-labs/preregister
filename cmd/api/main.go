@@ -273,7 +273,7 @@ func (app App) list(c *gin.Context) {
 		}
 		for _, u := range users {
 			l, _ := time.LoadLocation("Europe/Paris")
-			err := w.Write([]string{u.Type, u.Address, u.Email, u.UUID, fmt.Sprintf("%s", time.UnixMilli(u.Timestamp).In(l))})
+			err := w.Write([]string{u.Type, u.Address, u.Email, u.UUID, time.UnixMilli(u.Timestamp).In(l).String()})
 			if err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 				return
