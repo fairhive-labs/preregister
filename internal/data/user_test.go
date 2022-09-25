@@ -2,7 +2,6 @@ package data
 
 import (
 	"encoding/json"
-	"fmt"
 	"testing"
 
 	"github.com/go-playground/validator/v10"
@@ -35,18 +34,50 @@ func TestSetup(t *testing.T) {
 }
 
 func TestNewUser(t *testing.T) {
+	type errorDetails struct {
+		field string
+		tag   string
+		value interface{}
+	}
 
 	tt := []struct {
 		name string
 		u    *User
-		err  *struct {
-			field string
-			tag   string
-			value interface{}
-			param string
-		}
+		err  *errorDetails
 	}{
 		{"valid_user", NewUser("0x8ba1f109551bD432803012645Ac136ddd64DBA72", "john.doe@mailservice.com", "talent", sponsor), nil},
+		{"invalid_user_address",
+			NewUser("0x8ba1f109551bD432803012645Ac136ddd64DBA73", "john.doe@mailservice.com", "talent", sponsor),
+			&errorDetails{"Address", "eth_addr", "0x8ba1f109551bD432803012645Ac136ddd64DBA73"},
+		},
+		{"missing_user_address",
+			NewUser("", "john.doe@mailservice.com", "talent", sponsor),
+			&errorDetails{"Address", "required", ""},
+		},
+		{"invalid_email",
+			NewUser("0x8ba1f109551bD432803012645Ac136ddd64DBA72", "john.doemailservice.com", "talent", sponsor),
+			&errorDetails{"Email", "email", "john.doemailservice.com"},
+		},
+		{"missing_email",
+			NewUser("0x8ba1f109551bD432803012645Ac136ddd64DBA72", "", "talent", sponsor),
+			&errorDetails{"Email", "required", ""},
+		},
+		{"invalid_sponsor",
+			NewUser("0x8ba1f109551bD432803012645Ac136ddd64DBA72", "john.doemail@service.com", "talent", "0x8ba1f109551bD432803012645Ac136ddd64DBA73"),
+			&errorDetails{"Sponsor", "eth_addr", "0x8ba1f109551bD432803012645Ac136ddd64DBA73"},
+		},
+		{"missing_sponsor",
+			NewUser("0x8ba1f109551bD432803012645Ac136ddd64DBA72", "john.doemail@service.com", "talent", ""),
+			&errorDetails{"Sponsor", "required", ""},
+		},
+		{"missing_type",
+			NewUser("0x8ba1f109551bD432803012645Ac136ddd64DBA72", "john.doemail@service.com", "", sponsor),
+			&errorDetails{"Type", "required", ""},
+		},
+		{"invalid_type",
+			NewUser("0x8ba1f109551bD432803012645Ac136ddd64DBA72", "john.doemail@service.com", "unsupported_type", sponsor),
+			&errorDetails{"Type", "oneof", "unsupported_type"},
+		},
 	}
 
 	for _, tc := range tt {
@@ -56,12 +87,16 @@ func TestNewUser(t *testing.T) {
 			err := validate.Struct(u)
 			if err != nil {
 				if tc.err != nil {
-					for _, err := range err.(validator.ValidationErrors) {
-
-						fmt.Println(err.Field())
-						fmt.Println(err.Tag())
-						fmt.Println(err.Value())
-						fmt.Println(err.Param())
+					for _, e := range err.(validator.ValidationErrors) {
+						if e.Field() != tc.err.field {
+							t.Errorf("Field is incorrect, got %v, want %v", e.Field(), tc.err.field)
+						}
+						if e.Tag() != tc.err.tag {
+							t.Errorf("Tag is incorrect, got %v, want %v", e.Tag(), tc.err.tag)
+						}
+						if e.Value() != tc.err.value {
+							t.Errorf("Value is incorrect, got %v, want %v", e.Value(), tc.err.value)
+						}
 					}
 				} else {
 					t.Errorf("user %v is not valid, %v ", *u, err)
