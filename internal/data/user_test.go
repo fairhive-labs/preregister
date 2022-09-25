@@ -31,7 +31,7 @@ func TestSetup(t *testing.T) {
 	}
 }
 
-// Test NewUser() and defacto IsValid()
+// Test NewUser() + defacto IsValid() & IsSet()
 func TestNewUser(t *testing.T) {
 	type errorDetails struct {
 		field string
@@ -51,66 +51,66 @@ func TestNewUser(t *testing.T) {
 	invalidTimestampUser.Timestamp = 0
 
 	tt := []struct {
-		name string
-		u    *User
-		err  *errorDetails
-		v    bool
+		name       string
+		u          *User
+		err        *errorDetails
+		valid, set bool
 	}{
-		{"valid_user", validUser, nil, true},
+		{"valid_user", validUser, nil, true, true},
 		{"invalid_user_address",
 			NewUser("0x8ba1f109551bD432803012645Ac136ddd64DBA73", "john.doe@mailservice.com", "talent", sponsor),
 			&errorDetails{"Address", "eth_addr", "0x8ba1f109551bD432803012645Ac136ddd64DBA73"},
-			false,
+			false, false,
 		},
 		{"missing_user_address",
 			NewUser("", "john.doe@mailservice.com", "talent", sponsor),
 			&errorDetails{"Address", "required", ""},
-			false,
+			false, false,
 		},
 		{"invalid_email",
 			NewUser("0x8ba1f109551bD432803012645Ac136ddd64DBA72", "john.doemailservice.com", "talent", sponsor),
 			&errorDetails{"Email", "email", "john.doemailservice.com"},
-			false,
+			false, false,
 		},
 		{"missing_email",
 			NewUser("0x8ba1f109551bD432803012645Ac136ddd64DBA72", "", "talent", sponsor),
 			&errorDetails{"Email", "required", ""},
-			false,
+			false, false,
 		},
 		{"invalid_sponsor",
 			NewUser("0x8ba1f109551bD432803012645Ac136ddd64DBA72", "john.doemail@service.com", "talent", "0x8ba1f109551bD432803012645Ac136ddd64DBA73"),
 			&errorDetails{"Sponsor", "eth_addr", "0x8ba1f109551bD432803012645Ac136ddd64DBA73"},
-			false,
+			false, false,
 		},
 		{"missing_sponsor",
 			NewUser("0x8ba1f109551bD432803012645Ac136ddd64DBA72", "john.doemail@service.com", "talent", ""),
 			&errorDetails{"Sponsor", "required", ""},
-			false,
+			false, false,
 		},
 		{"missing_type",
 			NewUser("0x8ba1f109551bD432803012645Ac136ddd64DBA72", "john.doemail@service.com", "", sponsor),
 			&errorDetails{"Type", "required", ""},
-			false,
+			false, false,
 		},
 		{"invalid_type",
 			NewUser("0x8ba1f109551bD432803012645Ac136ddd64DBA72", "john.doemail@service.com", "unsupported_type", sponsor),
 			&errorDetails{"Type", "oneof", "unsupported_type"},
-			false,
+			false, false,
 		},
 		{"missing_uuid",
 			&noUUIDUser,
 			&errorDetails{"UUID", "required", ""},
-			false,
+			false, true,
 		},
 		{"invalid_uuid",
 			&invalidUUIDUser,
 			&errorDetails{"UUID", "uuid", "fakeUUID"},
-			false,
+			false, true,
 		},
 		{"invalid_timestamp",
 			&invalidTimestampUser,
 			&errorDetails{"Timestamp", "gt", int64(0)},
-			false,
+			false, true,
 		},
 	}
 
@@ -138,8 +138,12 @@ func TestNewUser(t *testing.T) {
 				}
 			}
 
-			if u.IsValid() != tc.v {
-				t.Errorf("incorrect validation, got %v, want %v", u.IsValid(), tc.v)
+			if u.IsValid() != tc.valid {
+				t.Errorf("incorrect complete validation, got %v, want %v", u.IsValid(), tc.valid)
+			}
+
+			if u.IsSet() != tc.set {
+				t.Errorf("incorrect partial validation, got %v, want %v", u.IsSet(), tc.set)
 			}
 		})
 	}

@@ -43,6 +43,12 @@ func (u *User) HasSupportedType() bool {
 	}
 }
 
+// IsValid tests if all fields are valid
 func (u *User) IsValid() bool {
 	return nil == validate.Struct(u)
+}
+
+// IsSet tests if only required fields are valid
+func (u *User) IsSet() bool {
+	return nil == validate.StructExcept(u, "UUID", "Timestamp")
 }
