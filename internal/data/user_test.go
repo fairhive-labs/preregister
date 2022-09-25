@@ -2,10 +2,14 @@ package data
 
 import (
 	"encoding/json"
+	"fmt"
 	"testing"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 )
+
+var validate = validator.New()
 
 const sponsor = "0xD01efFE216E16a85Fc529db66c26aBeCf4D885f8" // real address but empty balance
 
@@ -31,44 +35,50 @@ func TestSetup(t *testing.T) {
 }
 
 func TestNewUser(t *testing.T) {
-	address := "0x8ba1f109551bD432803012645Ac136ddd64DBA72"
-	email := "john.doe@mailservice.com"
-	utype := "talent"
-	u := NewUser(address, email, utype, sponsor)
 
-	if u.Address != address {
-		t.Errorf("Address is incorrect, got %s, want %s", u.Address, address)
-		t.FailNow()
+	tt := []struct {
+		name string
+		u    *User
+		err  *struct {
+			field string
+			tag   string
+			value interface{}
+			param string
+		}
+	}{
+		{"valid_user", NewUser("0x8ba1f109551bD432803012645Ac136ddd64DBA72", "john.doe@mailservice.com", "talent", sponsor), nil},
 	}
 
-	if u.Email != email {
-		t.Errorf("Email is incorrect, got %s, want %s", u.Email, email)
-		t.FailNow()
-	}
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			u := tc.u
 
-	if !u.HasSupportedType() {
-		t.Errorf("Type is incorrect, got %s, want %s", u.Type, utype)
-		t.FailNow()
-	}
+			err := validate.Struct(u)
+			if err != nil {
+				if tc.err != nil {
+					for _, err := range err.(validator.ValidationErrors) {
 
-	if u.UUID == "" {
-		t.Errorf("UUID is incorrect, cannot be empty string")
-		t.FailNow()
-	}
+						fmt.Println(err.Field())
+						fmt.Println(err.Tag())
+						fmt.Println(err.Value())
+						fmt.Println(err.Param())
+					}
+				} else {
+					t.Errorf("user %v is not valid, %v ", *u, err)
+					t.FailNow()
+				}
+			}
 
-	if _, err := uuid.Parse(u.UUID); err != nil {
-		t.Errorf("UUID is incorrect, cannot be parsed: %v", err)
-		t.FailNow()
-	}
+			if _, err := uuid.Parse(u.UUID); err != nil {
+				t.Errorf("UUID is incorrect, cannot be parsed: %v", err)
+				t.FailNow()
+			}
 
-	if u.Timestamp == 0 {
-		t.Errorf("Timestamp is incorrect, cannot be 0")
-		t.FailNow()
-	}
-
-	if u.Sponsor != sponsor {
-		t.Errorf("Sponsor is incorrect, got %s, want %s", u.Sponsor, sponsor)
-		t.FailNow()
+			if u.Timestamp == 0 {
+				t.Errorf("Timestamp is incorrect, cannot be 0")
+				t.FailNow()
+			}
+		})
 	}
 
 }
