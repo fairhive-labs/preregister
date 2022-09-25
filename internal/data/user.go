@@ -3,17 +3,20 @@ package data
 import (
 	"time"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 )
 
 type User struct {
 	Address   string `json:"address" binding:"required,eth_addr" validate:"required,eth_addr"`
 	Email     string `json:"email" binding:"required,email" validate:"required,email"`
-	UUID      string `json:"uuid,omitempty"`
-	Timestamp int64  `json:"timestamp,omitempty"`
+	UUID      string `json:"uuid,omitempty" validate:"required,uuid"`
+	Timestamp int64  `json:"timestamp,omitempty" validate:"gt=0"`
 	Type      string `json:"type" binding:"required,oneof=advisor agent client contributor investor mentor talent" validate:"required,oneof=advisor agent client contributor investor mentor talent"`
 	Sponsor   string `json:"sponsor" binding:"required,eth_addr" validate:"required,eth_addr"`
 }
+
+var validate = validator.New()
 
 func (u *User) Setup() {
 	u.UUID = uuid.New().String()
@@ -38,4 +41,8 @@ func (u *User) HasSupportedType() bool {
 	default:
 		return false
 	}
+}
+
+func (u *User) IsValid() bool {
+	return nil == validate.Struct(u)
 }
