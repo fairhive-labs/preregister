@@ -9,7 +9,7 @@ import (
 const (
 	secret     = "VERY_SECURE_JWT_SECRET_L0L"
 	address    = "0x8ba1f109551bD432803012645Ac136ddd64DBA72"
-	sponsor    = "0x9ba1f109551bD432803012645Ac136ddd64DBA73"
+	sponsor    = "0xD01efFE216E16a85Fc529db66c26aBeCf4D885f8" // real address but empty balance
 	email      = "john.doe@mailservice.com"
 	utype      = "talent"
 	timestamp  = 1647952128425

@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/google/uuid"
 )
 
 const (
@@ -174,34 +173,8 @@ func TestHeavyRotationECDSA(t *testing.T) {
 				t.FailNow()
 			}
 
-			if u2.Address != address {
-				t.Errorf("Address is incorrect, got %s, want %s", u2.Address, address)
-				t.FailNow()
-			}
-
-			if u2.Email != email {
-				t.Errorf("Email is incorrect, got %s, want %s", u2.Email, email)
-				t.FailNow()
-			}
-
-			if !u2.HasSupportedType() {
-				t.Errorf("Type is incorrect, got %s, want %s", u2.Type, utype)
-				t.FailNow()
-			}
-
-			if u2.UUID == "" {
-				t.Errorf("UUID is incorrect, cannot be empty string")
-				t.FailNow()
-			}
-
-			if _, err := uuid.Parse(u2.UUID); err != nil {
-				t.Errorf("UUID is incorrect, cannot be parsed: %v", err)
-				t.FailNow()
-			}
-
-			if u2.Timestamp == 0 {
-				t.Errorf("Timestamp is incorrect, cannot be 0")
-				t.FailNow()
+			if !u2.IsSet() {
+				t.Errorf("user u2 %v should be set and equal %v", u2, u)
 			}
 		})
 	}

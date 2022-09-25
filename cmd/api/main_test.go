@@ -17,7 +17,6 @@ import (
 	"github.com/fairhive-labs/preregister/internal/data"
 	"github.com/fairhive-labs/preregister/internal/limiter"
 	"github.com/fairhive-labs/preregister/internal/mailer"
-	"github.com/google/uuid"
 )
 
 const sponsor = "0xD01efFE216E16a85Fc529db66c26aBeCf4D885f8" // real address but empty balance
@@ -338,39 +337,8 @@ func TestActivate(t *testing.T) {
 
 				json.NewDecoder(w.Body).Decode(&u)
 
-				if u.Address != address {
-					t.Errorf("Address is incorrect, got %s, want %s", u.Address, address)
-					t.FailNow()
-				}
-
-				if u.Email != email {
-					t.Errorf("Email is incorrect, got %s, want %s", u.Email, email)
-					t.FailNow()
-				}
-
-				if !u.HasSupportedType() {
-					t.Errorf("Type is incorrect, got %s, want %s", u.Type, utype)
-					t.FailNow()
-				}
-
-				if u.UUID == "" {
-					t.Errorf("UUID is incorrect, cannot be empty string")
-					t.FailNow()
-				}
-
-				if _, err := uuid.Parse(u.UUID); err != nil {
-					t.Errorf("UUID is incorrect, cannot be parsed: %v", err)
-					t.FailNow()
-				}
-
-				if u.Timestamp == 0 {
-					t.Errorf("Timestamp is incorrect, cannot be 0")
-					t.FailNow()
-				}
-
-				if u.Sponsor != sponsor {
-					t.Errorf("Sponsor is incorrect, got %s, want %s", u.Sponsor, sponsor)
-					t.FailNow()
+				if !u.IsValid() {
+					t.Errorf("user %v should be valid", u)
 				}
 
 			case http.StatusNotFound:

@@ -1,6 +1,7 @@
 package data
 
 import (
+	"log"
 	"time"
 
 	"github.com/go-playground/validator/v10"
@@ -34,15 +35,6 @@ func NewUser(a, e, t, s string) *User {
 	return u
 }
 
-func (u *User) HasSupportedType() bool {
-	switch u.Type {
-	case "advisor", "agent", "client", "contributor", "investor", "mentor", "talent":
-		return true
-	default:
-		return false
-	}
-}
-
 // IsValid tests if all fields are valid
 func (u *User) IsValid() bool {
 	return nil == validate.Struct(u)
@@ -50,5 +42,9 @@ func (u *User) IsValid() bool {
 
 // IsSet tests if only required fields are valid
 func (u *User) IsSet() bool {
-	return nil == validate.StructExcept(u, "UUID", "Timestamp")
+	err := validate.StructExcept(u, "UUID", "Timestamp")
+	if err != nil {
+		log.Print(err)
+	}
+	return nil == err
 }
