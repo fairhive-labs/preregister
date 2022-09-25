@@ -77,6 +77,7 @@ func extract[SM *jwt.SigningMethodHMAC | *jwt.SigningMethodECDSA](token string, 
 		return k, nil
 	})
 
+	//TODO : use Go Validator
 	if tk.Valid &&
 		uclaims.Address != "" &&
 		uclaims.Email != "" &&
