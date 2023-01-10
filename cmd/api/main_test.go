@@ -19,6 +19,8 @@ import (
 	"github.com/fairhive-labs/preregister/internal/mailer"
 )
 
+const sponsor = "0xD01efFE216E16a85Fc529db66c26aBeCf4D885f8" // real address but empty balance
+
 func TestRegister(t *testing.T) {
 	var db data.DB = data.MockDB
 	k, _ := cipher.GenerateKey(32)
@@ -192,6 +194,7 @@ func TestRegister(t *testing.T) {
 				Address: address,
 				Email:   email,
 				Type:    utype,
+				Sponsor: sponsor,
 			})
 
 			w := httptest.NewRecorder()
@@ -259,7 +262,8 @@ func TestActivate(t *testing.T) {
 	vt, _ := app.jwt.Create(&data.User{
 		Address: address,
 		Email:   email,
-		Type:    utype}, time.Now())
+		Type:    utype,
+		Sponsor: sponsor}, time.Now())
 	vh := app.jwt.Hash(vt)
 
 	tt := []struct {
@@ -329,22 +333,14 @@ func TestActivate(t *testing.T) {
 					t.FailNow()
 				}
 
-				var res struct {
-					Activated bool
-					Token     string
+				var u data.User
+
+				json.NewDecoder(w.Body).Decode(&u)
+
+				if !u.IsValid() {
+					t.Errorf("user %v should be valid", u)
 				}
 
-				json.NewDecoder(w.Body).Decode(&res)
-
-				if !res.Activated {
-					t.Errorf("Activated is incorrect, got %v, want %v", res.Activated, true)
-					t.FailNow()
-				}
-
-				if res.Token != token {
-					t.Errorf("Token is incorrect, got %s, want %s", res.Token, token)
-					t.FailNow()
-				}
 			case http.StatusNotFound:
 				if w.Code != http.StatusNotFound {
 					t.Errorf("Status code is incorrect, got %d, want %d", w.Code, http.StatusNotFound)

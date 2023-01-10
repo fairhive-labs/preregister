@@ -98,6 +98,6 @@ func logEmailSent(e, m string, err error) {
 	if err != nil {
 		fmt.Printf("Error sending email to %q: %v", e, err)
 	} else {
-		fmt.Printf(m)
+		fmt.Print(m)
 	}
 }

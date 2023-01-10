@@ -44,8 +44,9 @@ func (db mockDB) List(options ...int) ([]*User, error) {
 	users := []*User{}
 	for k, v := range m {
 		for i := 0; i < v; i++ {
-			_, a, _ := key.Generate()
-			u := NewUser(a, fmt.Sprintf("%s_%d@domain.com", k, (i+1)), k)
+			_, a, _ := key.Generate() // user's address
+			_, s, _ := key.Generate() // user's sponsor
+			u := NewUser(a, fmt.Sprintf("%s_%d@domain.com", k, (i+1)), k, s)
 			users = append(users, u)
 		}
 	}
@@ -87,14 +88,14 @@ func (db mockErrDB) Save(u *User) (err error) {
 }
 
 func (db mockErrDB) Count() (map[string]int, error) {
-	m := fmt.Sprintf("🔥 Error counting Users in DB\n")
-	fmt.Print(m)
+	m := "🔥 Error counting Users in DB"
+	fmt.Println(m)
 	return nil, errors.New(m)
 }
 
 func (db mockErrDB) List(options ...int) ([]*User, error) {
-	m := fmt.Sprintf("🔥 Error listing Users in DB\n")
-	fmt.Print(m)
+	m := "🔥 Error listing Users in DB"
+	fmt.Println(m)
 	return nil, errors.New(m)
 }
 

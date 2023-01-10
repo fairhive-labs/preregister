@@ -92,6 +92,7 @@ func TestSave(t *testing.T) {
 		Address: address,
 		Email:   email,
 		Type:    utype,
+		Sponsor: sponsor,
 	}
 
 	db, _ := NewDynamoDB(tableName, ek)
@@ -104,9 +105,21 @@ func TestSave(t *testing.T) {
 		Address: "",
 		Email:   email,
 		Type:    utype,
+		Sponsor: sponsor,
 	}
 	if err := db.Save(u); err == nil {
 		t.Errorf("impossible to save user with an empty string Address: ValidationException")
+		t.FailNow()
+	}
+
+	u = &User{
+		Address: address,
+		Email:   email,
+		Type:    utype,
+		Sponsor: "",
+	}
+	if err := db.Save(u); err == nil {
+		t.Errorf("impossible to save user with an empty string Sponsor: ValidationException")
 		t.FailNow()
 	}
 }
@@ -132,7 +145,7 @@ func TestList(t *testing.T) {
 			t.Errorf("cannot list users: %v", err)
 			t.FailNow()
 		}
-		if users == nil || len(users) == 0 {
+		if len(users) == 0 {
 			t.Errorf("users list cannot be nil or empty")
 			t.FailNow()
 		}

@@ -41,9 +41,9 @@ func TestCreateHMAC(t *testing.T) {
 			nil,
 		},
 		{
-			"HS256 user missing address",
+			"HS256 user address missing",
 			time.UnixMicro(timestamp),
-			"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZGRyZXNzIjoiIiwiZW1haWwiOiJqb2huLmRvZUBtYWlsc2VydmljZS5jb20iLCJ0eXBlIjoidGFsZW50IiwiaXNzIjoiZmFpcmhpdmUuaW8iLCJleHAiOjE2NDg1NTIsIm5iZiI6MTY0Nzk1MiwiaWF0IjoxNjQ3OTUyfQ.fU_Vi8s1vxU59oRSAnTGj3bN4veMeNuFYBLNWKuOnJE",
+			"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZGRyZXNzIjoiIiwiZW1haWwiOiJqb2huLmRvZUBtYWlsc2VydmljZS5jb20iLCJ0eXBlIjoidGFsZW50Iiwic3BvbnNvciI6IiIsImlzcyI6ImZhaXJoaXZlLmlvIiwiZXhwIjoxNjQ4NTUyLCJuYmYiOjE2NDc5NTIsImlhdCI6MTY0Nzk1Mn0.T__JBBKaY4aUgUgMveimy-x2YfRVi10Q0W3gH7wehZY",
 			&data.User{
 				Email: email,
 				Type:  utype,
@@ -131,8 +131,23 @@ func TestExtractHMAC(t *testing.T) {
 
 	t.Run("token without address", func(t *testing.T) {
 		ss, _ = j.Create(&data.User{
-			Email: email,
-			Type:  utype,
+			Email:   email,
+			Type:    utype,
+			Sponsor: sponsor,
+		}, now)
+		_, err = j.Extract(ss)
+		if err != ErrInvalidToken {
+			t.Errorf("incorrect error, got %v, want %v", err, ErrInvalidToken)
+			t.Errorf(ss)
+			t.FailNow()
+		}
+	})
+
+	t.Run("token without sponsor", func(t *testing.T) {
+		ss, _ = j.Create(&data.User{
+			Address: address,
+			Email:   email,
+			Type:    utype,
 		}, now)
 		_, err = j.Extract(ss)
 		if err != ErrInvalidToken {

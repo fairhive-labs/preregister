@@ -143,10 +143,7 @@ func (app App) activate(c *gin.Context) {
 		app.mailer.SendConfirmationEmail(u.Email)
 	}()
 
-	c.JSON(http.StatusCreated, gin.H{
-		"token":     t,
-		"activated": true,
-	})
+	c.JSON(http.StatusCreated, u)
 }
 
 func (app App) limit(c *gin.Context) {
@@ -273,7 +270,7 @@ func (app App) list(c *gin.Context) {
 		}
 		for _, u := range users {
 			l, _ := time.LoadLocation("Europe/Paris")
-			err := w.Write([]string{u.Type, u.Address, u.Email, u.UUID, fmt.Sprintf("%s", time.UnixMilli(u.Timestamp).In(l))})
+			err := w.Write([]string{u.Type, u.Address, u.Email, u.UUID, time.UnixMilli(u.Timestamp).In(l).String()})
 			if err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 				return
