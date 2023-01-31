@@ -1,9 +1,9 @@
 module github.com/fairhive-labs/preregister
 
-go 1.18
+go 1.19
 
 // +heroku install ./cmd/...
-// +heroku goVersion 1.18
+// +heroku goVersion 1.19
 
 require github.com/gin-gonic/gin v1.8.2
 
@@ -13,6 +13,7 @@ require (
 	github.com/ethereum/go-ethereum v1.10.26 // indirect
 	github.com/goccy/go-json v0.10.0 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
+	github.com/kr/text v0.2.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.6 // indirect
 	golang.org/x/net v0.5.0 // indirect
 	golang.org/x/text v0.6.0 // indirect
