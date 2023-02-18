@@ -301,7 +301,7 @@ func setupRouter(app App) *gin.Engine {
 	})
 	r.GET("/:path1/:path2/count", app.count)
 	r.GET("/:path1/:path2/list", app.list)
-	r.POST("/", app.register)
+	r.POST("/register", app.register)
 	r.POST("/activate/:token/:hash", app.activate)
 	return r
 }

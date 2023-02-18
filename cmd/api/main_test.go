@@ -198,7 +198,7 @@ func TestRegister(t *testing.T) {
 			})
 
 			w := httptest.NewRecorder()
-			req, _ := http.NewRequest("POST", "/", bytes.NewBuffer(jsonUser))
+			req, _ := http.NewRequest("POST", "/register", bytes.NewBuffer(jsonUser))
 			r.ServeHTTP(w, req)
 
 			switch tc.status {
