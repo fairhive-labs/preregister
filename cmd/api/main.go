@@ -93,6 +93,10 @@ func NewApp() *App {
 
 var jwtregexp = regexp.MustCompile(`^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]*$`)
 
+func generateSecuredLink(t string) string {
+	return fmt.Sprintf("http://fairhive.io/activate/%s", t)
+}
+
 func (app App) register(c *gin.Context) {
 	var u data.User
 	if err := c.ShouldBindJSON(&u); err != nil {
@@ -109,7 +113,8 @@ func (app App) register(c *gin.Context) {
 	app.wg.Add(1)
 	go func() {
 		defer app.wg.Done()
-		app.mailer.SendActivationEmail(u.Email, fmt.Sprintf("http://fairhive.io/activate/%s", token), hash)
+		sl := generateSecuredLink(token)
+		app.mailer.SendActivationEmail(u.Email, sl, hash)
 	}()
 
 	c.JSON(http.StatusAccepted, gin.H{
