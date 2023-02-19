@@ -17,3 +17,9 @@ Response :
   "hash": "2A0C454A589B1CA4BA7FEF07828DF8F8BFD13E894B086FAB19415B137D33A18901F223995D8737B81B8A3354419035F5A0BC8A7DC73B51A84383A4876A5DB3E5"
 }
 ```
+
+## Sequence Diagram
+
+Complete workflow is detailed on [Medium](https://medium.com/fairhive/pre-registration-workflow-97dca90d6b9a) article
+
+
