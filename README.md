@@ -20,4 +20,6 @@ Response :
 
 ## Sequence Diagram
 
-![Pre-registration_Workflow_v1 0](https://user-images.githubusercontent.com/19473981/219856886-befdb7cd-bab7-4191-b348-20a308a2c6bc.png)
+Complete workflow is detailed on [Medium](https://medium.com/fairhive/pre-registration-workflow-97dca90d6b9a) article
+
+
