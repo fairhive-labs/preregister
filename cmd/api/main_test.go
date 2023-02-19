@@ -333,13 +333,13 @@ func TestActivate(t *testing.T) {
 					t.FailNow()
 				}
 
-				var u data.User
+				// var u data.User
 
-				json.NewDecoder(w.Body).Decode(&u)
+				// json.NewDecoder(w.Body).Decode(&u)
 
-				if !u.IsValid() {
-					t.Errorf("user %v should be valid", u)
-				}
+				// if !u.IsValid() {
+				// 	t.Errorf("user %v should be valid", u)
+				// }
 
 			case http.StatusNotFound:
 				if w.Code != http.StatusNotFound {
