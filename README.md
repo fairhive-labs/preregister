@@ -22,4 +22,4 @@ Response :
 
 Complete workflow is detailed on [Medium](https://medium.com/fairhive/pre-registration-workflow-97dca90d6b9a) article
 
-
+![Pre-registration_Workflow_v1 0](https://user-images.githubusercontent.com/19473981/219961084-4c9ae2d7-c202-492d-90e7-8956531144e2.png)
