@@ -77,12 +77,7 @@ func extract[SM *jwt.SigningMethodHMAC | *jwt.SigningMethodECDSA](token string, 
 		return k, nil
 	})
 
-	//TODO : use Go Validator
-	if tk.Valid &&
-		uclaims.Address != "" &&
-		uclaims.Email != "" &&
-		uclaims.Type != "" &&
-		uclaims.Sponsor != "" { // mandatory Fields...
+	if tk.Valid && uclaims.IsSet() {
 		return data.NewUser(uclaims.Address, uclaims.Email, uclaims.Type, uclaims.Sponsor), nil
 	}
 	//fmt.Printf("Error extracting JWT: %v\n", err)
