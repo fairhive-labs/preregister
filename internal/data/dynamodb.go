@@ -50,7 +50,7 @@ func (db *dynamoDB) Save(user *User) error {
 	if svc == nil {
 		return errors.New("cannot create dynamodb client")
 	}
-
+	//@TODO: control if sponsor exist
 	encEmail, err := cipher.Encrypt(user.Email, db.ek)
 	if err != nil {
 		return err
