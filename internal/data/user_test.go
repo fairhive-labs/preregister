@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 )
 
-const sponsor = "0xD01efFE216E16a85Fc529db66c26aBeCf4D885f8" // real address but empty balance
+const sponsor = "0xE3C3691DB5f5185F37A3f98e5ec76403B2d10c3E" // trendev eth address
 
 func TestSetup(t *testing.T) {
 
