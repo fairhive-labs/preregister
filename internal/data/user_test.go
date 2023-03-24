@@ -58,8 +58,8 @@ func TestNewUser(t *testing.T) {
 	}{
 		{"valid_user", validUser, nil, true, true},
 		{"invalid_user_address",
-			NewUser("0x8ba1f109551bD432803012645Ac136ddd64DBA73", "john.doe@mailservice.com", "talent", sponsor),
-			&errorDetails{"Address", "eth_addr", "0x8ba1f109551bD432803012645Ac136ddd64DBA73"},
+			NewUser("0x8bz1f109551bD432803012645Ac136ddd64DBA73", "john.doe@mailservice.com", "talent", sponsor),
+			&errorDetails{"Address", "eth_addr", "0x8bz1f109551bD432803012645Ac136ddd64DBA73"},
 			false, false,
 		},
 		{"missing_user_address",
