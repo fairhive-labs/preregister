@@ -34,17 +34,6 @@ jobs:
           go-version: ${{ matrix.go-version }}
       - name: checkout
         uses: actions/checkout@v3
-      - name: caching
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/go/pkg/mod
-            ~/.cache/go-build
-            ~/Library/Caches/go-build
-            ~\AppData\Local\go-build
-          key: ${{ runner.os }}-go-${{ matrix.go-version }}-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-${{ matrix.go-version }}-
       - run: go test -v ./...
   heroku:
     runs-on: ubuntu-latest
