@@ -29,13 +29,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: setup
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v4
         with:
           go-version: ${{ matrix.go-version }}
       - name: checkout
         uses: actions/checkout@v3
       - name: caching
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ~/go/pkg/mod
@@ -55,8 +55,8 @@ jobs:
         run: |
           echo "FAIRHIVE_API_SECURE_PATH1=$(uuidgen)" >> $GITHUB_ENV
           echo "FAIRHIVE_API_SECURE_PATH2=$(uuidgen)" >> $GITHUB_ENV
-      - uses: actions/checkout@v2
-      - uses: akhileshns/heroku-deploy@v3.12.12
+      - uses: actions/checkout@v3
+      - uses: akhileshns/heroku-deploy@v3.12.13
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
           heroku_app_name: "polar-plains-98105"
