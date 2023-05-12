@@ -80,6 +80,14 @@ func (app *App) activate(c *gin.Context) {
 		return
 	}
 
+	// @TODO: control if user is already present
+	// ra, err := app.db.IsPresent(u.Address)
+	// 409 Conflict
+
+	// @TODO: control if sponsor is present
+	// rs, err := app.db.IsPresent(u.Sponsor)
+	// 400 Bad Request
+
 	err = app.db.Save(u)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
