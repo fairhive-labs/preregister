@@ -235,10 +235,31 @@ func TestString(t *testing.T) {
 				Sponsor:   un.Sponsor,
 			}
 
-			if u.Timestamp != tc.u.Timestamp {
-				t.Errorf("timestamp is incorrect, got %d, want %d", u.Timestamp, tc.u.Timestamp)
+			if u.Address != tc.u.Address {
+				t.Errorf("Address is incorrect, got %s, want %s", u.Address, tc.u.Address)
 				t.FailNow()
 			}
+			if u.Email != tc.u.Email {
+				t.Errorf("Email is incorrect, got %s, want %s", u.Email, tc.u.Email)
+				t.FailNow()
+			}
+			if u.UUID != tc.u.UUID {
+				t.Errorf("UUID is incorrect, got %s, want %s", u.UUID, tc.u.UUID)
+				t.FailNow()
+			}
+			if u.Timestamp != tc.u.Timestamp {
+				t.Errorf("Timestamp is incorrect, got %d, want %d", u.Timestamp, tc.u.Timestamp)
+				t.FailNow()
+			}
+			if u.Type != tc.u.Type {
+				t.Errorf("Type is incorrect, got %s, want %s", u.Type, tc.u.Type)
+				t.FailNow()
+			}
+			if u.Sponsor != tc.u.Sponsor {
+				t.Errorf("Sponsor is incorrect, got %s, want %s", u.Sponsor, tc.u.Sponsor)
+				t.FailNow()
+			}
+
 		})
 	}
 
