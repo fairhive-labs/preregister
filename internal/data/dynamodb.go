@@ -38,11 +38,7 @@ func NewDynamoDB(tn, ek string) (db *dynamoDB, err error) {
 }
 
 func (db *dynamoDB) Save(user *User) error {
-	if user == nil ||
-		user.Address == "" ||
-		user.Email == "" ||
-		user.Type == "" ||
-		user.Sponsor == "" {
+	if user == nil || !user.IsSet() {
 		return ErrInvalidUser
 	}
 	sess := session.Must(session.NewSession())
