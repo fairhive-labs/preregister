@@ -196,26 +196,40 @@ func TestString(t *testing.T) {
 	ty1, ty2 := "talent", "client"
 	s1, s2 := "0x095cb719f8f69952599c15af31c80Ccb825E15d4", "0x233F858EaF43AFFE5DDFBD3AD69ACc6f5de6C529"
 
-	u1 := &User{a1, e1, id1, int64(tm1), ty1, s1}
-	u2 := &User{a2, e2, id2, int64(tm2), ty2, s2}
-	j1 := "{\"address\":\"0xaD51c5ac7612DB8dD1611c6B2e317E4950c40942\",\"email\":\"user1@domain.com\",\"uuid\":\"4a8e9808-563e-4761-a8fa-305fef099a3e\",\"type\":\"talent\",\"sponsor\":\"0x095cb719f8f69952599c15af31c80Ccb825E15d4\",\"timestamp\":\"2023-05-12T18:00:20.519+02:00\"}"
-	j2 := "{\"address\":\"0x9C93c71065ea9101F252dE2e0f277437f473ac04\",\"email\":\"user2@domain.com\",\"uuid\":\"942a5811-926d-4014-baff-ef707f38407e\",\"type\":\"client\",\"sponsor\":\"0x233F858EaF43AFFE5DDFBD3AD69ACc6f5de6C529\",\"timestamp\":\"2023-05-11T14:13:10.432+02:00\"}"
-
-	_, _ = u2, j2
-
-	if u1.String() != j1 {
-		t.Errorf("%s should be equal to %s", u1.String(), j1)
-		t.FailNow()
+	tt := []struct {
+		name string
+		u    *User
+		exp  string
+	}{
+		{
+			"valid_user1",
+			&User{a1, e1, id1, int64(tm1), ty1, s1},
+			"{\"address\":\"0xaD51c5ac7612DB8dD1611c6B2e317E4950c40942\",\"email\":\"user1@domain.com\",\"uuid\":\"4a8e9808-563e-4761-a8fa-305fef099a3e\",\"type\":\"talent\",\"sponsor\":\"0x095cb719f8f69952599c15af31c80Ccb825E15d4\",\"timestamp\":\"2023-05-12T18:00:20.519+02:00\"}",
+		},
+		{
+			"valid_user2",
+			&User{a2, e2, id2, int64(tm2), ty2, s2},
+			"{\"address\":\"0x9C93c71065ea9101F252dE2e0f277437f473ac04\",\"email\":\"user2@domain.com\",\"uuid\":\"942a5811-926d-4014-baff-ef707f38407e\",\"type\":\"client\",\"sponsor\":\"0x233F858EaF43AFFE5DDFBD3AD69ACc6f5de6C529\",\"timestamp\":\"2023-05-11T14:13:10.432+02:00\"}",
+		},
 	}
 
-	var u1j struct {
-		*User
-		Timestamp string `json:"timestamp"`
-	}
-	json.Unmarshal([]byte(j1), &u1j)
-	d, err := time.Parse(time.RFC3339Nano, u1j.Timestamp)
-	if err == nil {
-		fmt.Printf("timestamp = %v", d.UnixMilli())
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			if tc.u.String() != tc.exp {
+				t.Errorf("%s should be equal to %s", tc.u.String(), tc.exp)
+				t.FailNow()
+			}
+
+			var un struct { // same struct than User String()
+				*User
+				Timestamp string `json:"timestamp"`
+			}
+			json.Unmarshal([]byte(tc.exp), &un)
+			d, err := time.Parse(time.RFC3339Nano, un.Timestamp)
+			if err == nil {
+				fmt.Printf("timestamp = %v", d.UnixMilli())
+			}
+		})
 	}
 
 }
