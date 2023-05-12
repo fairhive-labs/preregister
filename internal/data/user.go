@@ -56,7 +56,7 @@ func (u User) String() string {
 		Timestamp string `json:"timestamp"`
 	}{
 		User:      &u,
-		Timestamp: time.UnixMilli(u.Timestamp).String(),
+		Timestamp: time.UnixMilli(u.Timestamp).Format(time.RFC3339Nano),
 	})
 	return string(r)
 }

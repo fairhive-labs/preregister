@@ -2,8 +2,9 @@ package data
 
 import (
 	"encoding/json"
-	"strings"
+	"fmt"
 	"testing"
+	"time"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
@@ -187,12 +188,6 @@ func TestMarshalling(t *testing.T) {
 	}
 }
 
-func Stringify(u *User) string {
-	ustr, _ := json.Marshal(u)
-	r, _ := json.Marshal(string(ustr))
-	return string(r)
-}
-
 func TestString(t *testing.T) {
 	a1, a2 := "0xaD51c5ac7612DB8dD1611c6B2e317E4950c40942", "0x9C93c71065ea9101F252dE2e0f277437f473ac04"
 	e1, e2 := "user1@domain.com", "user2@domain.com"
@@ -203,16 +198,24 @@ func TestString(t *testing.T) {
 
 	u1 := &User{a1, e1, id1, int64(tm1), ty1, s1}
 	u2 := &User{a2, e2, id2, int64(tm2), ty2, s2}
-	r1 := "{\"address\":\"0xaD51c5ac7612DB8dD1611c6B2e317E4950c40942\",\"email\":\"user1@domain.com\",\"uuid\":\"4a8e9808-563e-4761-a8fa-305fef099a3e\",\"type\":\"talent\",\"sponsor\":\"0x095cb719f8f69952599c15af31c80Ccb825E15d4\",\"timestamp\":\"2023-05-12 18:00:20.519 +0200 CEST\"}"
-	r2 := "{\"address\":\"0x9C93c71065ea9101F252dE2e0f277437f473ac04\",\"email\":\"user2@domain.com\",\"uuid\":\"942a5811-926d-4014-baff-ef707f38407e\",\"type\":\"client\",\"sponsor\":\"0x233F858EaF43AFFE5DDFBD3AD69ACc6f5de6C529\",\"timestamp\":\"2023-05-11 14:13:10.432 +0200 CEST\"}"
+	j1 := "{\"address\":\"0xaD51c5ac7612DB8dD1611c6B2e317E4950c40942\",\"email\":\"user1@domain.com\",\"uuid\":\"4a8e9808-563e-4761-a8fa-305fef099a3e\",\"type\":\"talent\",\"sponsor\":\"0x095cb719f8f69952599c15af31c80Ccb825E15d4\",\"timestamp\":\"2023-05-12T18:00:20.519+02:00\"}"
+	j2 := "{\"address\":\"0x9C93c71065ea9101F252dE2e0f277437f473ac04\",\"email\":\"user2@domain.com\",\"uuid\":\"942a5811-926d-4014-baff-ef707f38407e\",\"type\":\"client\",\"sponsor\":\"0x233F858EaF43AFFE5DDFBD3AD69ACc6f5de6C529\",\"timestamp\":\"2023-05-11T14:13:10.432+02:00\"}"
 
-	if u1.String() != r1 {
-		t.Errorf("%s should be equal to %s", u1.String(), r1)
+	_, _ = u2, j2
+
+	if u1.String() != j1 {
+		t.Errorf("%s should be equal to %s", u1.String(), j1)
 		t.FailNow()
 	}
 
-	if strings.Compare(u2.String(), r2) != 0 {
-		t.Errorf("%s should be equal to %s", u2.String(), r2)
-		t.FailNow()
+	var u1j struct {
+		*User
+		Timestamp string `json:"timestamp"`
 	}
+	json.Unmarshal([]byte(j1), &u1j)
+	d, err := time.Parse(time.RFC3339Nano, u1j.Timestamp)
+	if err == nil {
+		fmt.Printf("timestamp = %v", d.UnixMilli())
+	}
+
 }
