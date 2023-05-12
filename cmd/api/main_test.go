@@ -33,7 +33,7 @@ func TestRegister(t *testing.T) {
 		"path1",
 		"path2",
 	}
-	r := setupRouter(*app)
+	r := setupRouter(app)
 	tt := []struct {
 		name    string
 		address string
@@ -256,7 +256,7 @@ func TestActivate(t *testing.T) {
 		"path1",
 		"path2",
 	}
-	r := setupRouter(*app)
+	r := setupRouter(app)
 
 	address, email, utype := "0x8ba1f109551bD432803012645Ac136ddd64DBA72", "john.doe@mailservice.com", "talent"
 	vt, _ := app.jwt.Create(&data.User{
@@ -377,7 +377,7 @@ func TestActivate(t *testing.T) {
 	}
 
 	app.db = data.MockErrDB
-	r = setupRouter(*app)
+	r = setupRouter(app)
 	t.Run("faulty DB", func(t *testing.T) {
 		w := httptest.NewRecorder()
 		token := vt
@@ -403,7 +403,7 @@ func TestCount(t *testing.T) {
 		"path1",
 		"path2",
 	}
-	r := setupRouter(*app)
+	r := setupRouter(app)
 
 	t.Run("json normal", func(t *testing.T) {
 		w := httptest.NewRecorder()
@@ -547,7 +547,7 @@ func TestCount(t *testing.T) {
 	}
 
 	app.db = data.MockErrDB
-	r = setupRouter(*app)
+	r = setupRouter(app)
 	t.Run("json faulty DB", func(t *testing.T) {
 		w := httptest.NewRecorder()
 		req, _ := http.NewRequest("GET", fmt.Sprintf("/%s/%s/count?mime=json", app.secpath1, app.secpath2), nil)
@@ -571,7 +571,7 @@ func TestHealth(t *testing.T) {
 		"path1",
 		"path2",
 	}
-	r := setupRouter(*app)
+	r := setupRouter(app)
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/health", nil)
@@ -615,7 +615,7 @@ func TestList(t *testing.T) {
 		"path1",
 		"path2",
 	}
-	r := setupRouter(*app)
+	r := setupRouter(app)
 
 	t.Run("json normal", func(t *testing.T) {
 		w := httptest.NewRecorder()
@@ -766,7 +766,7 @@ func TestList(t *testing.T) {
 	}
 
 	app.db = data.MockErrDB
-	r = setupRouter(*app)
+	r = setupRouter(app)
 	t.Run("json faulty DB", func(t *testing.T) {
 		w := httptest.NewRecorder()
 		req, _ := http.NewRequest("GET", fmt.Sprintf("/%s/%s/list", app.secpath1, app.secpath2), nil)

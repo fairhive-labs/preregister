@@ -97,7 +97,7 @@ func generateSecuredLink(t string) string {
 	return fmt.Sprintf("http://fairhive.io/activate/%s", t)
 }
 
-func (app App) register(c *gin.Context) {
+func (app *App) register(c *gin.Context) {
 	var u data.User
 	if err := c.ShouldBindJSON(&u); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -122,7 +122,7 @@ func (app App) register(c *gin.Context) {
 	})
 }
 
-func (app App) activate(c *gin.Context) {
+func (app *App) activate(c *gin.Context) {
 	t := c.Param("token")
 	h := c.Param("hash")
 	if !jwtregexp.MatchString(t) || app.jwt.Hash(t) != h {
@@ -151,7 +151,7 @@ func (app App) activate(c *gin.Context) {
 	c.JSON(http.StatusCreated, nil)
 }
 
-func (app App) limit(c *gin.Context) {
+func (app *App) limit(c *gin.Context) {
 	ip := c.ClientIP()
 	l := app.rl.GetAccess(ip)
 	if !l.Allow() {
@@ -164,7 +164,7 @@ func (app App) limit(c *gin.Context) {
 	c.Next()
 }
 
-func (app App) cors(c *gin.Context) {
+func (app *App) cors(c *gin.Context) {
 	c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 	c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
 	c.Writer.Header().Set("Access-Control-Allow-Headers", "origin, content-type, accept, authorization")
@@ -177,7 +177,7 @@ func (app App) cors(c *gin.Context) {
 	c.Next()
 }
 
-func (app App) count(c *gin.Context) {
+func (app *App) count(c *gin.Context) {
 	p1, p2 := c.Param("path1"), c.Param("path2")
 	if p1 != app.secpath1 || p2 != app.secpath2 {
 		c.AbortWithStatus(http.StatusNotFound)
@@ -231,7 +231,7 @@ func (app App) count(c *gin.Context) {
 	}
 }
 
-func (app App) list(c *gin.Context) {
+func (app *App) list(c *gin.Context) {
 	p1, p2 := c.Param("path1"), c.Param("path2")
 	if p1 != app.secpath1 || p2 != app.secpath2 {
 		c.AbortWithStatus(http.StatusNotFound)
@@ -296,7 +296,7 @@ func (app App) list(c *gin.Context) {
 	}
 }
 
-func setupRouter(app App) *gin.Engine {
+func setupRouter(app *App) *gin.Engine {
 	r := gin.Default()
 	t := template.Must(template.ParseFS(tfs, "templates/*"))
 	r.SetHTMLTemplate(t)
@@ -312,7 +312,7 @@ func setupRouter(app App) *gin.Engine {
 }
 
 func main() {
-	app := *NewApp()
+	app := NewApp()
 	// gin.SetMode(gin.ReleaseMode)
 	r := setupRouter(app)
 
