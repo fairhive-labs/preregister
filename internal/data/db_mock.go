@@ -76,9 +76,15 @@ func (db mockDB) List(options ...int) ([]*User, error) {
 	return users[offset : offset+max], nil
 }
 
+func (db mockDB) IsPresent(a string) (bool, error) {
+	return a != "", nil
+}
+
 var MockDB = mockDB{}
 
 type mockErrDB struct {
+	mockDB
+	isPresent bool
 }
 
 func (db mockErrDB) Save(u *User) (err error) {
@@ -99,4 +105,8 @@ func (db mockErrDB) List(options ...int) ([]*User, error) {
 	return nil, errors.New(m)
 }
 
-var MockErrDB = mockErrDB{}
+func (db *mockErrDB) SetIsPresent(v bool) {
+	db.isPresent = v
+}
+
+var MockErrDB = mockErrDB{MockDB, true}

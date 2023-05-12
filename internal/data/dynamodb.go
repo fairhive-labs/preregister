@@ -37,6 +37,11 @@ func NewDynamoDB(tn, ek string) (db *dynamoDB, err error) {
 	return
 }
 
+// @TODO: to implement / test
+func (db *dynamoDB) IsPresent(a string) (bool, error) {
+	return true, nil
+}
+
 func (db *dynamoDB) Save(user *User) error {
 	if user == nil || !user.IsSet() {
 		return ErrInvalidUser
@@ -46,7 +51,7 @@ func (db *dynamoDB) Save(user *User) error {
 	if svc == nil {
 		return errors.New("cannot create dynamodb client")
 	}
-	//@TODO: control if sponsor exist
+
 	encEmail, err := cipher.Encrypt(user.Email, db.ek)
 	if err != nil {
 		return err
