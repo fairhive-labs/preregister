@@ -210,6 +210,41 @@ func TestString(t *testing.T) {
 			&User{a2, e2, id2, int64(tm2), ty2, s2},
 			"{\"address\":\"0x9C93c71065ea9101F252dE2e0f277437f473ac04\",\"email\":\"user2@domain.com\",\"uuid\":\"942a5811-926d-4014-baff-ef707f38407e\",\"type\":\"client\",\"sponsor\":\"0x233F858EaF43AFFE5DDFBD3AD69ACc6f5de6C529\",\"timestamp\":\"2023-05-11T14:13:10.432+02:00\"}",
 		},
+		{
+			"empty_address",
+			&User{"", e2, id2, int64(tm2), ty2, s2},
+			"{\"address\":\"\",\"email\":\"user2@domain.com\",\"uuid\":\"942a5811-926d-4014-baff-ef707f38407e\",\"type\":\"client\",\"sponsor\":\"0x233F858EaF43AFFE5DDFBD3AD69ACc6f5de6C529\",\"timestamp\":\"2023-05-11T14:13:10.432+02:00\"}",
+		},
+		{
+			"empty_address_empty_sponsor",
+			&User{"", e2, id2, int64(tm2), ty2, ""},
+			"{\"address\":\"\",\"email\":\"user2@domain.com\",\"uuid\":\"942a5811-926d-4014-baff-ef707f38407e\",\"type\":\"client\",\"sponsor\":\"\",\"timestamp\":\"2023-05-11T14:13:10.432+02:00\"}",
+		},
+		{
+			"no_email",
+			&User{a2, "", id2, int64(tm2), ty2, s2},
+			"{\"address\":\"0x9C93c71065ea9101F252dE2e0f277437f473ac04\",\"uuid\":\"942a5811-926d-4014-baff-ef707f38407e\",\"type\":\"client\",\"sponsor\":\"0x233F858EaF43AFFE5DDFBD3AD69ACc6f5de6C529\",\"timestamp\":\"2023-05-11T14:13:10.432+02:00\"}",
+		},
+		{
+			"no_uuid",
+			&User{a2, e2, "", int64(tm2), ty2, s2},
+			"{\"address\":\"0x9C93c71065ea9101F252dE2e0f277437f473ac04\",\"email\":\"user2@domain.com\",\"type\":\"client\",\"sponsor\":\"0x233F858EaF43AFFE5DDFBD3AD69ACc6f5de6C529\",\"timestamp\":\"2023-05-11T14:13:10.432+02:00\"}",
+		},
+		{
+			"no_uuid_no_type",
+			&User{a2, e2, "", int64(tm2), "", s2},
+			"{\"address\":\"0x9C93c71065ea9101F252dE2e0f277437f473ac04\",\"email\":\"user2@domain.com\",\"sponsor\":\"0x233F858EaF43AFFE5DDFBD3AD69ACc6f5de6C529\",\"timestamp\":\"2023-05-11T14:13:10.432+02:00\"}",
+		},
+		{
+			"epoch_T0_no_timestamp",
+			&User{a1, e1, id1, 0, ty1, s1},
+			"{\"address\":\"0xaD51c5ac7612DB8dD1611c6B2e317E4950c40942\",\"email\":\"user1@domain.com\",\"uuid\":\"4a8e9808-563e-4761-a8fa-305fef099a3e\",\"type\":\"talent\",\"sponsor\":\"0x095cb719f8f69952599c15af31c80Ccb825E15d4\"}",
+		},
+		{
+			"epoch_T0",
+			&User{a1, e1, id1, 0, ty1, s1},
+			"{\"address\":\"0xaD51c5ac7612DB8dD1611c6B2e317E4950c40942\",\"email\":\"user1@domain.com\",\"uuid\":\"4a8e9808-563e-4761-a8fa-305fef099a3e\",\"type\":\"talent\",\"sponsor\":\"0x095cb719f8f69952599c15af31c80Ccb825E15d4\",\"timestamp\":\"1970-01-01T00:00:00.000+00:00\"}",
+		},
 	}
 
 	for _, tc := range tt {
@@ -218,21 +253,27 @@ func TestString(t *testing.T) {
 				*User
 				Timestamp string `json:"timestamp"`
 			}
-			json.Unmarshal([]byte(tc.exp), &un)
-
-			d, err := time.Parse(time.RFC3339Nano, un.Timestamp)
+			err := json.Unmarshal([]byte(tc.exp), &un)
 			if err != nil {
+				t.Errorf("cannot unmarshal %v, got error %v", tc.exp, err)
+				t.FailNow()
+			}
+			d, err := time.Parse(time.RFC3339Nano, un.Timestamp)
+			if err != nil && un.Timestamp != "" {
 				t.Errorf("cannot parse time %s: %v", tc.exp, err)
 				t.FailNow()
 			}
 
 			u := &User{
-				Address:   un.Address,
-				Email:     un.Email,
-				UUID:      un.UUID,
-				Timestamp: d.UnixMilli(),
-				Type:      un.Type,
-				Sponsor:   un.Sponsor,
+				Address: un.Address,
+				Email:   un.Email,
+				UUID:    un.UUID,
+				Type:    un.Type,
+				Sponsor: un.Sponsor,
+			}
+
+			if un.Timestamp != "" {
+				u.Timestamp = d.UnixMilli()
 			}
 
 			if u.Address != tc.u.Address {
@@ -259,8 +300,6 @@ func TestString(t *testing.T) {
 				t.Errorf("Sponsor is incorrect, got %s, want %s", u.Sponsor, tc.u.Sponsor)
 				t.FailNow()
 			}
-
 		})
 	}
-
 }
