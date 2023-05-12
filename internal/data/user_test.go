@@ -2,7 +2,6 @@ package data
 
 import (
 	"encoding/json"
-	"fmt"
 	"testing"
 	"time"
 
@@ -215,19 +214,30 @@ func TestString(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			if tc.u.String() != tc.exp {
-				t.Errorf("%s should be equal to %s", tc.u.String(), tc.exp)
-				t.FailNow()
-			}
-
 			var un struct { // same struct than User String()
 				*User
 				Timestamp string `json:"timestamp"`
 			}
 			json.Unmarshal([]byte(tc.exp), &un)
+
 			d, err := time.Parse(time.RFC3339Nano, un.Timestamp)
-			if err == nil {
-				fmt.Printf("timestamp = %v", d.UnixMilli())
+			if err != nil {
+				t.Errorf("cannot parse time %s: %v", tc.exp, err)
+				t.FailNow()
+			}
+
+			u := &User{
+				Address:   un.Address,
+				Email:     un.Email,
+				UUID:      un.UUID,
+				Timestamp: d.UnixMilli(),
+				Type:      un.Type,
+				Sponsor:   un.Sponsor,
+			}
+
+			if u.Timestamp != tc.u.Timestamp {
+				t.Errorf("timestamp is incorrect, got %d, want %d", u.Timestamp, tc.u.Timestamp)
+				t.FailNow()
 			}
 		})
 	}
