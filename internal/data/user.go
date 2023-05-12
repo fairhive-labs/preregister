@@ -1,6 +1,7 @@
 package data
 
 import (
+	"encoding/json"
 	"log"
 	"time"
 
@@ -47,4 +48,15 @@ func (u *User) IsSet() bool {
 		log.Print(err)
 	}
 	return nil == err
+}
+
+func (u User) String() string {
+	r, _ := json.Marshal(&struct {
+		*User
+		Timestamp string `json:"timestamp"`
+	}{
+		User:      &u,
+		Timestamp: time.UnixMilli(u.Timestamp).String(),
+	})
+	return string(r)
 }

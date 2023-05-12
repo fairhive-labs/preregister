@@ -6,7 +6,6 @@ import (
 	"sort"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -158,7 +157,7 @@ func TestList(t *testing.T) {
 		})
 		var johndoe *User
 		for i, u := range users {
-			fmt.Printf("%0.2d - ethaddress = %s; email = %s; type = %s; timestamp = %s\n", i+1, u.Address, u.Email, u.Type, time.UnixMilli(u.Timestamp))
+			fmt.Printf("%0.2d - %s\n", i+1, u)
 			if u.Address == "0x8ba1f109551bD432803012645Ac136ddd64DBA72" &&
 				u.Email == "john.doe@mailservice.com" &&
 				u.Type == "talent" {

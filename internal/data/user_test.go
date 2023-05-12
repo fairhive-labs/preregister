@@ -185,3 +185,5 @@ func TestMarshalling(t *testing.T) {
 		t.FailNow()
 	}
 }
+
+func TestString(t *testing.T) {}
