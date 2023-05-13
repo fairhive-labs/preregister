@@ -198,4 +198,30 @@ func TestList(t *testing.T) {
 	}
 }
 
-func TestIsPresent(t *testing.T) {}
+func TestIsPresent(t *testing.T) {
+	address := "0x8ba1f109551bD432803012645Ac136ddd64DBA72"
+	db, _ := NewDynamoDB(tableName, ek)
+
+	tt := []struct {
+		a string
+		r bool
+	}{
+		{address, true},
+		{sponsor, true},
+		{"fake4adr3ss", false},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.a, func(t *testing.T) {
+			r, err := db.IsPresent(tc.a)
+			if err != nil {
+				t.Errorf("cannot test if user %s is present or not: %v", tc.a, err)
+				t.FailNow()
+			}
+			if r != tc.r {
+				t.Errorf("incorrect IsPresent(%s) result, got %v, want %v", tc.a, r, tc.r)
+				t.FailNow()
+			}
+		})
+	}
+}

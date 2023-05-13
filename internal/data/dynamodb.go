@@ -37,9 +37,21 @@ func NewDynamoDB(tn, ek string) (db *dynamoDB, err error) {
 	return
 }
 
-// @TODO: to implement / test
 func (db *dynamoDB) IsPresent(a string) (bool, error) {
-	return true, nil
+	sess := session.Must(session.NewSession())
+	svc := dynamodb.New(sess)
+	r, err := svc.GetItem(&dynamodb.GetItemInput{
+		TableName: aws.String(db.tn),
+		Key: map[string]*dynamodb.AttributeValue{
+			"address": {
+				S: aws.String(a),
+			},
+		},
+	})
+	if err != nil {
+		return false, err
+	}
+	return r.Item != nil, nil
 }
 
 func (db *dynamoDB) Save(user *User) error {
