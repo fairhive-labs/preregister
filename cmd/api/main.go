@@ -27,12 +27,9 @@ type App struct {
 	secpath1, secpath2 string
 }
 
-const (
-	tableName = "Waitlist"
-)
-
 var (
 	jwts               = map[string]crypto.Token{}
+	tableName          = "Waitlist"
 	ek                 string
 	secpath1, secpath2 string
 )
@@ -45,6 +42,12 @@ func init() {
 	jwts["ES256"], _ = crypto.NewJWTES256()
 	jwts["ES512"], _ = crypto.NewJWTES512()
 	log.Println("🔐 JWT Services: OK")
+
+	tn := os.Getenv("FAIRHIVE_PREREGISTER_TABLE_NAME")
+	if tn != "" {
+		tableName = tn
+	}
+	log.Printf("💾 DynamoDB Table is %q\n", tableName)
 
 	ek = os.Getenv("FAIRHIVE_ENCRYPTION_KEY")
 	if ek == "" {
