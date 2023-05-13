@@ -34,7 +34,7 @@ var (
 	secpath1, secpath2 string
 )
 
-func init() {
+func setup() {
 	k, _ := cipher.GenerateKey(32)
 	jwts["HS512"] = crypto.NewJWTHS512(k)
 	k, _ = cipher.GenerateKey(16)
@@ -65,7 +65,7 @@ func init() {
 	}
 }
 
-func NewApp() *App {
+func newApp() *App {
 	db, err := data.NewDynamoDB(tableName, ek)
 	if err != nil {
 		panic(err)
@@ -82,7 +82,8 @@ func NewApp() *App {
 }
 
 func main() {
-	app := NewApp()
+	setup()
+	app := newApp()
 	r := setupRouter(app)
 
 	var addr string
