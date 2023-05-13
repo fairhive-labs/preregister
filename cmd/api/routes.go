@@ -86,7 +86,7 @@ func (app *App) activate(c *gin.Context) {
 		return
 	}
 	if ra {
-		err := fmt.Sprintf("user address %s already exist in DB", u.Address)
+		err := fmt.Sprintf("user address %s already used", u.Address)
 		c.JSON(http.StatusConflict, gin.H{"error": err})
 		return
 	}
@@ -96,8 +96,11 @@ func (app *App) activate(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	// 400 Bad Request
-	_ = rs
+	if !rs {
+		err := fmt.Sprintf("sponsor address %s not found", u.Sponsor)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		return
+	}
 
 	err = app.db.Save(u)
 	if err != nil {

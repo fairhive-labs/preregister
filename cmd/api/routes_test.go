@@ -245,7 +245,7 @@ func TestRegister(t *testing.T) {
 }
 
 func TestActivate(t *testing.T) {
-	var db data.DB = data.MockDB
+	var db data.DB = data.NewMockDBContent([]string{sponsor})
 	k, _ := cipher.GenerateKey(32)
 	app := &App{
 		db,
@@ -381,9 +381,9 @@ func TestActivate(t *testing.T) {
 		db   data.DB
 		code int
 	}{
-		{"faulty DB", data.MockErrDB, http.StatusInternalServerError},
-		{"fail finding address", data.NewMockErrFindingAddress(address), http.StatusInternalServerError},
-		{"fail finding sponsor", data.NewMockErrFindingAddress(sponsor), http.StatusInternalServerError},
+		{"faulty DB", data.NewMockErrDB([]string{sponsor}), http.StatusInternalServerError},
+		{"fail finding address", data.NewMockErrFindingAddress([]string{sponsor}, address), http.StatusInternalServerError},
+		{"fail finding sponsor", data.NewMockErrFindingAddress([]string{sponsor}, sponsor), http.StatusInternalServerError},
 		{"address_nok_sponsor_nok", data.NewMockDBContent([]string{}), http.StatusBadRequest},
 		{"address_nok_sponsor_ok", data.NewMockDBContent([]string{sponsor}), http.StatusCreated},
 		{"address_ok_sponsor_nok", data.NewMockDBContent([]string{address}), http.StatusConflict},
@@ -559,7 +559,7 @@ func TestCount(t *testing.T) {
 		})
 	}
 
-	app.db = data.MockErrDB
+	app.db = data.NewMockErrDB([]string{sponsor})
 	r = setupRouter(app)
 	t.Run("json faulty DB", func(t *testing.T) {
 		w := httptest.NewRecorder()
@@ -778,7 +778,7 @@ func TestList(t *testing.T) {
 		})
 	}
 
-	app.db = data.MockErrDB
+	app.db = data.NewMockErrDB([]string{sponsor})
 	r = setupRouter(app)
 	t.Run("json faulty DB", func(t *testing.T) {
 		w := httptest.NewRecorder()
