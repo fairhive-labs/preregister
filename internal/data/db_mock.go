@@ -120,6 +120,24 @@ func (db mockErrFindingAddress) IsPresent(a string) (bool, error) {
 	return true, nil
 }
 
-func NewMockErrFindingAddress(a string) mockErrFindingAddress {
-	return mockErrFindingAddress{MockDB, a}
+func NewMockErrFindingAddress(a string) *mockErrFindingAddress {
+	return &mockErrFindingAddress{MockDB, a}
+}
+
+type mockDBContent struct {
+	mockDB
+	l []string
+}
+
+func (db mockDBContent) IsPresent(a string) (bool, error) {
+	for _, v := range db.l {
+		if v == a {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+func NewMockDBContent(l []string) *mockDBContent {
+	return &mockDBContent{MockDB, l}
 }

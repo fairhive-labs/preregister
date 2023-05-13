@@ -384,6 +384,10 @@ func TestActivate(t *testing.T) {
 		{"faulty DB", data.MockErrDB, http.StatusInternalServerError},
 		{"fail finding address", data.NewMockErrFindingAddress(address), http.StatusInternalServerError},
 		{"fail finding sponsor", data.NewMockErrFindingAddress(sponsor), http.StatusInternalServerError},
+		{"address_nok_sponsor_nok", data.NewMockDBContent([]string{}), http.StatusBadRequest},
+		{"address_nok_sponsor_ok", data.NewMockDBContent([]string{sponsor}), http.StatusCreated},
+		{"address_ok_sponsor_nok", data.NewMockDBContent([]string{address}), http.StatusConflict},
+		{"address_ok_sponsor_ok", data.NewMockDBContent([]string{address, sponsor}), http.StatusConflict},
 	}
 	for _, tc := range tt2 {
 		t.Run(tc.name, func(t *testing.T) {
