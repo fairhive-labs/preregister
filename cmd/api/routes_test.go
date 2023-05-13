@@ -376,19 +376,26 @@ func TestActivate(t *testing.T) {
 		})
 	}
 
-	app.db = data.MockErrDB
-	r = setupRouter(app)
-	t.Run("faulty DB", func(t *testing.T) {
-		w := httptest.NewRecorder()
-		token := vt
-		hash := vh
-		req, _ := http.NewRequest("POST", fmt.Sprintf("/activate/%s/%s", token, hash), nil)
-		r.ServeHTTP(w, req)
-		if w.Code != http.StatusInternalServerError {
-			t.Errorf("Status code is incorrect, got %d, want %d", w.Code, http.StatusInternalServerError)
-			t.FailNow()
-		}
-	})
+	tt2 := []struct {
+		name string
+		db   data.DB
+		code int
+	}{
+		{"faulty DB", data.MockErrDB, http.StatusInternalServerError},
+	}
+	for _, tc := range tt2 {
+		t.Run(tc.name, func(t *testing.T) {
+			app.db = tc.db
+			r := setupRouter(app)
+			w := httptest.NewRecorder()
+			req, _ := http.NewRequest("POST", fmt.Sprintf("/activate/%s/%s", vt, vh), nil)
+			r.ServeHTTP(w, req)
+			if w.Code != tc.code {
+				t.Errorf("Status code is incorrect, got %d, want %d", w.Code, tc.code)
+				t.FailNow()
+			}
+		})
+	}
 }
 
 func TestCount(t *testing.T) {
