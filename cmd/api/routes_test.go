@@ -382,6 +382,8 @@ func TestActivate(t *testing.T) {
 		code int
 	}{
 		{"faulty DB", data.MockErrDB, http.StatusInternalServerError},
+		{"fail finding address", data.NewMockErrFindingAddress(address), http.StatusInternalServerError},
+		{"fail finding sponsor", data.NewMockErrFindingAddress(sponsor), http.StatusInternalServerError},
 	}
 	for _, tc := range tt2 {
 		t.Run(tc.name, func(t *testing.T) {

@@ -80,13 +80,21 @@ func (app *App) activate(c *gin.Context) {
 		return
 	}
 
-	// @TODO: control if user is already present
-	// ra, err := app.db.IsPresent(u.Address)
+	ra, err := app.db.IsPresent(u.Address)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 	// 409 Conflict
+	_ = ra
 
-	// @TODO: control if sponsor is present
-	// rs, err := app.db.IsPresent(u.Sponsor)
+	rs, err := app.db.IsPresent(u.Sponsor)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 	// 400 Bad Request
+	_ = rs
 
 	err = app.db.Save(u)
 	if err != nil {

@@ -105,3 +105,21 @@ func (db mockErrDB) List(options ...int) ([]*User, error) {
 }
 
 var MockErrDB = mockErrDB{MockDB}
+
+type mockErrFindingAddress struct {
+	mockDB
+	a string
+}
+
+func (db mockErrFindingAddress) IsPresent(a string) (bool, error) {
+	if a == db.a {
+		m := fmt.Sprintf("🔥 Error finding address %s in DB", a)
+		fmt.Println(m)
+		return false, errors.New(m)
+	}
+	return true, nil
+}
+
+func NewMockErrFindingAddress(a string) mockErrFindingAddress {
+	return mockErrFindingAddress{MockDB, a}
+}
