@@ -84,17 +84,24 @@ func TestNewDynamoDB(t *testing.T) {
 }
 
 func TestSave(t *testing.T) {
+	db, _ := NewDynamoDB(tableName, ek)
+
+	u := NewUser(sponsor, "jsie@trendev.fr", "mentor", sponsor) // sponsor is first user and its own sponsor
+	if err := db.Save(u); err != nil {
+		t.Errorf("impossible to save default sponsor: %v", err)
+		t.FailNow()
+	}
+
 	address := "0x8ba1f109551bD432803012645Ac136ddd64DBA72"
 	email := "john.doe@mailservice.com"
 	utype := "talent"
-	u := &User{
+	u = &User{
 		Address: address,
 		Email:   email,
 		Type:    utype,
 		Sponsor: sponsor,
 	}
 
-	db, _ := NewDynamoDB(tableName, ek)
 	if err := db.Save(u); err != nil {
 		t.Errorf("cannot save user %v: %v", *u, err)
 		t.FailNow()
@@ -180,7 +187,7 @@ func TestList(t *testing.T) {
 		{10, 5, 5, nil},
 		{2, 3, 3, nil},
 		{0, -1, 0, ErrBadMax},
-		{0, 1000, 60, nil}, //  2022-05-06: 60 items in the test db
+		{0, 1000, 61, nil}, //  2023-05-13: 61 items in the test db
 	}
 
 	for _, tc := range tt {
