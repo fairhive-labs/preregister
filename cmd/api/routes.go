@@ -85,8 +85,11 @@ func (app *App) activate(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	// 409 Conflict
-	_ = ra
+	if ra {
+		err := fmt.Sprintf("user address %s already exist in DB", u.Address)
+		c.JSON(http.StatusConflict, gin.H{"error": err})
+		return
+	}
 
 	rs, err := app.db.IsPresent(u.Sponsor)
 	if err != nil {
