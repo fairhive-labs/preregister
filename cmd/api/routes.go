@@ -117,7 +117,7 @@ func (app *App) activate(c *gin.Context) {
 		app.mailer.SendConfirmationEmail(u.Email)
 	}()
 
-	c.JSON(http.StatusCreated, nil)
+	c.JSON(http.StatusCreated, u)
 }
 
 func (app *App) limit(c *gin.Context) {
