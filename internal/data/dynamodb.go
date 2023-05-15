@@ -37,12 +37,25 @@ func NewDynamoDB(tn, ek string) (db *dynamoDB, err error) {
 	return
 }
 
+func (db *dynamoDB) IsPresent(a string) (bool, error) {
+	sess := session.Must(session.NewSession())
+	svc := dynamodb.New(sess)
+	r, err := svc.GetItem(&dynamodb.GetItemInput{
+		TableName: aws.String(db.tn),
+		Key: map[string]*dynamodb.AttributeValue{
+			"address": {
+				S: aws.String(a),
+			},
+		},
+	})
+	if err != nil {
+		return false, err
+	}
+	return r.Item != nil, nil
+}
+
 func (db *dynamoDB) Save(user *User) error {
-	if user == nil ||
-		user.Address == "" ||
-		user.Email == "" ||
-		user.Type == "" ||
-		user.Sponsor == "" {
+	if user == nil || !user.IsSet() {
 		return ErrInvalidUser
 	}
 	sess := session.Must(session.NewSession())

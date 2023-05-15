@@ -76,9 +76,36 @@ func (db mockDB) List(options ...int) ([]*User, error) {
 	return users[offset : offset+max], nil
 }
 
+func (db mockDB) IsPresent(a string) (bool, error) {
+	return true, nil
+}
+
 var MockDB = mockDB{}
 
+type mockDBContent struct {
+	mockDB
+	l []string
+}
+
+func (db mockDBContent) IsPresent(a string) (bool, error) {
+	for _, v := range db.l {
+		if v == a {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+func NewMockDBContent(l []string) *mockDBContent {
+	return &mockDBContent{MockDB, l}
+}
+
 type mockErrDB struct {
+	mockDBContent
+}
+
+func NewMockErrDB(l []string) *mockErrDB {
+	return &mockErrDB{*NewMockDBContent(l)}
 }
 
 func (db mockErrDB) Save(u *User) (err error) {
@@ -99,4 +126,20 @@ func (db mockErrDB) List(options ...int) ([]*User, error) {
 	return nil, errors.New(m)
 }
 
-var MockErrDB = mockErrDB{}
+type mockErrFindingAddress struct {
+	mockDBContent
+	a string
+}
+
+func (db mockErrFindingAddress) IsPresent(a string) (bool, error) {
+	if a == db.a {
+		m := fmt.Sprintf("🔥 Error finding address %s in DB", a)
+		fmt.Println(m)
+		return false, errors.New(m)
+	}
+	return db.mockDBContent.IsPresent(a)
+}
+
+func NewMockErrFindingAddress(l []string, a string) *mockErrFindingAddress {
+	return &mockErrFindingAddress{*NewMockDBContent(l), a}
+}

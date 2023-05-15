@@ -3,12 +3,13 @@ package data
 import (
 	"encoding/json"
 	"testing"
+	"time"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 )
 
-const sponsor = "0xD01efFE216E16a85Fc529db66c26aBeCf4D885f8" // real address but empty balance
+const sponsor = "0xE3C3691DB5f5185F37A3f98e5ec76403B2d10c3E" // trendev eth address
 
 func TestSetup(t *testing.T) {
 
@@ -183,5 +184,122 @@ func TestMarshalling(t *testing.T) {
 	if len(m) != n {
 		t.Errorf("Incorrect number of field in json, got %d, want %d", len(m), n)
 		t.FailNow()
+	}
+}
+
+func TestString(t *testing.T) {
+	a1, a2 := "0xaD51c5ac7612DB8dD1611c6B2e317E4950c40942", "0x9C93c71065ea9101F252dE2e0f277437f473ac04"
+	e1, e2 := "user1@domain.com", "user2@domain.com"
+	id1, id2 := "4a8e9808-563e-4761-a8fa-305fef099a3e", "942a5811-926d-4014-baff-ef707f38407e"
+	tm1, tm2 := 1683907220519, 1683807190432
+	ty1, ty2 := "talent", "client"
+	s1, s2 := "0x095cb719f8f69952599c15af31c80Ccb825E15d4", "0x233F858EaF43AFFE5DDFBD3AD69ACc6f5de6C529"
+
+	tt := []struct {
+		name string
+		u    *User
+		exp  string
+	}{
+		{
+			"valid_user1",
+			&User{a1, e1, id1, int64(tm1), ty1, s1},
+			"{\"address\":\"0xaD51c5ac7612DB8dD1611c6B2e317E4950c40942\",\"email\":\"user1@domain.com\",\"uuid\":\"4a8e9808-563e-4761-a8fa-305fef099a3e\",\"type\":\"talent\",\"sponsor\":\"0x095cb719f8f69952599c15af31c80Ccb825E15d4\",\"timestamp\":\"2023-05-12T18:00:20.519+02:00\"}",
+		},
+		{
+			"valid_user2",
+			&User{a2, e2, id2, int64(tm2), ty2, s2},
+			"{\"address\":\"0x9C93c71065ea9101F252dE2e0f277437f473ac04\",\"email\":\"user2@domain.com\",\"uuid\":\"942a5811-926d-4014-baff-ef707f38407e\",\"type\":\"client\",\"sponsor\":\"0x233F858EaF43AFFE5DDFBD3AD69ACc6f5de6C529\",\"timestamp\":\"2023-05-11T14:13:10.432+02:00\"}",
+		},
+		{
+			"empty_address",
+			&User{"", e2, id2, int64(tm2), ty2, s2},
+			"{\"address\":\"\",\"email\":\"user2@domain.com\",\"uuid\":\"942a5811-926d-4014-baff-ef707f38407e\",\"type\":\"client\",\"sponsor\":\"0x233F858EaF43AFFE5DDFBD3AD69ACc6f5de6C529\",\"timestamp\":\"2023-05-11T14:13:10.432+02:00\"}",
+		},
+		{
+			"empty_address_empty_sponsor",
+			&User{"", e2, id2, int64(tm2), ty2, ""},
+			"{\"address\":\"\",\"email\":\"user2@domain.com\",\"uuid\":\"942a5811-926d-4014-baff-ef707f38407e\",\"type\":\"client\",\"sponsor\":\"\",\"timestamp\":\"2023-05-11T14:13:10.432+02:00\"}",
+		},
+		{
+			"no_email",
+			&User{a2, "", id2, int64(tm2), ty2, s2},
+			"{\"address\":\"0x9C93c71065ea9101F252dE2e0f277437f473ac04\",\"uuid\":\"942a5811-926d-4014-baff-ef707f38407e\",\"type\":\"client\",\"sponsor\":\"0x233F858EaF43AFFE5DDFBD3AD69ACc6f5de6C529\",\"timestamp\":\"2023-05-11T14:13:10.432+02:00\"}",
+		},
+		{
+			"no_uuid",
+			&User{a2, e2, "", int64(tm2), ty2, s2},
+			"{\"address\":\"0x9C93c71065ea9101F252dE2e0f277437f473ac04\",\"email\":\"user2@domain.com\",\"type\":\"client\",\"sponsor\":\"0x233F858EaF43AFFE5DDFBD3AD69ACc6f5de6C529\",\"timestamp\":\"2023-05-11T14:13:10.432+02:00\"}",
+		},
+		{
+			"no_uuid_no_type",
+			&User{a2, e2, "", int64(tm2), "", s2},
+			"{\"address\":\"0x9C93c71065ea9101F252dE2e0f277437f473ac04\",\"email\":\"user2@domain.com\",\"sponsor\":\"0x233F858EaF43AFFE5DDFBD3AD69ACc6f5de6C529\",\"timestamp\":\"2023-05-11T14:13:10.432+02:00\"}",
+		},
+		{
+			"epoch_T0_no_timestamp",
+			&User{a1, e1, id1, 0, ty1, s1},
+			"{\"address\":\"0xaD51c5ac7612DB8dD1611c6B2e317E4950c40942\",\"email\":\"user1@domain.com\",\"uuid\":\"4a8e9808-563e-4761-a8fa-305fef099a3e\",\"type\":\"talent\",\"sponsor\":\"0x095cb719f8f69952599c15af31c80Ccb825E15d4\"}",
+		},
+		{
+			"epoch_T0",
+			&User{a1, e1, id1, 0, ty1, s1},
+			"{\"address\":\"0xaD51c5ac7612DB8dD1611c6B2e317E4950c40942\",\"email\":\"user1@domain.com\",\"uuid\":\"4a8e9808-563e-4761-a8fa-305fef099a3e\",\"type\":\"talent\",\"sponsor\":\"0x095cb719f8f69952599c15af31c80Ccb825E15d4\",\"timestamp\":\"1970-01-01T00:00:00.000+00:00\"}",
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			var un struct { // same struct than User String()
+				*User
+				Timestamp string `json:"timestamp"`
+			}
+			err := json.Unmarshal([]byte(tc.exp), &un)
+			if err != nil {
+				t.Errorf("cannot unmarshal %v, got error %v", tc.exp, err)
+				t.FailNow()
+			}
+			d, err := time.Parse(time.RFC3339Nano, un.Timestamp)
+			if err != nil && un.Timestamp != "" {
+				t.Errorf("cannot parse time %s: %v", tc.exp, err)
+				t.FailNow()
+			}
+
+			u := &User{
+				Address: un.Address,
+				Email:   un.Email,
+				UUID:    un.UUID,
+				Type:    un.Type,
+				Sponsor: un.Sponsor,
+			}
+
+			if un.Timestamp != "" {
+				u.Timestamp = d.UnixMilli()
+			}
+
+			if u.Address != tc.u.Address {
+				t.Errorf("Address is incorrect, got %s, want %s", u.Address, tc.u.Address)
+				t.FailNow()
+			}
+			if u.Email != tc.u.Email {
+				t.Errorf("Email is incorrect, got %s, want %s", u.Email, tc.u.Email)
+				t.FailNow()
+			}
+			if u.UUID != tc.u.UUID {
+				t.Errorf("UUID is incorrect, got %s, want %s", u.UUID, tc.u.UUID)
+				t.FailNow()
+			}
+			if u.Timestamp != tc.u.Timestamp {
+				t.Errorf("Timestamp is incorrect, got %d, want %d", u.Timestamp, tc.u.Timestamp)
+				t.FailNow()
+			}
+			if u.Type != tc.u.Type {
+				t.Errorf("Type is incorrect, got %s, want %s", u.Type, tc.u.Type)
+				t.FailNow()
+			}
+			if u.Sponsor != tc.u.Sponsor {
+				t.Errorf("Sponsor is incorrect, got %s, want %s", u.Sponsor, tc.u.Sponsor)
+				t.FailNow()
+			}
+		})
 	}
 }
