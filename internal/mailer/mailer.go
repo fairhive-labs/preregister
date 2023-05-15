@@ -102,6 +102,7 @@ func logEmailSent(e, m string, err error) {
 	}
 }
 
+// MOCK
 type mockSmtpMailer struct{}
 
 func (m *mockSmtpMailer) SendActivationEmail(e, u, h string) (err error) {
