@@ -56,6 +56,9 @@ func (app *App) register(c *gin.Context) {
 	app.wg.Add(1)
 	go func() {
 		defer app.wg.Done()
+		if gin.IsDebugging() {
+			fmt.Printf("📤 sending token [%s] by email to %q", token, u.Email)
+		}
 		sl := generateSecuredLink(token)
 		app.mailer.SendActivationEmail(u.Email, sl, hash)
 	}()
