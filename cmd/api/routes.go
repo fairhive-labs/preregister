@@ -21,7 +21,6 @@ var tfs embed.FS
 
 func setupRouter(app *App) *gin.Engine {
 	r := gin.Default()
-	// gin.SetMode(gin.ReleaseMode)
 	t := template.Must(template.ParseFS(tfs, "templates/*"))
 	r.SetHTMLTemplate(t)
 	r.Use(app.cors, app.limit)

@@ -79,6 +79,7 @@ jobs:
           HD_FAIRHIVE_GSUITE_USER: ${{ secrets.FAIRHIVE_GSUITE_USER }}
           HD_MAILTRAP_PASSWORD: ${{ secrets.MAILTRAP_PASSWORD }}
           HD_MAILTRAP_USER: ${{ secrets.MAILTRAP_USER }}
+          HD_GIN_MODE: release
       - name: Slack Notification
         uses: rtCamp/action-slack-notify@v2
         env:
