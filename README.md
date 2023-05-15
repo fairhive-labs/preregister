@@ -1,6 +1,8 @@
 # preregister
 [![Test & Heroku Deployment](https://github.com/fairhive-labs/preregister/actions/workflows/test_heroku_deploy.yml/badge.svg)](https://github.com/fairhive-labs/preregister/actions/workflows/test_heroku_deploy.yml)
 
+[![codecov](https://codecov.io/gh/fairhive-labs/preregister/branch/main/graph/badge.svg?token=LNC6CEOAM6)](https://codecov.io/gh/fairhive-labs/preregister)
+
 Microservice used during preregistration process
 
 ### Preregister a User
