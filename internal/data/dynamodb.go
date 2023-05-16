@@ -54,8 +54,8 @@ func (db *dynamoDB) IsPresent(a string) (bool, error) {
 	return r.Item != nil, nil
 }
 
-func (db *dynamoDB) Save(user *User) error {
-	if user == nil || !user.IsSet() {
+func (db *dynamoDB) Save(u *User) error {
+	if u == nil || !u.IsSet() {
 		return ErrInvalidUser
 	}
 	sess := session.Must(session.NewSession())
@@ -64,12 +64,12 @@ func (db *dynamoDB) Save(user *User) error {
 		return errors.New("cannot create dynamodb client")
 	}
 
-	encEmail, err := cipher.Encrypt(user.Email, db.ek)
+	encEmail, err := cipher.Encrypt(u.Email, db.ek)
 	if err != nil {
 		return err
 	}
-	u := NewUser(user.Address, encEmail, user.Type, user.Sponsor)
-	av, err := dynamodbattribute.MarshalMap(*u)
+	u2 := NewUser(u.Address, encEmail, u.Type, u.Sponsor)
+	av, err := dynamodbattribute.MarshalMap(*u2)
 	if err != nil {
 		return err
 	}
@@ -82,7 +82,8 @@ func (db *dynamoDB) Save(user *User) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("💾 User [%v] saved in DB\n", *u)
+	fmt.Printf("💾 User saved in DB: [%v]\n", *u2)
+	*u = *u2 // copy saved user
 	return nil
 }
 

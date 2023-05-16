@@ -104,8 +104,8 @@ func (app *App) activate(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
-
-	err = app.db.Save(u)
+	e := u.Email         // user's email will be replaced by encryted value, so better do a copy
+	err = app.db.Save(u) //user data are replaced by saved one
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -114,7 +114,7 @@ func (app *App) activate(c *gin.Context) {
 	app.wg.Add(1)
 	go func() {
 		defer app.wg.Done()
-		app.mailer.SendConfirmationEmail(u.Email)
+		app.mailer.SendConfirmationEmail(e)
 	}()
 
 	c.JSON(http.StatusCreated, u)
