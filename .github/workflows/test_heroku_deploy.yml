@@ -86,6 +86,6 @@ jobs:
           SLACK_CHANNEL: _github
           SLACK_COLOR: ${{ job.status }}
           SLACK_TITLE: Heroku Deployment - preregister/waitlist
-          SLACK_MESSAGE: "<http://fairhive.io/admin/${{ env.FAIRHIVE_API_SECURE_PATH1 }}/${{ env.FAIRHIVE_API_SECURE_PATH2 }}/users|Users details>"
+          SLACK_MESSAGE: "<http://poln.org/admin/${{ env.FAIRHIVE_API_SECURE_PATH1 }}/${{ env.FAIRHIVE_API_SECURE_PATH2 }}/users|Users details>"
           SLACK_FOOTER: "<https://polar-plains-98105.herokuapp.com/${{ env.FAIRHIVE_API_SECURE_PATH1 }}/${{ env.FAIRHIVE_API_SECURE_PATH2 }}/list?mime=csv| Users list - CSV>"
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}

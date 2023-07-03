@@ -37,7 +37,7 @@ func setupRouter(app *App) *gin.Engine {
 var jwtregexp = regexp.MustCompile(`^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]*$`)
 
 func generateSecuredLink(t string) string {
-	return fmt.Sprintf("http://fairhive.io/activate/%s", t)
+	return fmt.Sprintf("http://poln.org/activate/%s", t)
 }
 
 func (app *App) register(c *gin.Context) {

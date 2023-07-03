@@ -51,7 +51,7 @@ func create(user *data.User, t time.Time, m jwt.SigningMethod, k interface{}) (s
 			ExpiresAt: jwt.NewNumericDate(t.Add(10 * time.Minute)), // seconds
 			IssuedAt:  jwt.NewNumericDate(t),                       // seconds
 			NotBefore: jwt.NewNumericDate(t),                       // seconds
-			Issuer:    "fairhive.io",
+			Issuer:    "poln.org",
 		},
 	}
 	token := jwt.NewWithClaims(m, claims)

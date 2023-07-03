@@ -10,7 +10,7 @@ Microservice used during preregistration process
 
 or 
 
-> curl -L -s --post301 -X POST http://preregister.fairhive.io -H 'content-type: application/json' -d '{ "email": "jsie@trendev.fr", "address":"0x8ba1f109551bD432803012645Ac136ddd64DBA72", "type":"mentor" }' | jq
+> curl -L -s --post301 -X POST http://preregister.poln.org -H 'content-type: application/json' -d '{ "email": "jsie@trendev.fr", "address":"0x8ba1f109551bD432803012645Ac136ddd64DBA72", "type":"mentor" }' | jq
 
 Response :
 
