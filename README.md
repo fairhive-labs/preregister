@@ -22,6 +22,6 @@ Response :
 
 ## Sequence Diagram
 
-Complete workflow is detailed on [Medium](https://medium.com/fairhive/pre-registration-workflow-97dca90d6b9a) article
+Complete workflow is detailed on [GitBook](https://docs.poln.org/fairhive-archives/whitelist-pre-registration-workflow).
 
 ![Pre-registration_Workflow_v1 0](https://user-images.githubusercontent.com/19473981/219961084-4c9ae2d7-c202-492d-90e7-8956531144e2.png)

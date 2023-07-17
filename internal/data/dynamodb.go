@@ -17,7 +17,7 @@ type dynamoDB struct {
 }
 
 var (
-	ErrDynamoDBNoEncryptionKey = errors.New("cannot create DynamoDB: fairhive's encryption key is missing")
+	ErrDynamoDBNoEncryptionKey = errors.New("cannot create DynamoDB: poln's encryption key is missing")
 	ErrDynamoDBNoTableName     = errors.New("cannot create DynamoDB: no table name")
 	ErrBadMax                  = errors.New("incorrect max")
 	ErrInvalidUser             = errors.New("nil user or missing required field")

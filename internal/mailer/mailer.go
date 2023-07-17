@@ -75,7 +75,7 @@ Subject: %s
 }
 
 func (m *SmtpMailer) SendActivationEmail(e, u, h string) (err error) {
-	err = sendEmail(m, e, "fairhive - preregistration", "emailActivation",
+	err = sendEmail(m, e, "poln - preregistration", "emailActivation",
 		struct {
 			Hash string
 			Url  string
@@ -88,7 +88,7 @@ func (m *SmtpMailer) SendActivationEmail(e, u, h string) (err error) {
 }
 
 func (m *SmtpMailer) SendConfirmationEmail(e string) (err error) {
-	err = sendEmail(m, e, "fairhive - preregistration completed", "emailConfirmation",
+	err = sendEmail(m, e, "poln - preregistration completed", "emailConfirmation",
 		struct{}{})
 	logEmailSent(e, fmt.Sprintf("💌 Email to %q: [ \033[1;32mSent\033[0m ]\n", e), err)
 	return
