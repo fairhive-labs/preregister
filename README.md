@@ -24,4 +24,5 @@ Response :
 
 Complete workflow is detailed on [GitBook](https://docs.poln.org/fairhive-archives/whitelist-pre-registration-workflow).
 
-![Pre-registration_Workflow_v1 0](https://user-images.githubusercontent.com/19473981/219961084-4c9ae2d7-c202-492d-90e7-8956531144e2.png)
+![Pre-registration_Workflow_v1 2](https://github.com/fairhive-labs/preregister/assets/139374260/f13e28ef-3398-43fe-a01b-fa3fe808d3ef)
+
