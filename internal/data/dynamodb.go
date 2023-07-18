@@ -95,7 +95,7 @@ func (db *dynamoDB) Count() (map[string]int, error) {
 		"contributor": 0,
 		"investor":    0,
 		"mentor":      0,
-		"talent":      0,
+		"contractor":  0,
 	}
 	sess := session.Must(session.NewSession())
 	svc := dynamodb.New(sess)

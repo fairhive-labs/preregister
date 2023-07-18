@@ -14,7 +14,7 @@ type User struct {
 	Email     string `json:"email" binding:"required,email" validate:"required,email"`
 	UUID      string `json:"uuid,omitempty" validate:"required,uuid"`
 	Timestamp int64  `json:"timestamp,omitempty" validate:"gt=0"`
-	Type      string `json:"type" binding:"required,oneof=advisor agent initiator contributor investor mentor talent" validate:"required,oneof=advisor agent initiator contributor investor mentor talent"`
+	Type      string `json:"type" binding:"required,oneof=advisor agent initiator contributor investor mentor contractor" validate:"required,oneof=advisor agent initiator contributor investor mentor contractor"`
 	Sponsor   string `json:"sponsor" binding:"required,eth_addr" validate:"required,eth_addr"`
 }
 

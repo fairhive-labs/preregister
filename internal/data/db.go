@@ -23,7 +23,7 @@ var (
 		"contributor": 0,
 		"investor":    10,
 		"mentor":      5,
-		"talent":      31,
+		"contractor":  31,
 	}
 	UsersCountMock = 0
 )

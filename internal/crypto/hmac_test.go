@@ -43,7 +43,7 @@ func TestCreateHMAC(t *testing.T) {
 		{
 			"HS256 user address missing",
 			time.UnixMicro(timestamp),
-			"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZGRyZXNzIjoiIiwiZW1haWwiOiJqb2huLmRvZUBtYWlsc2VydmljZS5jb20iLCJ0eXBlIjoidGFsZW50Iiwic3BvbnNvciI6IiIsImlzcyI6InBvbG4ub3JnIiwiZXhwIjoxNjQ4NTUyLCJuYmYiOjE2NDc5NTIsImlhdCI6MTY0Nzk1Mn0.jPbVUGbdDBDTPKPSUBfQOm6WHGaw1BOTBRsLTemBrMQ",
+			"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZGRyZXNzIjoiIiwiZW1haWwiOiJqb2huLmRvZUBtYWlsc2VydmljZS5jb20iLCJ0eXBlIjoiY29udHJhY3RvciIsInNwb25zb3IiOiIiLCJpc3MiOiJwb2xuLm9yZyIsImV4cCI6MTY0ODU1MiwibmJmIjoxNjQ3OTUyLCJpYXQiOjE2NDc5NTJ9.760S9lnRV3Hp1aBKzB2KBUnHKUg8WJEr4R3cQCZoByc",
 			&data.User{
 				Email: email,
 				Type:  utype,

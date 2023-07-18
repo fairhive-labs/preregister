@@ -40,7 +40,7 @@ func TestNewUser(t *testing.T) {
 		value interface{}
 	}
 
-	validUser := NewUser("0x8ba1f109551bD432803012645Ac136ddd64DBA72", "john.doe@mailservice.com", "talent", sponsor)
+	validUser := NewUser("0x8ba1f109551bD432803012645Ac136ddd64DBA72", "john.doe@mailservice.com", "contractor", sponsor)
 
 	noUUIDUser := *validUser
 	noUUIDUser.UUID = ""
@@ -59,32 +59,32 @@ func TestNewUser(t *testing.T) {
 	}{
 		{"valid_user", validUser, nil, true, true},
 		{"invalid_user_address",
-			NewUser("0x8bz1f109551bD432803012645Ac136ddd64DBA73", "john.doe@mailservice.com", "talent", sponsor),
+			NewUser("0x8bz1f109551bD432803012645Ac136ddd64DBA73", "john.doe@mailservice.com", "contractor", sponsor),
 			&errorDetails{"Address", "eth_addr", "0x8bz1f109551bD432803012645Ac136ddd64DBA73"},
 			false, false,
 		},
 		{"missing_user_address",
-			NewUser("", "john.doe@mailservice.com", "talent", sponsor),
+			NewUser("", "john.doe@mailservice.com", "contractor", sponsor),
 			&errorDetails{"Address", "required", ""},
 			false, false,
 		},
 		{"invalid_email",
-			NewUser("0x8ba1f109551bD432803012645Ac136ddd64DBA72", "john.doemailservice.com", "talent", sponsor),
+			NewUser("0x8ba1f109551bD432803012645Ac136ddd64DBA72", "john.doemailservice.com", "contractor", sponsor),
 			&errorDetails{"Email", "email", "john.doemailservice.com"},
 			false, false,
 		},
 		{"missing_email",
-			NewUser("0x8ba1f109551bD432803012645Ac136ddd64DBA72", "", "talent", sponsor),
+			NewUser("0x8ba1f109551bD432803012645Ac136ddd64DBA72", "", "contractor", sponsor),
 			&errorDetails{"Email", "required", ""},
 			false, false,
 		},
 		{"invalid_sponsor",
-			NewUser("0x8ba1f109551bD432803012645Ac136ddd64DBA72", "john.doemail@service.com", "talent", "0x8bz1f109551bD432803012645Ac136ddd64DBA73"),
+			NewUser("0x8ba1f109551bD432803012645Ac136ddd64DBA72", "john.doemail@service.com", "contractor", "0x8bz1f109551bD432803012645Ac136ddd64DBA73"),
 			&errorDetails{"Sponsor", "eth_addr", "0x8bz1f109551bD432803012645Ac136ddd64DBA73"},
 			false, false,
 		},
 		{"missing_sponsor",
-			NewUser("0x8ba1f109551bD432803012645Ac136ddd64DBA72", "john.doemail@service.com", "talent", ""),
+			NewUser("0x8ba1f109551bD432803012645Ac136ddd64DBA72", "john.doemail@service.com", "contractor", ""),
 			&errorDetails{"Sponsor", "required", ""},
 			false, false,
 		},
@@ -154,7 +154,7 @@ func TestNewUser(t *testing.T) {
 func TestMarshalling(t *testing.T) {
 	address := "0x8ba1f109551bD432803012645Ac136ddd64DBA72"
 	email := "john.doe@mailservice.com"
-	utype := "talent"
+	utype := "contractor"
 	u := NewUser(address, email, utype, sponsor)
 	jsonUser, _ := json.Marshal(u)
 	n := 6
@@ -192,7 +192,7 @@ func TestString(t *testing.T) {
 	e1, e2 := "user1@domain.com", "user2@domain.com"
 	id1, id2 := "4a8e9808-563e-4761-a8fa-305fef099a3e", "942a5811-926d-4014-baff-ef707f38407e"
 	tm1, tm2 := 1683907220519, 1683807190432
-	ty1, ty2 := "talent", "initiator"
+	ty1, ty2 := "contractor", "initiator"
 	s1, s2 := "0x095cb719f8f69952599c15af31c80Ccb825E15d4", "0x233F858EaF43AFFE5DDFBD3AD69ACc6f5de6C529"
 
 	tt := []struct {
@@ -203,7 +203,7 @@ func TestString(t *testing.T) {
 		{
 			"valid_user1",
 			&User{a1, e1, id1, int64(tm1), ty1, s1},
-			"{\"address\":\"0xaD51c5ac7612DB8dD1611c6B2e317E4950c40942\",\"email\":\"user1@domain.com\",\"uuid\":\"4a8e9808-563e-4761-a8fa-305fef099a3e\",\"type\":\"talent\",\"sponsor\":\"0x095cb719f8f69952599c15af31c80Ccb825E15d4\",\"timestamp\":\"2023-05-12T18:00:20.519+02:00\"}",
+			"{\"address\":\"0xaD51c5ac7612DB8dD1611c6B2e317E4950c40942\",\"email\":\"user1@domain.com\",\"uuid\":\"4a8e9808-563e-4761-a8fa-305fef099a3e\",\"type\":\"contractor\",\"sponsor\":\"0x095cb719f8f69952599c15af31c80Ccb825E15d4\",\"timestamp\":\"2023-05-12T18:00:20.519+02:00\"}",
 		},
 		{
 			"valid_user2",
@@ -238,12 +238,12 @@ func TestString(t *testing.T) {
 		{
 			"epoch_T0_no_timestamp",
 			&User{a1, e1, id1, 0, ty1, s1},
-			"{\"address\":\"0xaD51c5ac7612DB8dD1611c6B2e317E4950c40942\",\"email\":\"user1@domain.com\",\"uuid\":\"4a8e9808-563e-4761-a8fa-305fef099a3e\",\"type\":\"talent\",\"sponsor\":\"0x095cb719f8f69952599c15af31c80Ccb825E15d4\"}",
+			"{\"address\":\"0xaD51c5ac7612DB8dD1611c6B2e317E4950c40942\",\"email\":\"user1@domain.com\",\"uuid\":\"4a8e9808-563e-4761-a8fa-305fef099a3e\",\"type\":\"contractor\",\"sponsor\":\"0x095cb719f8f69952599c15af31c80Ccb825E15d4\"}",
 		},
 		{
 			"epoch_T0",
 			&User{a1, e1, id1, 0, ty1, s1},
-			"{\"address\":\"0xaD51c5ac7612DB8dD1611c6B2e317E4950c40942\",\"email\":\"user1@domain.com\",\"uuid\":\"4a8e9808-563e-4761-a8fa-305fef099a3e\",\"type\":\"talent\",\"sponsor\":\"0x095cb719f8f69952599c15af31c80Ccb825E15d4\",\"timestamp\":\"1970-01-01T00:00:00.000+00:00\"}",
+			"{\"address\":\"0xaD51c5ac7612DB8dD1611c6B2e317E4950c40942\",\"email\":\"user1@domain.com\",\"uuid\":\"4a8e9808-563e-4761-a8fa-305fef099a3e\",\"type\":\"contractor\",\"sponsor\":\"0x095cb719f8f69952599c15af31c80Ccb825E15d4\",\"timestamp\":\"1970-01-01T00:00:00.000+00:00\"}",
 		},
 	}
 
