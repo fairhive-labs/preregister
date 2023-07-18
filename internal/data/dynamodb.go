@@ -91,7 +91,7 @@ func (db *dynamoDB) Count() (map[string]int, error) {
 	m := map[string]int{
 		"advisor":     0,
 		"agent":       0,
-		"client":      0,
+		"initiator":   0,
 		"contributor": 0,
 		"investor":    0,
 		"mentor":      0,

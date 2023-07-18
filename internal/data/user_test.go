@@ -192,7 +192,7 @@ func TestString(t *testing.T) {
 	e1, e2 := "user1@domain.com", "user2@domain.com"
 	id1, id2 := "4a8e9808-563e-4761-a8fa-305fef099a3e", "942a5811-926d-4014-baff-ef707f38407e"
 	tm1, tm2 := 1683907220519, 1683807190432
-	ty1, ty2 := "talent", "client"
+	ty1, ty2 := "talent", "initiator"
 	s1, s2 := "0x095cb719f8f69952599c15af31c80Ccb825E15d4", "0x233F858EaF43AFFE5DDFBD3AD69ACc6f5de6C529"
 
 	tt := []struct {
@@ -208,27 +208,27 @@ func TestString(t *testing.T) {
 		{
 			"valid_user2",
 			&User{a2, e2, id2, int64(tm2), ty2, s2},
-			"{\"address\":\"0x9C93c71065ea9101F252dE2e0f277437f473ac04\",\"email\":\"user2@domain.com\",\"uuid\":\"942a5811-926d-4014-baff-ef707f38407e\",\"type\":\"client\",\"sponsor\":\"0x233F858EaF43AFFE5DDFBD3AD69ACc6f5de6C529\",\"timestamp\":\"2023-05-11T14:13:10.432+02:00\"}",
+			"{\"address\":\"0x9C93c71065ea9101F252dE2e0f277437f473ac04\",\"email\":\"user2@domain.com\",\"uuid\":\"942a5811-926d-4014-baff-ef707f38407e\",\"type\":\"initiator\",\"sponsor\":\"0x233F858EaF43AFFE5DDFBD3AD69ACc6f5de6C529\",\"timestamp\":\"2023-05-11T14:13:10.432+02:00\"}",
 		},
 		{
 			"empty_address",
 			&User{"", e2, id2, int64(tm2), ty2, s2},
-			"{\"address\":\"\",\"email\":\"user2@domain.com\",\"uuid\":\"942a5811-926d-4014-baff-ef707f38407e\",\"type\":\"client\",\"sponsor\":\"0x233F858EaF43AFFE5DDFBD3AD69ACc6f5de6C529\",\"timestamp\":\"2023-05-11T14:13:10.432+02:00\"}",
+			"{\"address\":\"\",\"email\":\"user2@domain.com\",\"uuid\":\"942a5811-926d-4014-baff-ef707f38407e\",\"type\":\"initiator\",\"sponsor\":\"0x233F858EaF43AFFE5DDFBD3AD69ACc6f5de6C529\",\"timestamp\":\"2023-05-11T14:13:10.432+02:00\"}",
 		},
 		{
 			"empty_address_empty_sponsor",
 			&User{"", e2, id2, int64(tm2), ty2, ""},
-			"{\"address\":\"\",\"email\":\"user2@domain.com\",\"uuid\":\"942a5811-926d-4014-baff-ef707f38407e\",\"type\":\"client\",\"sponsor\":\"\",\"timestamp\":\"2023-05-11T14:13:10.432+02:00\"}",
+			"{\"address\":\"\",\"email\":\"user2@domain.com\",\"uuid\":\"942a5811-926d-4014-baff-ef707f38407e\",\"type\":\"initiator\",\"sponsor\":\"\",\"timestamp\":\"2023-05-11T14:13:10.432+02:00\"}",
 		},
 		{
 			"no_email",
 			&User{a2, "", id2, int64(tm2), ty2, s2},
-			"{\"address\":\"0x9C93c71065ea9101F252dE2e0f277437f473ac04\",\"uuid\":\"942a5811-926d-4014-baff-ef707f38407e\",\"type\":\"client\",\"sponsor\":\"0x233F858EaF43AFFE5DDFBD3AD69ACc6f5de6C529\",\"timestamp\":\"2023-05-11T14:13:10.432+02:00\"}",
+			"{\"address\":\"0x9C93c71065ea9101F252dE2e0f277437f473ac04\",\"uuid\":\"942a5811-926d-4014-baff-ef707f38407e\",\"type\":\"initiator\",\"sponsor\":\"0x233F858EaF43AFFE5DDFBD3AD69ACc6f5de6C529\",\"timestamp\":\"2023-05-11T14:13:10.432+02:00\"}",
 		},
 		{
 			"no_uuid",
 			&User{a2, e2, "", int64(tm2), ty2, s2},
-			"{\"address\":\"0x9C93c71065ea9101F252dE2e0f277437f473ac04\",\"email\":\"user2@domain.com\",\"type\":\"client\",\"sponsor\":\"0x233F858EaF43AFFE5DDFBD3AD69ACc6f5de6C529\",\"timestamp\":\"2023-05-11T14:13:10.432+02:00\"}",
+			"{\"address\":\"0x9C93c71065ea9101F252dE2e0f277437f473ac04\",\"email\":\"user2@domain.com\",\"type\":\"initiator\",\"sponsor\":\"0x233F858EaF43AFFE5DDFBD3AD69ACc6f5de6C529\",\"timestamp\":\"2023-05-11T14:13:10.432+02:00\"}",
 		},
 		{
 			"no_uuid_no_type",
