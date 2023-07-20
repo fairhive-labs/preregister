@@ -19,11 +19,11 @@ var (
 	UsersMapMock = map[string]int{
 		"advisor":     1,
 		"agent":       5,
-		"client":      7,
+		"initiator":   7,
 		"contributor": 0,
 		"investor":    10,
 		"mentor":      5,
-		"talent":      31,
+		"contractor":  31,
 	}
 	UsersCountMock = 0
 )

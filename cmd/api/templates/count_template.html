@@ -48,7 +48,7 @@
             color: #ffe864 !important;
         }
 
-        .client {
+        .initiator {
             color: #f36b6b !important;
         }
 
@@ -56,7 +56,7 @@
             color: #a9c2f0 !important;
         }
 
-        .talent {
+        .contractor {
             color: #ffbe96 !important;
         }
 
@@ -86,7 +86,7 @@
             </thead>
             <tbody>
                 {{range $type,$count := .users}}<tr>
-                    {{ if or (eq $type "agent") (eq $type "client") (eq $type "mentor") (eq $type "talent")}}
+                    {{ if or (eq $type "agent") (eq $type "initiator") (eq $type "mentor") (eq $type "contractor")}}
                     <td class="{{$type}}">{{$type}}</td>{{else}}<td>{{$type}}</td>{{end}}<td class="count">{{$count}}</td>
                 </tr>
                 {{end}}

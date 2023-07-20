@@ -94,7 +94,7 @@ func TestSave(t *testing.T) {
 
 	address := "0x8ba1f109551bD432803012645Ac136ddd64DBA72"
 	email := "john.doe@mailservice.com"
-	utype := "talent"
+	utype := "contractor"
 	u = &User{
 		Address: address,
 		Email:   email,
@@ -137,8 +137,8 @@ func TestCount(t *testing.T) {
 		t.Errorf("cannot count users: %v", err)
 		t.FailNow()
 	}
-	if mc["talent"] == 0 {
-		t.Errorf("incorrect talent count: must be greater than 0")
+	if mc["contractor"] == 0 {
+		t.Errorf("incorrect contractor count: must be greater than 0")
 		t.FailNow()
 	}
 }
@@ -167,7 +167,7 @@ func TestList(t *testing.T) {
 			fmt.Printf("%0.2d - %s\n", i+1, u)
 			if u.Address == "0x8ba1f109551bD432803012645Ac136ddd64DBA72" &&
 				u.Email == "john.doe@mailservice.com" &&
-				u.Type == "talent" {
+				u.Type == "contractor" {
 				johndoe = u
 			}
 		}
