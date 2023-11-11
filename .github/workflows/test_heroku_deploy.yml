@@ -6,7 +6,7 @@ on:
     branches:
       - main
   schedule: 
-    - cron: "0 5 * * 1" # Every Monday at 5:00am UTC 
+    - cron: "0 6 * * 1" # Every Monday at 6:00am UTC 
 
 name: Test & Heroku Deployment
 jobs:
