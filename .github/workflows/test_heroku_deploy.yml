@@ -8,15 +8,14 @@ on:
       - main
   schedule: 
     - cron: "0 6 * * 1" # Every Monday at 6:00am UTC 
-env:
-  FAIRHIVE_API_SECURE_PATH1: "foo"
-  FAIRHIVE_API_SECURE_PATH2: "bar"
 jobs:
   test:
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_REGION: ${{ secrets.AWS_REGION }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      FAIRHIVE_API_SECURE_PATH1: "foo"
+      FAIRHIVE_API_SECURE_PATH2: "bar"
       FAIRHIVE_ENCRYPTION_KEY: ${{ secrets.FAIRHIVE_ENCRYPTION_KEY }}
       FAIRHIVE_GSUITE_PASSWORD: ${{ secrets.FAIRHIVE_GSUITE_PASSWORD }}
       FAIRHIVE_GSUITE_USER: ${{ secrets.FAIRHIVE_GSUITE_USER }}
@@ -59,11 +58,6 @@ jobs:
     needs: test
     if: github.ref == 'refs/heads/main'
     steps:
-      # override default secure path
-      - name: Generate Secured Path
-        run: |
-          echo "FAIRHIVE_API_SECURE_PATH1=$(uuidgen)" >> $GITHUB_ENV
-          echo "FAIRHIVE_API_SECURE_PATH2=$(uuidgen)" >> $GITHUB_ENV
       - uses: actions/checkout@v4
       - uses: akhileshns/heroku-deploy@v3.13.15
         with:
@@ -78,8 +72,8 @@ jobs:
           HD_AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
           HD_AWS_REGION: ${{ secrets.AWS_REGION }}
           HD_AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          HD_FAIRHIVE_API_SECURE_PATH1: ${{ env.FAIRHIVE_API_SECURE_PATH1 }}
-          HD_FAIRHIVE_API_SECURE_PATH2: ${{ env.FAIRHIVE_API_SECURE_PATH2 }}
+          HD_FAIRHIVE_API_SECURE_PATH1: ${{ secrets.FAIRHIVE_API_SECURE_PATH1 }}
+          HD_FAIRHIVE_API_SECURE_PATH2: ${{ secrets.FAIRHIVE_API_SECURE_PATH2 }}
           HD_FAIRHIVE_ENCRYPTION_KEY: ${{ secrets.FAIRHIVE_ENCRYPTION_KEY }}
           HD_FAIRHIVE_GSUITE_PASSWORD: ${{ secrets.FAIRHIVE_GSUITE_PASSWORD }}
           HD_FAIRHIVE_GSUITE_USER: ${{ secrets.FAIRHIVE_GSUITE_USER }}
@@ -92,6 +86,6 @@ jobs:
           SLACK_CHANNEL: _github
           SLACK_COLOR: ${{ job.status }}
           SLACK_TITLE: Heroku Deployment - preregister/waitlist
-          SLACK_MESSAGE: "<http://poln.org/admin/${{ env.FAIRHIVE_API_SECURE_PATH1 }}/${{ env.FAIRHIVE_API_SECURE_PATH2 }}/users|Users details>"
-          SLACK_FOOTER: "<https://polar-plains-98105.herokuapp.com/${{ env.FAIRHIVE_API_SECURE_PATH1 }}/${{ env.FAIRHIVE_API_SECURE_PATH2 }}/list?mime=csv| Users list - CSV>"
+          SLACK_MESSAGE: "<http://poln.org/admin/${{ secrets.FAIRHIVE_API_SECURE_PATH1 }}/${{ secrets.FAIRHIVE_API_SECURE_PATH2 }}/users|Users details>"
+          SLACK_FOOTER: "<https://polar-plains-98105.herokuapp.com/${{ secrets.FAIRHIVE_API_SECURE_PATH1 }}/${{ secrets.FAIRHIVE_API_SECURE_PATH2 }}/list?mime=csv| Users list - CSV>"
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
