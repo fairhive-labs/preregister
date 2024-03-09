@@ -39,11 +39,11 @@ jobs:
       - name: Get coverage report
         run: go test -coverprofile=coverage.out ./...
       - name: Convert coverage report (HTML)
-        run: go tool cover -html=coverage.out -o coverage_go${{ matrix.go-version }}_${{ matrix.os }}.html
+        run: go tool cover -html=coverage.out -o coverage_go_${{ matrix.go-version }}_${{ matrix.os }}.html
       - name: Archive code coverage
         uses: actions/upload-artifact@v4
         with:
-          name: code-coverage
+          name: code-coverage_${{ matrix.go-version }}_${{ matrix.os }}
           path: ./coverage*.html
           retention-days: 30
       - name: Upload coverage to Codecov
