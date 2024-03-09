@@ -45,6 +45,7 @@ jobs:
         with:
           name: code-coverage_${{ matrix.go-version }}_${{ matrix.os }}
           path: ./coverage*.html
+          compression-level: 9
           retention-days: 30
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
